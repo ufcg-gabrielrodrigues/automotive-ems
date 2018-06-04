@@ -39,6 +39,10 @@ AlternatorParametersEMS;
 matlabFunctionBlock('AutomotiveEMS/Back EMF (abc reference)/backEMF', ...
     sym(alternator.e_a), 'FunctionName', 'backEMF', 'Outputs', {'e_a'});
 
+% 
+matlabFunctionBlock('AutomotiveEMS/Stator Inductance (abc reference)/statorInductance', ...
+    sym(alternator.stator.l), 'FunctionName', 'statorInductance', 'Outputs', {'l_s'});
+
 %% 
 
 iceToAltRotRatio = 2.5;
