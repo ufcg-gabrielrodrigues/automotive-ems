@@ -33,7 +33,7 @@ if (alternatorFittingFlag)
     alternator.l_af = @(i_f) openCircuitVoltage(i_f)./(sqrt(3).*i_f);           % Indutância mútua entre estator e rotor [H]
     alternator.n = n;                                                           % Número de fases
     alternator.p = p;                                                           % Número de pares de polos
-    alternator.rotor.l = 0;                                                     % Indutância própria do circuito de excitação [H]
+    alternator.rotor.l = 0.2;                                               	% Indutância própria do circuito de excitação [H]
     alternator.rotor.r_b = 0.1;                                                 % Resistência de contatos do circuito de excitação [Ohm]
     alternator.rotor.r_f = r_f;                                                 % Resistência do circuito de excitação a 20oC [Ohm]
     alternator.rotor.control.pwm.f_s = 10e+3;                                   % Frequência de chaveamento do PWM de controle do circuito de excitação [Hz]

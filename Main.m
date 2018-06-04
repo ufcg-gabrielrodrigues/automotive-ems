@@ -26,7 +26,7 @@ ice.speed = 2000;       % Velocidade de rotação [rpm]
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = true;
+alternatorFittingFlag = false;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -42,6 +42,10 @@ matlabFunctionBlock('AutomotiveEMS/Back EMF (abc reference)/backEMF', ...
 %% 
 
 iceToAltRotRatio = 2.5;
+
+%% 
+
+T_s = 1e-6;
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB
