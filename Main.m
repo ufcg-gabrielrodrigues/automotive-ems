@@ -36,11 +36,11 @@ AlternatorParametersEMS;
 
 % Atribui modelo parametrizado da FEM induzida por fase ao bloco
 % responsável pelo seu cálculo no ambiente do Simulink
-matlabFunctionBlock('AutomotiveEMS/Back EMF (abc reference)/backEMF', ...
+matlabFunctionBlock('AutomotiveEMS/Alternator/Back EMF (abc reference)/backEMF', ...
     sym(alternator.e_a), 'FunctionName', 'backEMF', 'Outputs', {'e_a'});
 
 % 
-matlabFunctionBlock('AutomotiveEMS/Stator Inductance (abc reference)/statorInductance', ...
+matlabFunctionBlock('AutomotiveEMS/Alternator/Stator Inductance (abc reference)/statorInductance', ...
     sym(alternator.stator.l), 'FunctionName', 'statorInductance', 'Outputs', {'l_s'});
 
 %% 
