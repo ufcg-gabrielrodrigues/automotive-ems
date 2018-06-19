@@ -2,7 +2,7 @@
 
 %% Preparação de ambiente para simulação
 
-clearvars;
+clear all;
 close all;
 clc;
 
