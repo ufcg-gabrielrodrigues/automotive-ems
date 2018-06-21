@@ -18,6 +18,10 @@ root = genpath(root);
 % Inclusão do diretório aos caminhos de busca do MATLAB
 addpath(root);
 
+%% Inicializa modelo no Simulink
+
+open_system('AutomotiveEMS.slx');
+
 %% Motor a combustão interna
 
 ice.speed = 2000;       % Velocidade de rotação [rpm]
