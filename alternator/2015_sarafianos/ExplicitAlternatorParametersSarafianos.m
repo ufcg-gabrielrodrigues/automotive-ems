@@ -14,7 +14,7 @@ end
 %% Características explícitas do alternador utilizado
 
 n = 3;          % Número de fases
-p = 8;          % Número de pares de polos
+p = 8;          % Número de pares de polos por fase
 s = 48;         % Número de ranhuras no estator
 r_a = 0.03;     % Resistência de estator (por fase) a 20 oC
 r_f = 1.90;     % Resistência de rotor a 20 oC

@@ -27,12 +27,11 @@ if (alternatorFittingFlag)
     
     %% Registro de parâmetros definidos em estrutura que representa o alternador
     
-    alternator.e_a = @(omega_r, i_f) omega_r.*openCircuitVoltage(i_f)./sqrt(3); % Tensão induzida por fase pelo circuito de excitação [V]
+    alternator.e_a = @(omega_r, i_f) omega_r.*openCircuitVoltage(i_f);          % Tensão induzida por fase pelo circuito de excitação [V]
     alternator.frictionWindageLosses = frictionWindageLosses;                   % Perdas por atrito e enrolamento [W]
     alternator.ironLoss = @(omega_r, i_f) omega_r.*ironLoss(i_f);               % Perdas no ferro [W]
-    alternator.l_af = @(i_f) openCircuitVoltage(i_f)./(sqrt(3).*i_f);           % Indutância mútua entre estator e rotor [H]
     alternator.n = n;                                                           % Número de fases
-    alternator.p = p;                                                           % Número de pares de polos
+    alternator.p = p;                                                           % Número de pares de polos por fase
     alternator.rotor.l = 0.2;                                               	% Indutância própria do circuito de excitação [H]
     alternator.rotor.r_b = 0.1;                                                 % Resistência de contatos do circuito de excitação [Ohm]
     alternator.rotor.r_f = r_f;                                                 % Resistência do circuito de excitação a 20oC [Ohm]
