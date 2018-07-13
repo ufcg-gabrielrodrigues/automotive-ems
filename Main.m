@@ -47,6 +47,11 @@ matlabFunctionBlock('AutomotiveEMS/Alternator/Back EMF (abc reference)/backEMF',
 matlabFunctionBlock('AutomotiveEMS/Alternator/Stator Inductance (abc reference)/statorInductance', ...
     sym(alternator.stator.l), 'FunctionName', 'statorInductance', 'Outputs', {'l_s'});
 
+%% Retificador
+
+% 
+RectifierParametersEMS;
+
 %% 
 
 iceToAltRotRatio = 2.5;
