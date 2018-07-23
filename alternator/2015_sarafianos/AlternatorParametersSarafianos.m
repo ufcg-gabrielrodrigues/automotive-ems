@@ -27,21 +27,21 @@ if (alternatorFittingFlag)
     
     %% Registro de parâmetros definidos em estrutura que representa o alternador
     
-    alternator.e_a = @(omega_r, i_f) omega_r.*openCircuitVoltage(i_f);          % Tensão induzida por fase pelo circuito de excitação [V]
     alternator.frictionWindageLosses = frictionWindageLosses;                   % Perdas por atrito e enrolamento [W]
     alternator.ironLoss = @(omega_r, i_f) omega_r.*ironLoss(i_f);               % Perdas no ferro [W]
     alternator.n = n;                                                           % Número de fases
     alternator.p = p;                                                           % Número de pares de polos por fase
-    alternator.rotor.l = 0.2;                                               	% Indutância própria do circuito de excitação [H]
-    alternator.rotor.r_b = 0.1;                                                 % Resistência de contatos do circuito de excitação [Ohm]
-    alternator.rotor.r_f = r_f;                                                 % Resistência do circuito de excitação a 20oC [Ohm]
+    alternator.rotor.l.value = 0.2;                                             % Indutância própria do circuito de excitação [H]
+    alternator.rotor.r.value = r_f;                                             % Resistência do circuito de excitação a 20oC [Ohm]
     alternator.rotor.control.pwm.f_s = 10e+3;                                   % Frequência de chaveamento do PWM de controle do circuito de excitação [Hz]
     alternator.rotor.control.pwm.v_clear = 0;                                   % Tensão de 'clear' do PWM de controle do circuito de excitação [V]
     alternator.rotor.control.pwm.v_set = 5;                                     % Tensão de 'set' do PWM de controle do circuito de excitação [V]
     alternator.rotor.control.pwm.v_out = 15;                                    % Tensão de saída do driver do PWM de controle do circuito de excitação [V]
-    alternator.s = s;                                                           % Número de ranhuras no estator
-    alternator.stator.l = inductance;                                           % Indutância própria por fase do circuito de armadura [H]
-    alternator.stator.r = r_a;                                                  % Resistência por fase do circuito de armadura a 20oC [Ohm]
+    alternator.stator.slots = slots;                                            % Número de ranhuras no estator
+    alternator.stator.e.function = @(omega_r, i_f) ...
+        omega_r.*openCircuitVoltage(i_f);                                       % Tensão induzida por fase pelo circuito de excitação [V]
+    alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
+    alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura a 20oC [Ohm]
     
     %% Registro da estrutura que representa o alternador em arquivos .MAT
     

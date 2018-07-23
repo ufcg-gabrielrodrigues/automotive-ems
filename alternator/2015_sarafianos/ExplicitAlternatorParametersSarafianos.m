@@ -15,7 +15,7 @@ end
 
 n = 3;          % Número de fases
 p = 8;          % Número de pares de polos por fase
-s = 48;         % Número de ranhuras no estator
+slots = 48;     % Número de ranhuras no estator
 r_a = 0.03;     % Resistência de estator (por fase) a 20 oC
 r_f = 1.90;     % Resistência de rotor a 20 oC
 v_o = 13.5;     % Tensão de saída (CC)
@@ -33,7 +33,7 @@ explicitAlternatorCharacteristics = strcat(currentFolder, ...
     '/explicitAlternatorCharacteristics.mat');
 
 % Registro das características no destino previamente especificado
-save(explicitAlternatorCharacteristics, 'n', 'p', 's', 'r_a', 'r_f', 'v_o', ...
+save(explicitAlternatorCharacteristics, 'n', 'p', 'slots', 'r_a', 'r_f', 'v_o', ...
     'i_max_2k', 'i_max_4k', 'i_max_6k');
 
 %% Exclusão das variáveis excedentes
