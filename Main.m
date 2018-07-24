@@ -119,8 +119,8 @@ clear ans;
 
 %% 
 
-save('results/alternator.mat', 'alternator');
-save('results/rectifier.mat', 'rectifier');
+save('results/alternator.mat', 'alternator', '-v7.3');
+save('results/rectifier.mat', 'rectifier', '-v7.3');
 
 %% Finaliza modelo no Simulink
 
