@@ -38,7 +38,7 @@ if (alternatorFittingFlag)
     alternator.rotor.control.pwm.v_set = 5;                                     % Tensão de 'set' do PWM de controle do circuito de excitação [V]
     alternator.rotor.control.pwm.v_out = 15;                                    % Tensão de saída do driver do PWM de controle do circuito de excitação [V]
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
-    alternator.stator.e.function = @(omega_r, i_f) ...
+    alternator.stator.input.e.function = @(omega_r, i_f) ...
         omega_r.*openCircuitVoltage(i_f);                                       % Tensão induzida por fase pelo circuito de excitação [V]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura a 20oC [Ohm]
