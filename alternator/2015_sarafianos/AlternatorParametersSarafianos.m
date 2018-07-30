@@ -28,8 +28,7 @@ if (alternatorFittingFlag)
     %% Registro de parâmetros definidos em estrutura que representa o alternador
     
     alternator.frictionWindageLosses = frictionWindageLosses;                   % Perdas por atrito e enrolamento [W]
-    alternator.ironLoss = extFunctionHandle(@(omega_r, i_f) ...
-        omega_r.*ironLoss(i_f));                                                % Perdas no ferro [W]
+    alternator.ironLoss = extFunctionHandle(@(n_r, i_f) n_r.*ironLoss(i_f));    % Perdas no ferro [W]
     alternator.n = n;                                                           % Número de fases
     alternator.p = p;                                                           % Número de pares de polos por fase
     alternator.rotor.l.value = 0.2;                                             % Indutância própria do circuito de excitação [H]
@@ -39,8 +38,8 @@ if (alternatorFittingFlag)
     alternator.rotor.control.pwm.v_set = 5;                                     % Tensão de 'set' do PWM de controle do circuito de excitação [V]
     alternator.rotor.control.pwm.v_out = 15;                                    % Tensão de saída do driver do PWM de controle do circuito de excitação [V]
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
-    alternator.stator.input.e.function = extFunctionHandle(@(omega_r, i_f) ...
-        omega_r.*openCircuitVoltage(i_f));                                      % Tensão induzida por fase pelo circuito de excitação [V]
+    alternator.stator.input.e.function = extFunctionHandle(@(n_r, i_f) ...
+        n_r.*openCircuitVoltage(i_f));                                          % Tensão induzida por fase pelo circuito de excitação [V]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura a 20oC [Ohm]
     
