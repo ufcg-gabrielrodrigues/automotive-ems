@@ -38,14 +38,13 @@ alternatorCase = 'Sarafianos2015';
 % Executa script que determina parâmetros do alternador
 AlternatorParametersEMS;
 
-% Atribui modelo parametrizado da FEM induzida por fase ao bloco
-% responsável pelo seu cálculo no ambiente do Simulink
-matlabFunctionBlock('AutomotiveEMS/Alternator/Back EMF (abc reference)/backEMF', ...
-    sym(alternator.stator.input.e.function), 'FunctionName', 'backEMF', 'outputs', {'e_a'});
+% 
+e_a_str = regexprep(func2str(alternator.stator.input.e.function), '@\(.+?\)', '');
+replaceFileExpression('+SimscapeCustomBlocks/back_emf.ssc', 'e == 0', ['e == ' e_a_str]);
 
 % 
-matlabFunctionBlock('AutomotiveEMS/Alternator/Stator Inductance (abc reference)/statorInductance', ...
-    sym(alternator.stator.l.function), 'FunctionName', 'statorInductance', 'outputs', {'l_s'});
+l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+replaceFileExpression('+SimscapeCustomBlocks/stator_inductance.ssc', 'l == 1e-6', ['l == ' l_a_str]);
 
 %% Retificador
 
@@ -56,25 +55,22 @@ RectifierParametersEMS;
 
 iceToAltRotRatio = 2.5;
 
-%% Salva simulação com últimas alterações
-
-save_system('AutomotiveEMS.slx');
-
 %% 
 
 t = 1e+1;           % [s]
-solver = 'ode15s';  % 
 
 %% 
 
 simulationParameters.StopTime   = num2str(t);
-simulationParameters.Solver     = solver;
 
 %% 
 
 sim('AutomotiveEMS', simulationParameters);
 
 %% 
+
+% Motor a combustão interna
+ice.n = ans.n_ice;
 
 % Alternador
 alternator.rotor.control.q = ans.q_s_f;
@@ -125,6 +121,14 @@ save('results/rectifier.mat', 'rectifier', '-v7.3');
 %% Finaliza modelo no Simulink
 
 close_system('AutomotiveEMS.slx');
+
+%% 
+
+% 
+replaceFileExpression('+SimscapeCustomBlocks/back_emf.ssc', ['e == ' e_a_str], 'e == 0');
+
+%
+replaceFileExpression('+SimscapeCustomBlocks/stator_inductance.ssc', ['l == ' l_a_str], 'l == 1e-6');
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB
