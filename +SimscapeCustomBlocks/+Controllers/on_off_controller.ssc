@@ -1,0 +1,24 @@
+component on_off_controller
+    % On-Off Controller
+    % Description.
+    
+    inputs
+        setpoint = 0;   % Setpoint:left
+        reading = 0;    % Reading:left
+    end
+    outputs
+        q = 0;          % Output:right
+    end
+    variables
+        error = 0;      % 
+    end
+    equations
+        error == setpoint - reading;
+        
+        if (error > 0)
+            q == 1;
+        else
+            q == 0;
+        end
+    end
+end
