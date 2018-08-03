@@ -30,7 +30,7 @@ open_system('AutomotiveEMS.slx', 'loadonly');
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = false;
+alternatorFittingFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -57,19 +57,23 @@ RectifierParametersEMS;
 
 iceToAltRotRatio = 2.5;
 
-%% 
+%% Parâmetros de simulação
 
-t = 1e+1;           % [s]
+% Parâmetros do 'solver' local para sistemas físicos
+set_param('AutomotiveEMS/Solver Configuration', 'UseLocalSolver', 'on');
+set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverChoice', 'NE_BACKWARD_EULER_ADVANCER');
+set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverSampleTime', '1e-5');
+set_param('AutomotiveEMS/Solver Configuration', 'DoFixedCost', 'on');
+set_param('AutomotiveEMS/Solver Configuration', 'MaxNonlinIter', '10');
 
-%% 
+% Parâmetros do 'solver' global
+simulationParameters.StopTime = '1e+1'; % [s]
 
-simulationParameters.StopTime   = num2str(t);
-
-%% 
+%% Execução da simulação em ambiente Simulink
 
 sim('AutomotiveEMS', simulationParameters);
 
-%% 
+%% Registro de resultados obtidos na simulação
 
 % Motor a combustão interna
 ice.n = ans.n_ice;
@@ -79,8 +83,8 @@ alternator.rotor.control.q = ans.q_s_f;
 alternator.rotor.l.i = ans.i_f;
 
 alternator.stator.input.e.value = ans.e_a_abc;
-alternator.stator.l.value = ans.l_a_abc;
 alternator.stator.output.v = ans.v_a_abc;
+alternator.stator.output.i = ans.i_a_abc;
 
 % Retificador
 rectifier.output.v = timeseries(ans.rectifier_output.Data(:, 1), ans.rectifier_output.Time);
@@ -89,7 +93,7 @@ rectifier.output.i = timeseries(ans.rectifier_output.Data(:, 2), ans.rectifier_o
 % 
 clear ans;
 
-%% 
+%% Armazenamento dos resultados de simulação
 
 save('results/alternator.mat', 'alternator', '-v7.3');
 save('results/rectifier.mat', 'rectifier', '-v7.3');
