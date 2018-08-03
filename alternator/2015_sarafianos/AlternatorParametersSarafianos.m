@@ -33,10 +33,8 @@ if (alternatorFittingFlag)
     alternator.p = p;                                                           % Número de pares de polos por fase
     alternator.rotor.l.value = 0.2;                                             % Indutância própria do circuito de excitação [H]
     alternator.rotor.r.value = r_f;                                             % Resistência do circuito de excitação a 20oC [Ohm]
+    alternator.rotor.s.v_gs_on = 10;                                            % Tensão gate-source para acionamento do MOSFET do circuito de excitação [V]
     alternator.rotor.control.pwm.f_s = 10e+3;                                   % Frequência de chaveamento do PWM de controle do circuito de excitação [Hz]
-    alternator.rotor.control.pwm.v_clear = 0;                                   % Tensão de 'clear' do PWM de controle do circuito de excitação [V]
-    alternator.rotor.control.pwm.v_set = 5;                                     % Tensão de 'set' do PWM de controle do circuito de excitação [V]
-    alternator.rotor.control.pwm.v_out = 15;                                    % Tensão de saída do driver do PWM de controle do circuito de excitação [V]
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
     alternator.stator.input.e.function = extFunctionHandle(@(n_r, i_f) ...
         n_r.*openCircuitVoltage(i_f));                                          % Tensão induzida por fase pelo circuito de excitação [V]

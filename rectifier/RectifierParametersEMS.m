@@ -10,12 +10,13 @@ else
     previousVars{1} = who;
 end
 
+%% Parâmetros de circuito
+
+rectifier.s.v_gs_on = 10;           % Tensão gate-source para acionamento dos MOSFETs do circuito retificador [V]
+
 %% Parâmetros de controle
 
-rectifier.control.pwm.f_s = 10e+3;  % Frequência de chaveamento dos PWMs de controle do circuito de retificador [Hz]
-rectifier.control.pwm.v_clear = 0;  % Tensão de 'clear' dos PWMs de controle do circuito de retificador [V]
-rectifier.control.pwm.v_set = 5;    % Tensão de 'set' dos PWMs de controle do circuito de retificador [V]
-rectifier.control.pwm.v_out = 15;   % Tensão de saída do driver dos PWMs de controle do circuito de retificador [V]
+rectifier.control.pwm.f_s = 10e+3;  % Frequência de chaveamento dos PWMs de controle do circuito retificador [Hz]
 
 %% Exclusão das variáveis excedentes
 
