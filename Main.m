@@ -30,7 +30,7 @@ open_system('AutomotiveEMS.slx', 'loadonly');
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = true;
+alternatorFittingFlag = false;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -89,6 +89,9 @@ alternator.stator.output.i = ans.i_a_abc;
 % Retificador
 rectifier.output.v = timeseries(ans.rectifier_output.Data(:, 1), ans.rectifier_output.Time);
 rectifier.output.i = timeseries(ans.rectifier_output.Data(:, 2), ans.rectifier_output.Time);
+
+% Bateria
+battery.v = ans.v_b;
 
 % 
 clear ans;
