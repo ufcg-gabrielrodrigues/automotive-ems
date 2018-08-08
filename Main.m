@@ -39,6 +39,11 @@ alternatorCase = 'Sarafianos2015';
 AlternatorParametersEMS;
 
 % 
+k_v_str = regexprep(func2str(alternator.k_v), '@\(.+?\)', '');
+replaceFileExpression('+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
+    'k_v == 0', ['k_v == ' k_v_str]);
+
+% 
 e_a_str = regexprep(func2str(alternator.stator.input.e.function), '@\(.+?\)', '');
 replaceFileExpression('+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
     'e == 0', ['e == ' e_a_str]);
@@ -106,6 +111,10 @@ save('results/rectifier.mat', 'rectifier', '-v7.3');
 close_system('AutomotiveEMS.slx');
 
 %% 
+
+% 
+replaceFileExpression('+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
+    ['k_v == ' k_v_str], 'k_v == 0');
 
 % 
 replaceFileExpression('+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...

@@ -40,6 +40,8 @@ if (alternatorFittingFlag)
         n_r.*openCircuitVoltage(i_f));                                          % Tensão induzida por fase pelo circuito de excitação [V]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura a 20oC [Ohm]
+    alternator.k_v = extFunctionHandle(@(i_f) ...
+        (openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));                      % 
     
     %% Registro da estrutura que representa o alternador em arquivos .MAT
     
