@@ -1,5 +1,6 @@
 # 
 slprj/
+sscprj/
 
 # Ignore Mac OS X file that stores custom attributes of its containing folder
 .DS_Store
