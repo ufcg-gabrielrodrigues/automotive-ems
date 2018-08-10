@@ -30,7 +30,7 @@ open_system('AutomotiveEMS.slx', 'loadonly');
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = false;
+alternatorFittingFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -84,7 +84,7 @@ sim('AutomotiveEMS', simulationParameters);
 ice.n = ans.n_ice;
 
 % Alternador
-alternator.rotor.control.q = ans.q_s_f;
+alternator.rotor.control.u = ans.u_i_f;
 alternator.rotor.l.i = ans.i_f;
 
 alternator.stator.input.e.value = ans.e_a_abc;
@@ -92,6 +92,7 @@ alternator.stator.output.v = ans.v_a_abc;
 alternator.stator.output.i = ans.i_a_abc;
 
 % Retificador
+rectifier.control.u = ans.u_v_r;
 rectifier.output.v = timeseries(ans.rectifier_output.Data(:, 1), ans.rectifier_output.Time);
 rectifier.output.i = timeseries(ans.rectifier_output.Data(:, 2), ans.rectifier_output.Time);
 

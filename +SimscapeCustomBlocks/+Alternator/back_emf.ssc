@@ -32,7 +32,7 @@ component back_emf
     equations
         omega_r == n_r*2*pi/60;
         theta_r == integ(omega_r);
-        omega_a == 2*pi*(p*n_r/60);
+        omega_a == p*omega_r;
         e == 0;
         e_a == e*cos(omega_a*time + theta_r)*{1, 'V/rpm'};
         e_b == e*cos(omega_a*time + theta_r + 2*pi/3)*{1, 'V/rpm'};

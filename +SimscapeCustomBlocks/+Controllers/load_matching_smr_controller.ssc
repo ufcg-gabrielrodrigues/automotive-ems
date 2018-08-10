@@ -7,18 +7,21 @@ component load_matching_smr_controller
         i_f = 0;        % i_f [A]:left
     end
     outputs
-        d = 0;          % d:right
+        u = 0;          % u:right
     end
     parameters
+        p = 1;          % Pole-pairs
         v_o = 14;       % Output voltage
     end
     variables
         k_v = 0;
         omega_r = 0;
+        omega_a = 0;
     end
     equations
         k_v == 0;
         omega_r == 2*pi*n_r/60;
-        d == ((sqrt(2)*pi*k_v)/(4*v_o))*omega_r*i_f;
+        omega_a == p*omega_r;
+        u == 1 - ((sqrt(2)*pi*k_v)/(4*v_o))*omega_a*i_f;
     end
 end
