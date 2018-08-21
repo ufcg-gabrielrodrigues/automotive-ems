@@ -12,7 +12,7 @@ component load_matching_smr_controller
     parameters
         p = 1;          % Pole-pairs
         v_o = 14;       % Output voltage
-        u_lim_u = 0.7;  % Control signal upper limit
+        u_lim_u = 1.0;  % Control signal upper limit
         u_lim_l = 0.0;  % Control signal lower limit
     end
     variables
@@ -22,10 +22,11 @@ component load_matching_smr_controller
         u_tmp = 0;
     end
     equations
-        k_v == 0;
+        k_v == (i_f.*5.675385693185443e-3+i_f.^2.*3.869613708864798e-5-i_f.^3.*3.190181256805497e-4+i_f.^4.*3.766242573326611e-5-9.565291657294457e-5)./i_f;
         omega_r == 2*pi*n_r/60;
         omega_a == p*omega_r;
-        u_tmp == 1 - ((sqrt(2)*pi*k_v)/(4*v_o))*omega_a*i_f;
+%         u_tmp == 1 - ((sqrt(2)*pi*k_v)/(4*v_o))*omega_a*i_f;
+        u_tmp == 1 - ((3*sqrt(3)/pi)*(k_v*omega_a*i_f)/v_o);
         
         if (u_tmp > u_lim_u)
             u == u_lim_u;

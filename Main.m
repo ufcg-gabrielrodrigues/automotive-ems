@@ -30,7 +30,7 @@ open_system('AutomotiveEMS.slx', 'loadonly');
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = true;
+alternatorFittingFlag = false;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -65,14 +65,15 @@ iceToAltRotRatio = 2.5;
 %% Parâmetros de simulação
 
 % Parâmetros do 'solver' local para sistemas físicos
+T_s = 1e-6;
 set_param('AutomotiveEMS/Solver Configuration', 'UseLocalSolver', 'on');
-set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverChoice', 'NE_BACKWARD_EULER_ADVANCER');
-set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverSampleTime', '1e-5');
+set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
+set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
 set_param('AutomotiveEMS/Solver Configuration', 'DoFixedCost', 'on');
-set_param('AutomotiveEMS/Solver Configuration', 'MaxNonlinIter', '10');
+set_param('AutomotiveEMS/Solver Configuration', 'MaxNonlinIter', '20');
 
 % Parâmetros do 'solver' global
-simulationParameters.StopTime = '1e+1'; % [s]
+simulationParameters.StopTime = '3e+0'; % [s]
 
 %% Execução da simulação em ambiente Simulink
 
