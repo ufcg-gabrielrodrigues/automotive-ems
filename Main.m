@@ -108,8 +108,9 @@ clear ans;
 save('results/alternator.mat', 'alternator', '-v7.3');
 save('results/rectifier.mat', 'rectifier', '-v7.3');
 
-%% Finaliza modelo no Simulink
+%% Salva e finaliza modelo no Simulink
 
+save_system('AutomotiveEMS.slx');
 close_system('AutomotiveEMS.slx');
 
 %% 
