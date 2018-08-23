@@ -60,6 +60,7 @@ RectifierParametersEMS;
 
 %% 
 
+n_ice_option = 1;
 iceToAltRotRatio = 2.5;
 
 %% Parâmetros de simulação
@@ -105,8 +106,10 @@ clear ans;
 
 %% Armazenamento dos resultados de simulação
 
+save('results/ice.mat', 'ice', '-v7.3');
 save('results/alternator.mat', 'alternator', '-v7.3');
 save('results/rectifier.mat', 'rectifier', '-v7.3');
+save('results/battery.mat', 'battery', '-v7.3');
 
 %% Salva e finaliza modelo no Simulink
 
