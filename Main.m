@@ -30,7 +30,7 @@ open_system('AutomotiveEMS.slx', 'loadonly');
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = false;
+alternatorFittingFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
