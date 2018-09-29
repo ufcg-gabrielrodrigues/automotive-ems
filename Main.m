@@ -18,10 +18,6 @@ root = genpath(root);
 % Inclusão do diretório aos caminhos de busca do MATLAB
 addpath(root);
 
-%% Inicializa modelo no Simulink
-
-open_system('AutomotiveEMS.slx', 'loadonly');
-
 %% Motor a combustão interna
 
 % 
@@ -58,63 +54,9 @@ replaceFileExpression('+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc',
 % 
 RectifierParametersEMS;
 
-%% 
+%% Curvas P x u
 
-n_ice_option = 1;
-iceToAltRotRatio = 2.5;
-
-%% Parâmetros de simulação
-
-% Parâmetros do 'solver' local para sistemas físicos
-T_s = 1e-6;
-set_param('AutomotiveEMS/Solver Configuration', 'UseLocalSolver', 'on');
-set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
-set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
-set_param('AutomotiveEMS/Solver Configuration', 'DoFixedCost', 'on');
-set_param('AutomotiveEMS/Solver Configuration', 'MaxNonlinIter', '20');
-
-% Parâmetros do 'solver' global
-simulationParameters.StopTime = '3e+0'; % [s]
-
-%% Execução da simulação em ambiente Simulink
-
-sim('AutomotiveEMS', simulationParameters);
-
-%% Registro de resultados obtidos na simulação
-
-% Motor a combustão interna
-ice.n = ans.n_ice;
-
-% Alternador
-alternator.rotor.control.u = ans.u_i_f;
-alternator.rotor.l.i = ans.i_f;
-
-alternator.stator.input.e.value = ans.e_a_abc;
-alternator.stator.output.v = ans.v_a_abc;
-alternator.stator.output.i = ans.i_a_abc;
-
-% Retificador
-rectifier.control.u = ans.u_v_r;
-rectifier.output.v = timeseries(ans.rectifier_output.Data(:, 1), ans.rectifier_output.Time);
-rectifier.output.i = timeseries(ans.rectifier_output.Data(:, 2), ans.rectifier_output.Time);
-
-% Bateria
-battery.v = ans.v_b;
-
-% 
-clear ans;
-
-%% Armazenamento dos resultados de simulação
-
-save('results/ice.mat', 'ice', '-v7.3');
-save('results/alternator.mat', 'alternator', '-v7.3');
-save('results/rectifier.mat', 'rectifier', '-v7.3');
-save('results/battery.mat', 'battery', '-v7.3');
-
-%% Salva e finaliza modelo no Simulink
-
-save_system('AutomotiveEMS.slx');
-close_system('AutomotiveEMS.slx');
+MPPTCurvesRoutine;
 
 %% 
 
@@ -129,6 +71,7 @@ replaceFileExpression('+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
 %
 replaceFileExpression('+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     ['l == ' l_a_str], 'l == 1e-6');
+
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB
