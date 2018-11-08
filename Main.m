@@ -26,7 +26,7 @@ addpath(root);
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = false;
+alternatorFittingFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -36,17 +36,17 @@ AlternatorParametersEMS;
 
 % 
 k_v_str = regexprep(func2str(alternator.k_v), '@\(.+?\)', '');
-replaceFileExpression('+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
     'k_v == 0', ['k_v == ' k_v_str]);
 
 % 
 e_a_str = regexprep(func2str(alternator.stator.input.e.function), '@\(.+?\)', '');
-replaceFileExpression('+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
     'e == 0', ['e == ' e_a_str]);
 
 % 
 l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
-replaceFileExpression('+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     'l == 1e-6', ['l == ' l_a_str]);
 
 %% Retificador
@@ -61,15 +61,15 @@ MPPTCurvesRoutine;
 %% 
 
 % 
-replaceFileExpression('+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Controllers/load_matching_smr_controller.ssc', ...
     ['k_v == ' k_v_str], 'k_v == 0');
 
 % 
-replaceFileExpression('+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
     ['e == ' e_a_str], 'e == 0');
 
 %
-replaceFileExpression('+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
+replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     ['l == ' l_a_str], 'l == 1e-6');
 
 

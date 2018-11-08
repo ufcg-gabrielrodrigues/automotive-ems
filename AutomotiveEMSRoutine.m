@@ -5,7 +5,7 @@ iceToAltRotRatio = 2.5;
 
 %% Inicializa modelo no Simulink
 
-open_system('AutomotiveEMS.slx', 'loadonly');
+open_system('models/AutomotiveEMS.slx', 'loadonly');
 
 %% Parâmetros de simulação
 
@@ -26,8 +26,8 @@ simout = sim('AutomotiveEMS', simulationParameters);
 
 %% Salva e finaliza modelo no Simulink
 
-save_system('AutomotiveEMS.slx');
-close_system('AutomotiveEMS.slx');
+save_system('models/AutomotiveEMS.slx');
+close_system('models/AutomotiveEMS.slx');
 
 %% Registro de resultados obtidos na simulação
 
