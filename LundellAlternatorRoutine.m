@@ -1,3 +1,16 @@
+%% Alternador
+
+alternator.rotor.n = 2000;  % Valocidade do rotor [rpm]
+
+%% Retificador
+
+% Filtro passivo
+rectifier.filter.c = 47e-3;	% Capacitância de filtro [F]
+
+%% Carga
+
+load.r = 13.5/35;          	% Resistência de carga [Ohm]
+
 %% Inicializa modelo no Simulink
 
 open_system('models/LundellAlternator.slx', 'loadonly');
@@ -28,7 +41,6 @@ close_system('models/LundellAlternator.slx');
 
 % Alternador
 alternator.rotor.n = simout.n_r;
-alternator.rotor.control.u = simout.u_i_f;
 alternator.rotor.l.i = simout.i_f;
 
 alternator.stator.input.e.value = simout.e_a_abc;
@@ -41,6 +53,7 @@ battery.v = simout.v_b;
 % Carga
 load.v = simout.v_l;
 load.i = simout.i_l;
+load.p = simout.p_l;
 
 %% Armazenamento dos resultados de simulação
 

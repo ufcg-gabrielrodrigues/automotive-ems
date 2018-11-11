@@ -12,6 +12,11 @@ end
 
 %% Parâmetros de circuito
 
+% Diodos
+rectifier.d.v_on = 0.8;             % Tensão de polarização [V]
+rectifier.d.r_on = 10e-3;           % Resistência de condução [Ohm]
+
+% MOSFETs
 rectifier.s.v_gs_on = 10;           % Tensão gate-source para acionamento dos MOSFETs do circuito retificador [V]
 
 %% Parâmetros de controle
