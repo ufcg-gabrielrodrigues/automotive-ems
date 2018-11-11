@@ -54,9 +54,9 @@ replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductanc
 % 
 RectifierParametersEMS;
 
-%% Curvas P x u
+%% 
 
-MPPTCurvesRoutine;
+LundellAlternatorRoutine;
 
 %% 
 
@@ -71,7 +71,6 @@ replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', .
 %
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     ['l == ' l_a_str], 'l == 1e-6');
-
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB
