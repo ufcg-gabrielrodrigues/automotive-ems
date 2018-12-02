@@ -1,11 +1,16 @@
-%%
+ %% Retificador
 
-i_f_list = 3.5;                         % [A]
-n_alt_list = 2000:500:6000;             % [rpm]
-r_l_list = [0.1 0.5:0.5:5];             % [Ohm]
+% Filtro passivo
+rectifier.filter.c = 47e-3;	% Capacitância de filtro [F]
 
-%%
+%% Varredura de parâmetros
 
+% Lista de parâmetros a serem varridos individualmente
+i_f_list = 3.5;                 % Corrente de excitação [A]
+n_alt_list = 2000:500:6000;     % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.5:0.5:5];	% Resistência de carga [Ohm]
+
+% Formação das casos de varredura
 param_sweep = [];
 
 for index_i_f = 1:length(i_f_list)
@@ -23,14 +28,14 @@ for index_i_f = 1:length(i_f_list)
     param_sweep = [param_sweep; i_f_tmp];
 end
 
-%% 
+%% Perfil temporal do ciclo de trabalho
 
-% Tempo de simulação por valor de ciclo de trabalho
+% Período de simulação por valor de ciclo de trabalho
 t_u = 2e-2; % [s]
 
-% 
-u.Time = [0.0 (t_u * 2):t_u:(t_u * 101)];
+% Formação da estrutura de dados contendo o perfil
 u.Data = 0.0:0.01:1.0;
+u.Time = [0.0 (t_u * 2):t_u:(t_u * length(u.Data))];
 
 %% Inicializa modelo no Simulink
 
@@ -112,48 +117,25 @@ for test_case_index = 1:num_cases
     end
 end
 
-% %% 
-% 
-% i_f_lim = [];
-% n_alt_lim = [];
-% 
-% for i_f_index = 1:length(i_f_list)
-%     % 
-%     i_f_lim_case = find(param_sweep(:, 1) == i_f_list(i_f_index));
-%     i_f_lim(i_f_index, :) = [i_f_lim_case(1) i_f_lim_case(end)];
-%     
-%     % 
-%     for n_alt_index = 1:length(n_alt_list)
-%         %
-%         n_alt_lim_case = find(param_sweep(i_f_lim(i_f_index, 1):i_f_lim(i_f_index, 2), 2) == n_alt_list(n_alt_index));
-%         n_alt_lim(n_alt_index + (i_f_index - 1)*length(n_alt_list), :) = [n_alt_lim_case(1) n_alt_lim_case(end)] + (i_f_lim(i_f_index, 1) - 1);
-%     end
-% end
-% 
-% curve_lim = n_alt_lim;
-% 
-% %% 
-% 
-% for curve_index = 1:length(curve_lim)
-%     mppt_curve(curve_index).n_alt = test_case_out(curve_lim(curve_index, 1)).alternator.rotor.n;
-%     mppt_curve(curve_index).i_f = test_case_out(curve_lim(curve_index, 1)).alternator.rotor.l.i;
-%     
-%     for point_index = curve_lim(curve_index, 1):curve_lim(curve_index, 2)
-%         mppt_curve(curve_index).trace(point_index - curve_lim(curve_index, 1) + 1, 1) = test_case_out(point_index).rectifier.control.u;
-%         mppt_curve(curve_index).trace(point_index - curve_lim(curve_index, 1) + 1, 2) = test_case_out(point_index).load.p.avg;
-%     end
-%     
-%     % 
-%     figure(curve_index)
-%     plot(mppt_curve(curve_index).trace(:,1), mppt_curve(curve_index).trace(:,2));
-%     title(['Curva P x u (i_{f} = ' num2str(mppt_curve(curve_index).i_f) ...
-%         ' A; n_{alt} = ' num2str(mppt_curve(curve_index).n_alt) ' rpm)']);
-%     xlabel('u');
-%     ylabel('P_{l}');
-%     grid on;
-% end
+%% Tratamento de casos de teste
+
+t_interest = u.Time(1:(end - 1));
+t_interest(1) = t_u;
+t_interest = round((t_interest + t_u/2)/T_s);
+batch_length = length(u.Time) - 1;
+test_case_matrix = zeros(length(test_case_out) * batch_length, 5);
+
+for test_case_index = 1:length(test_case_out)
+    batch_interval = (batch_length * (test_case_index - 1) + 1):(batch_length * test_case_index);
+    
+    test_case_matrix(batch_interval, 1) = test_case_out(test_case_index).alternator.rotor.l.i;
+    test_case_matrix(batch_interval, 2) = test_case_out(test_case_index).alternator.rotor.n;
+    test_case_matrix(batch_interval, 3) = test_case_out(test_case_index).load.r;
+    test_case_matrix(batch_interval, 4) = test_case_out(test_case_index).rectifier.control.u.Data(1:(end - 1), 1);
+    test_case_matrix(batch_interval, 5) = test_case_out(test_case_index).load.p.avg.Data(t_interest, 1);
+end
 
 %% Armazenamento dos resultados de simulação
 
 save('results/test_case_out.mat', 'test_case_out', '-v7.3');
-% save('results/mppt_curve.mat', 'mppt_curve', '-v7.3');
+save('results/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
