@@ -215,6 +215,67 @@ for i_f = i_f_list
     end
 end
 
+%% Identificação de pontos de máxima potência
+
+mpp_u_3d = zeros(length(r_l_list), length(n_alt_list), length(i_f_list));
+mpp_p_3d = zeros(length(r_l_list), length(n_alt_list), length(i_f_list));
+
+mpp_matrix = [param_sweep zeros(num_cases, 2)];
+case_index = 0;
+
+i_f_index = 0;
+n_alt_index = 0;
+r_l_index = 0;
+
+for i_f = i_f_list
+    i_f_index = i_f_index + 1;
+    n_alt_index = 0;
+    
+    for n_alt = n_alt_list
+        n_alt_index = n_alt_index + 1;
+        r_l_index = 0;
+        
+        for r_l = r_l_list
+            r_l_index = r_l_index + 1;
+            case_index = case_index + 1;
+            
+            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 3) == r_l));
+            
+            u = test_case_matrix(curve_indexes, 4);
+            p = test_case_matrix(curve_indexes, 5);
+            
+            [p_max, i_max] = max(p);
+            u_max = u(i_max);
+            
+            mpp_matrix(case_index, 4) = u_max;
+            mpp_matrix(case_index, 5) = p_max;
+            
+            mpp_u_3d(r_l_index, n_alt_index, i_f_index) = u_max;
+            mpp_p_3d(r_l_index, n_alt_index, i_f_index) = p_max;
+        end
+        
+    end
+end
+
+% 
+[n_alt, r_l] = meshgrid(n_alt_list, r_l_list);
+mpp_u = reshape(mpp_u_3d, length(r_l_list), length(n_alt_list));
+mpp_p = reshape(mpp_p_3d, length(r_l_list), length(n_alt_list));
+
+%
+figure_index = figure_index + 1;
+figure(figure_index)
+
+surf(n_alt, r_l, mpp_u);
+
+% 
+figure_index = figure_index + 1;
+figure(figure_index)
+
+surf(n_alt, r_l, mpp_p);
+
 %% Armazenamento de figuras
 
 for i = 1:figure_index
@@ -226,3 +287,4 @@ end
 
 save('results/test_case_out.mat', 'test_case_out', '-v7.3');
 save('results/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
+save('results/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
