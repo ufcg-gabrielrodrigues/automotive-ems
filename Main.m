@@ -6,6 +6,16 @@ clear all;
 close all;
 clc;
 
+%% Formatação de gráficos
+
+% Formatação
+set(groot, 'DefaultTextInterpreter', 'LaTeX');
+set(groot, 'DefaultLegendInterpreter', 'LaTeX');
+set(groot, 'DefaultTextFontSize', 14);
+set(groot, 'DefaultAxesFontSize', 14);
+set(groot, 'DefaultLegendFontSize', 14);
+set(groot, 'DefaultLineLineWidth', 1);
+
 %% Identificação e adição do diretório principal e seus subdiretórios aos
 %  caminhos de busca do MATLAB
 
@@ -26,7 +36,7 @@ addpath(root);
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = true;
+alternatorFittingFlag = false;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';

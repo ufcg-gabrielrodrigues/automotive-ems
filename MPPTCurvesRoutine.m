@@ -135,6 +135,93 @@ for test_case_index = 1:length(test_case_out)
     test_case_matrix(batch_interval, 5) = test_case_out(test_case_index).load.p.avg.Data(t_interest, 1);
 end
 
+%% Curvas de potência (comparadas por velocidade do alternador)
+
+figure_index = 0;
+
+for i_f = i_f_list
+    
+    for r_l = r_l_list
+        
+        colors = distinguishable_colors(length(n_alt_list));
+        color_index = 0;
+        
+        figure_index = figure_index + 1;
+        figure(figure_index)
+        
+        for n_alt = n_alt_list
+            color_index = color_index + 1;
+            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 3) == r_l));
+            
+            plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
+                'Color', colors(color_index, :), 'DisplayName', ...
+                ['$n_{alt} = ' num2str(n_alt) ' rpm$']);
+            hold on;
+            
+            legend('off');
+            legend('show');
+        end
+        
+        title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
+            ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+        xlabel('$u$');
+        ylabel('$P$ [W]');
+        
+        if (r_l == r_l_list(1))
+            legend('Location', 'NorthEast');
+        else
+            legend('Location', 'NorthWest');
+        end
+        
+        grid on;
+    end
+end
+
+%% Curvas de potência (comparadas por carga)
+
+for i_f = i_f_list
+    
+    for n_alt = n_alt_list
+        
+        colors = distinguishable_colors(length(r_l_list));
+        color_index = 0;
+        
+        figure_index = figure_index + 1;
+        figure(figure_index)
+        
+        for r_l = r_l_list
+            color_index = color_index + 1;
+            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 3) == r_l));
+            
+            plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
+                'Color', colors(color_index, :), 'DisplayName', ...
+                ['$r_{l} = ' num2str(r_l) ' \Omega$']);
+            hold on;
+            
+            legend('off');
+            legend('show');
+        end
+        
+        title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
+            ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
+        xlabel('$u$');
+        ylabel('$P$ [W]');
+        legend('Location', 'NorthWest');
+        grid on;
+    end
+end
+
+%% Armazenamento de figuras
+
+for i = 1:figure_index
+    fileName = sprintf('results/Figura_%d', i);
+    saveFigure(figure(i), fileName, 'fig');
+end
+
 %% Armazenamento dos resultados de simulação
 
 save('results/test_case_out.mat', 'test_case_out', '-v7.3');
