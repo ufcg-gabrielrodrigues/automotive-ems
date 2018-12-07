@@ -1,14 +1,14 @@
  %% Retificador
 
 % Filtro passivo
-rectifier.filter.c = 47e-3;	% Capacitância de filtro [F]
+rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = 3.5;                 % Corrente de excitação [A]
-n_alt_list = 2000:500:6000;     % Velocidade do alternador [rpm]
-r_l_list = [0.01 0.5:0.5:5];	% Resistência de carga [Ohm]
+i_f_list = 3.0;                             % Corrente de excitação [A]
+n_alt_list = 2000:500:6000;                 % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:5];	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
@@ -135,9 +135,12 @@ for test_case_index = 1:length(test_case_out)
     test_case_matrix(batch_interval, 5) = test_case_out(test_case_index).load.p.avg.Data(t_interest, 1);
 end
 
-%% Curvas de potência (comparadas por velocidade do alternador)
+%% Parâmetros auxiliares para figuras
 
 figure_index = 0;
+leg_entries_per_columns = 3;
+
+%% Curvas de potência (comparadas por velocidade do alternador)
 
 for i_f = i_f_list
     
@@ -168,13 +171,9 @@ for i_f = i_f_list
             ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
         xlabel('$u$');
         ylabel('$P$ [W]');
-        
-        if (r_l == r_l_list(1))
-            legend('Location', 'NorthEast');
-        else
-            legend('Location', 'NorthWest');
-        end
-        
+        leg = legend;
+        leg.Location = 'SouthOutside';
+        leg.NumColumns = ceil(length(n_alt_list)/leg_entries_per_columns);
         grid on;
     end
 end
@@ -199,7 +198,7 @@ for i_f = i_f_list
             
             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
                 'Color', colors(color_index, :), 'DisplayName', ...
-                ['$r_{l} = ' num2str(r_l) ' \Omega$']);
+                ['$r_{l} = ' num2str(r_l, '%1.2f') ' \Omega$']);
             hold on;
             
             legend('off');
@@ -210,7 +209,9 @@ for i_f = i_f_list
             ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
         xlabel('$u$');
         ylabel('$P$ [W]');
-        legend('Location', 'NorthWest');
+        leg = legend;
+        leg.Location = 'SouthOutside';
+        leg.NumColumns = ceil(length(r_l_list)/leg_entries_per_columns);
         grid on;
     end
 end
