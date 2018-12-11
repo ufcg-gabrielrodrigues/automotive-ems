@@ -65,7 +65,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-AutomotiveEMSRoutine;
+ControlComparisonRoutine;
 
 %% Redefinição de parâmetros de alternador
 
