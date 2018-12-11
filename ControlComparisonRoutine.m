@@ -1,6 +1,7 @@
 %% Parâmetros temporais
 
-T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
+T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
+T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
 t_f = 5.0;  % Tempo total de simula��o [s]
 
 %% Motor a combustão interna
@@ -25,9 +26,9 @@ load.r = 0.5;
 
 %% Esquemas de controle
 
-conventionalControlScheme = Simulink.Variant('control_scheme == 0');
-neuralControlScheme = Simulink.Variant('control_scheme == 1');
-fittedControlScheme = Simulink.Variant('control_scheme == 2');
+conventionalControlScheme = Simulink.Variant('control_scheme == 1');
+neuralControlScheme = Simulink.Variant('control_scheme == 2');
+fittedControlScheme = Simulink.Variant('control_scheme == 3');
 
 %% Inicializa modelo no Simulink
 
@@ -47,7 +48,8 @@ simulationParameters.StopTime = num2str(t_f);   % [s]
 
 %% Execução da simulação em ambiente Simulink
 
-parfor control_scheme_index = 1:3
+for control_scheme_index = 1:3
+    fprintf('Running control scheme #%d...\n', control_scheme_index);
     control_scheme = control_scheme_index;
     simout{control_scheme_index} = sim('ControlComparison', simulationParameters);
 end
@@ -59,28 +61,39 @@ close_system('models/ControlComparison.slx');
 
 %% Registro de resultados obtidos na simulação
 
-% Motor a combustão interna
-ice.n = simout.n_ice;
-
-% Alternador
-alternator.rotor.control.u = simout.u_i_f;
-alternator.rotor.l.i = simout.i_f;
-
-alternator.stator.input.e.value = simout.e_a_abc;
-alternator.stator.output.v = simout.v_a_abc;
-alternator.stator.output.i = simout.i_a_abc;
-
-% Retificador
-rectifier.control.u = simout.u_smr;
-rectifier.output.v = simout.v_r_o;
-rectifier.output.i = simout.i_r_o;
-
-% Bateria
-battery.v = simout.v_b;
+for control_scheme_index = 1:3
+    % Motor a combustão interna
+    ice.n{control_scheme_index} = simout.n_ice;
+    
+    % Alternador
+    alternator.rotor.n{control_scheme_index} = simout.n_r;
+    alternator.rotor.control.u{control_scheme_index} = simout.u_i_f;
+    alternator.rotor.l.i{control_scheme_index} = simout.i_f;
+    
+    alternator.stator.input.e.value{control_scheme_index} = simout.e_a_abc;
+    alternator.stator.output.v{control_scheme_index} = simout.v_a_abc;
+    alternator.stator.output.i{control_scheme_index} = simout.i_a_abc;
+    
+    % Retificador
+    rectifier.control.u{control_scheme_index} = simout.u_smr;
+    
+    % Carga
+    load.v{control_scheme_index} = simout.v_l;
+    load.i{control_scheme_index} = simout.i_l;
+    load.z{control_scheme_index} = simout.z_l;
+    load.p{control_scheme_index} = simout.p_l;
+    
+    % Bateria
+    battery.v{control_scheme_index} = simout.v_b;
+end
 
 %% Armazenamento dos resultados de simulação
 
 save('results/ice.mat', 'ice', '-v7.3');
 save('results/alternator.mat', 'alternator', '-v7.3');
 save('results/rectifier.mat', 'rectifier', '-v7.3');
+save('results/load.mat', 'load', '-v7.3');
 save('results/battery.mat', 'battery', '-v7.3');
+
+%%
+

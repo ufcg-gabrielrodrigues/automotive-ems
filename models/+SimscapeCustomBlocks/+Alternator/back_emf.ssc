@@ -33,7 +33,7 @@ component back_emf
         omega_r == n_r*2*pi/60;
         theta_r == integ(omega_r);
         omega_a == p*omega_r;
-        e == n_r.*(i_f.*4.7546e-3+i_f.^2.*3.2418e-5-i_f.^3.*2.6726e-4+i_f.^4.*3.1552e-5-8.0134e-5);
+        e == 0;
         e_a == e*cos(omega_a*time + theta_r)*{1, 'V/rpm'};
         e_b == e*cos(omega_a*time + theta_r + 2*pi/3)*{1, 'V/rpm'};
         e_c == e*cos(omega_a*time + theta_r - 2*pi/3)*{1, 'V/rpm'};
