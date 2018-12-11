@@ -1,3 +1,8 @@
+%% Retificador
+
+% Filtro passivo
+rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
+
 %% 
 
 n_ice_option = 3;

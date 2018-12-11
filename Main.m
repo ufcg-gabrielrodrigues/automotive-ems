@@ -65,7 +65,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-MPPTCurvesRoutine;
+AutomotiveEMSRoutine;
 
 %% Redefinição de parâmetros de alternador
 
