@@ -1,23 +1,14 @@
-%% Parâmetros de simulação
+%% Parâmetros temporais
 
-% Parâmetros do 'solver' local para sistemas físicos
-T_s = 1e-6;
-set_param('ControlComparison/Solver Configuration', 'UseLocalSolver', 'on');
-set_param('ControlComparison/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
-set_param('ControlComparison/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
-set_param('ControlComparison/Solver Configuration', 'DoFixedCost', 'on');
-set_param('ControlComparison/Solver Configuration', 'MaxNonlinIter', '20');
+T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
+t_f = 5.0;  % Tempo total de simula��o [s]
 
-% Parâmetros do 'solver' global
-simulationParameters.StopTime = '5e+0'; % [s]
+%% Motor a combustão interna
 
-%% ICE
-
-% 
+% Razão entre a polia do motor a combustão e a polia do alternador
 iceToAltRotRatio = 2.5;
 
-% 
-t_f = str2double(simulationParameters.StopTime);
+% Pontos de interesse do perfil de velocidade
 n_ice_i = 6e+3/iceToAltRotRatio;
 n_ice_f = 2e+3/iceToAltRotRatio;
 t_brake_i = t_f*0.20;
@@ -41,6 +32,18 @@ fittedControlScheme = Simulink.Variant('control_scheme == 2');
 %% Inicializa modelo no Simulink
 
 open_system('models/ControlComparison.slx', 'loadonly');
+
+%% Parâmetros de simulação
+
+% Parâmetros do 'solver' local para sistemas físicos
+set_param('ControlComparison/Solver Configuration', 'UseLocalSolver', 'on');
+set_param('ControlComparison/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
+set_param('ControlComparison/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
+set_param('ControlComparison/Solver Configuration', 'DoFixedCost', 'on');
+set_param('ControlComparison/Solver Configuration', 'MaxNonlinIter', '20');
+
+% Parâmetros do 'solver' global
+simulationParameters.StopTime = num2str(t_f);   % [s]
 
 %% Execução da simulação em ambiente Simulink
 

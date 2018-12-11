@@ -1,3 +1,8 @@
+%% Parâmetros temporais
+
+T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
+t_f = 5e-1; % Tempo total de simula��o [s]
+
 %% Alternador
 
 alternator.rotor.n = 2000;  % Valocidade do rotor [rpm]
@@ -18,7 +23,6 @@ open_system('models/LundellAlternator.slx', 'loadonly');
 %% Parâmetros de simulação
 
 % Parâmetros do 'solver' local para sistemas físicos
-T_s = 1e-6;
 set_param('LundellAlternator/Solver Configuration', 'UseLocalSolver', 'on');
 set_param('LundellAlternator/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
 set_param('LundellAlternator/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
@@ -26,7 +30,7 @@ set_param('LundellAlternator/Solver Configuration', 'DoFixedCost', 'on');
 set_param('LundellAlternator/Solver Configuration', 'MaxNonlinIter', '20');
 
 % Parâmetros do 'solver' global
-simulationParameters.StopTime = '5e-1'; % [s]
+simulationParameters.StopTime = num2str(t_f);   % [s]
 
 %% Execução da simulação em ambiente Simulink
 

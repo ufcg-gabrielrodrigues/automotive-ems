@@ -1,3 +1,7 @@
+%% Parâmetros temporais
+
+T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
+
 %% Retificador
 
 % Filtro passivo
@@ -44,7 +48,6 @@ open_system('MPPTCurves.slx', 'loadonly');
 %% Parâmetros de simulação
 
 % Parâmetros do 'solver' local para sistemas físicos
-T_s = 1e-6;
 set_param('MPPTCurves/Solver Configuration', 'UseLocalSolver', 'on');
 set_param('MPPTCurves/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
 set_param('MPPTCurves/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));

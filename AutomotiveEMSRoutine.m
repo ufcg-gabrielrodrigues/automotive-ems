@@ -1,3 +1,8 @@
+%% Parâmetros temporais
+
+T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
+t_f = 3.0;  % Tempo total de simula��o [s]
+
 %% Retificador
 
 % Filtro passivo
@@ -15,7 +20,6 @@ open_system('models/AutomotiveEMS.slx', 'loadonly');
 %% Parâmetros de simulação
 
 % Parâmetros do 'solver' local para sistemas físicos
-T_s = 1e-6;
 set_param('AutomotiveEMS/Solver Configuration', 'UseLocalSolver', 'on');
 set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverChoice', 'NE_TRAPEZOIDAL_ADVANCER');
 set_param('AutomotiveEMS/Solver Configuration', 'LocalSolverSampleTime', num2str(T_s));
@@ -23,7 +27,7 @@ set_param('AutomotiveEMS/Solver Configuration', 'DoFixedCost', 'on');
 set_param('AutomotiveEMS/Solver Configuration', 'MaxNonlinIter', '20');
 
 % Parâmetros do 'solver' global
-simulationParameters.StopTime = '3e+0'; % [s]
+simulationParameters.StopTime = num2str(t_f);   % [s]
 
 %% Execução da simulação em ambiente Simulink
 
