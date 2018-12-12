@@ -1,7 +1,7 @@
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
-t_f = 5e-1; % Tempo total de simula��o [s]
+t_f = 5e-1; % Tempo total de simulação [s]
 
 %% Alternador
 

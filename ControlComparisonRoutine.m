@@ -2,7 +2,7 @@
 
 T_s = 1e-6; % Passo de cÃ¡lculo utilizado pelo 'solver' local para sistemas fÃ­sicos [s]
 T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
-t_f = 5.0;  % Tempo total de simulação [s]
+t_f = 5.0;  % Tempo total de simulaÃ§Ã£o [s]
 
 %% Motor a combustÃ£o interna
 
@@ -26,13 +26,13 @@ electrical_load.r = 0.5;
 
 %% Esquemas de controle
 
-% 
+%
 conventionalControlScheme = Simulink.Variant('control_scheme == 1');
 
-% 
+%
 neuralControlScheme = Simulink.Variant('control_scheme == 2');
 
-% 
+%
 fittedControlScheme = Simulink.Variant('control_scheme == 3');
 load('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
 
@@ -101,11 +101,41 @@ save('results/rectifier.mat', 'rectifier', '-v7.3');
 save('results/electrical_load.mat', 'electrical_load', '-v7.3');
 save('results/battery.mat', 'battery', '-v7.3');
 
-%%
+%% Montagem de séries temporais de valores esperados relativos aos MPPs
+
+% Carregamento de matrix de dados de pontos de máxima potência
+mpp_target = [];
 
 try
     load('results/mpp_matrix.mat');
     mpp_target = mpp_matrix(mpp_matrix(:, 3) == electrical_load.r, :);
 catch
     disp('MPP Matrix unavailable');
+end
+
+% Caso a matriz tenha sido carregada com sucesso, executar a rotina
+if (~isempty(mpp_target))
+    % Remoção de valores fora da região de interesse de velocidade
+    n_r_min = min(iceToAltRotRatio*[n_ice_i n_ice_f]);
+    n_r_max = max(iceToAltRotRatio*[n_ice_i n_ice_f]);
+    
+    mpp_target((mpp_target(:, 2) < n_r_min) | (mpp_target(:, 2) > n_r_max), :) = [];
+    
+    % Determinação da equação da reta que descreve a variação de velocidade
+    a = iceToAltRotRatio*(n_ice_f - n_ice_i)/(t_brake_f - t_brake_i);
+    b = iceToAltRotRatio*n_ice_i - a*t_brake_i;
+    
+    % Determinação dos instantes correspondente aos valores de interesse da
+    % velocidade
+    time = (mpp_target(:, 2) - b)/a;
+    
+    % Ordenação da matriz de casos esperados com relação ao tempo
+    mpp_target = [time mpp_target];
+    [~, sorted_indexes] = sort(mpp_target(:, 1), 'ascend');
+    mpp_target = mpp_target(sorted_indexes, :);
+    
+    % Montagem das séries temporais relativas ao ciclo de trabalho e à
+    % potência
+    mpp_target_u = timeseries(mpp_target(:, 5), mpp_target(:, 1));
+    mpp_target_p = timeseries(mpp_target(:, 6), mpp_target(:, 1));
 end
