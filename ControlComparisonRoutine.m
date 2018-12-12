@@ -139,3 +139,26 @@ if (~isempty(mpp_target))
     mpp_target_u = timeseries(mpp_target(:, 5), mpp_target(:, 1));
     mpp_target_p = timeseries(mpp_target(:, 6), mpp_target(:, 1));
 end
+
+%% 
+
+figure_index = 0;
+
+for control_scheme_index = 1:3
+    figure_index = figure_index + 1;
+    figure(figure_index)
+    
+    subplot(2, 1, 1)
+    plot(electrical_load.p{control_scheme_index}, 'b-');
+    hold on;
+    plot(mpp_target_p, 'ro');
+    hold off;
+    grid on;
+    
+    subplot(2, 1, 2)
+    plot(rectifier.control.u{control_scheme_index}, 'b-');
+    hold on;
+    plot(mpp_target_u, 'ro');
+    hold off;
+    grid on;
+end
