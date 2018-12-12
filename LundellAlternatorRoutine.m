@@ -12,9 +12,9 @@ alternator.rotor.n = 2000;  % Valocidade do rotor [rpm]
 % Filtro passivo
 rectifier.filter.c = 47e-3;	% Capacitância de filtro [F]
 
-%% Carga
+%% Carga el�trica
 
-load.r = 13.5/35;          	% Resistência de carga [Ohm]
+electrical_load.r = 13.5/35;          	% Resistência de carga [Ohm]
 
 %% Inicializa modelo no Simulink
 
@@ -55,12 +55,13 @@ alternator.stator.output.i = simout.i_a_abc;
 battery.v = simout.v_b;
 
 % Carga
-load.v = simout.v_l;
-load.i = simout.i_l;
-load.p = simout.p_l;
+electrical_load.v = simout.v_l;
+electrical_load.i = simout.i_l;
+electrical_load.p = simout.p_l;
 
 %% Armazenamento dos resultados de simulação
 
 save('results/alternator.mat', 'alternator', '-v7.3');
+save('results/rectifier.mat', 'rectifier', '-v7.3');
+save('results/electrical_load.mat', 'electrical_load', '-v7.3');
 save('results/battery.mat', 'battery', '-v7.3');
-save('results/load.mat', 'rectifier', '-v7.3');

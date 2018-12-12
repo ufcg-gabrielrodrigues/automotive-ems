@@ -20,15 +20,21 @@ t_brake_f = t_f*0.80;
 % Filtro passivo
 rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 
-%% Carga
+%% Carga el�trica
 
-load.r = 0.5;
+electrical_load.r = 0.5;
 
 %% Esquemas de controle
 
+% 
 conventionalControlScheme = Simulink.Variant('control_scheme == 1');
+
+% 
 neuralControlScheme = Simulink.Variant('control_scheme == 2');
+
+% 
 fittedControlScheme = Simulink.Variant('control_scheme == 3');
+load('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
 
 %% Inicializa modelo no Simulink
 
@@ -63,28 +69,28 @@ close_system('models/ControlComparison.slx');
 
 for control_scheme_index = 1:3
     % Motor a combustão interna
-    ice.n{control_scheme_index} = simout.n_ice;
+    ice.n{control_scheme_index} = simout{control_scheme_index}.n_ice;
     
     % Alternador
-    alternator.rotor.n{control_scheme_index} = simout.n_r;
-    alternator.rotor.control.u{control_scheme_index} = simout.u_i_f;
-    alternator.rotor.l.i{control_scheme_index} = simout.i_f;
+    alternator.rotor.n{control_scheme_index} = simout{control_scheme_index}.n_r;
+    alternator.rotor.control.u{control_scheme_index} = simout{control_scheme_index}.u_i_f;
+    alternator.rotor.l.i{control_scheme_index} = simout{control_scheme_index}.i_f;
     
-    alternator.stator.input.e.value{control_scheme_index} = simout.e_a_abc;
-    alternator.stator.output.v{control_scheme_index} = simout.v_a_abc;
-    alternator.stator.output.i{control_scheme_index} = simout.i_a_abc;
+    alternator.stator.input.e.value{control_scheme_index} = simout{control_scheme_index}.e_a_abc;
+    alternator.stator.output.v{control_scheme_index} = simout{control_scheme_index}.v_a_abc;
+    alternator.stator.output.i{control_scheme_index} = simout{control_scheme_index}.i_a_abc;
     
     % Retificador
-    rectifier.control.u{control_scheme_index} = simout.u_smr;
+    rectifier.control.u{control_scheme_index} = simout{control_scheme_index}.u_smr;
     
     % Carga
-    load.v{control_scheme_index} = simout.v_l;
-    load.i{control_scheme_index} = simout.i_l;
-    load.z{control_scheme_index} = simout.z_l;
-    load.p{control_scheme_index} = simout.p_l;
+    electrical_load.v{control_scheme_index} = simout{control_scheme_index}.v_l;
+    electrical_load.i{control_scheme_index} = simout{control_scheme_index}.i_l;
+    electrical_load.z{control_scheme_index} = simout{control_scheme_index}.z_l;
+    electrical_load.p{control_scheme_index} = simout{control_scheme_index}.p_l;
     
     % Bateria
-    battery.v{control_scheme_index} = simout.v_b;
+    battery.v{control_scheme_index} = simout{control_scheme_index}.v_b;
 end
 
 %% Armazenamento dos resultados de simulação
@@ -92,8 +98,14 @@ end
 save('results/ice.mat', 'ice', '-v7.3');
 save('results/alternator.mat', 'alternator', '-v7.3');
 save('results/rectifier.mat', 'rectifier', '-v7.3');
-save('results/load.mat', 'load', '-v7.3');
+save('results/electrical_load.mat', 'electrical_load', '-v7.3');
 save('results/battery.mat', 'battery', '-v7.3');
 
 %%
 
+try
+    load('results/mpp_matrix.mat');
+    mpp_target = mpp_matrix(mpp_matrix(:, 3) == electrical_load.r, :);
+catch
+    disp('MPP Matrix unavailable');
+end
