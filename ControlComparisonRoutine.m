@@ -95,11 +95,11 @@ end
 
 %% Armazenamento dos resultados de simulaÃ§Ã£o
 
-save('results/ice.mat', 'ice', '-v7.3');
-save('results/alternator.mat', 'alternator', '-v7.3');
-save('results/rectifier.mat', 'rectifier', '-v7.3');
-save('results/electrical_load.mat', 'electrical_load', '-v7.3');
-save('results/battery.mat', 'battery', '-v7.3');
+save('results/ControlComparison/ice.mat', 'ice', '-v7.3');
+save('results/ControlComparison/alternator.mat', 'alternator', '-v7.3');
+save('results/ControlComparison/rectifier.mat', 'rectifier', '-v7.3');
+save('results/ControlComparison/electrical_load.mat', 'electrical_load', '-v7.3');
+save('results/ControlComparison/battery.mat', 'battery', '-v7.3');
 
 %% Montagem de séries temporais de valores esperados relativos aos MPPs
 
@@ -107,7 +107,7 @@ save('results/battery.mat', 'battery', '-v7.3');
 mpp_target = [];
 
 try
-    load('results/mpp_matrix.mat');
+    load('results/MPPTCurves/mpp_matrix.mat');
     mpp_target = mpp_matrix(mpp_matrix(:, 3) == electrical_load.r, :);
 catch
     disp('MPP Matrix unavailable');
@@ -140,25 +140,49 @@ if (~isempty(mpp_target))
     mpp_target_p = timeseries(mpp_target(:, 6), mpp_target(:, 1));
 end
 
-%% 
+%% Análise de potência e ciclo de trabalho para cada esquema de controle
 
+% Índice de figuras
 figure_index = 0;
 
+% Lista de títulos por esquema de controle
+title_case = {'Esquema de controle convencional', ...
+    'Esquema de controle baseado em rede neural', ...
+    'Esquema de controle baseado em superf{\''{i}}cie ajustada'};
+    
+% Laço de traço de figuras
 for control_scheme_index = 1:3
     figure_index = figure_index + 1;
     figure(figure_index)
     
     subplot(2, 1, 1)
-    plot(electrical_load.p{control_scheme_index}, 'b-');
+    plot(electrical_load.p{control_scheme_index}, 'b-', 'DisplayName', '$P_{l}$');
     hold on;
-    plot(mpp_target_p, 'ro');
+    plot(mpp_target_p, 'ro', 'DisplayName', '$P_{MPP}^{*}$');
     hold off;
+    title('Pot{\^{e}}ncia el{\''{e}}trica consumida pela carga');
+    xlabel('$t$ [s]');
+    ylabel('$P_{l}$ [W]');
+    legend('show');
     grid on;
     
     subplot(2, 1, 2)
-    plot(rectifier.control.u{control_scheme_index}, 'b-');
+    plot(rectifier.control.u{control_scheme_index}, 'b-', 'DisplayName', '$d_{SMR}$');
     hold on;
-    plot(mpp_target_u, 'ro');
+    plot(mpp_target_u, 'ro', 'DisplayName', '$d_{MPP}^{*}$');
     hold off;
+    title('Ciclo de trabalho das chaves do retificador semi-controlado');
+    xlabel('$t$ [s]');
+    ylabel('$d_{SMR}$');
+    legend('show');
     grid on;
+    
+    suptitle(title_case{control_scheme_index});
+end
+
+%% Armazenamento de figuras
+
+for i = 1:figure_index
+    fileName = sprintf('results/ControlComparison/Figura_%d', i);
+    saveFigure(figure(i), fileName, 'fig');
 end

@@ -61,7 +61,7 @@ electrical_load.p = simout.p_l;
 
 %% Armazenamento dos resultados de simulação
 
-save('results/alternator.mat', 'alternator', '-v7.3');
-save('results/rectifier.mat', 'rectifier', '-v7.3');
-save('results/electrical_load.mat', 'electrical_load', '-v7.3');
-save('results/battery.mat', 'battery', '-v7.3');
+save('results/LundellAlternator/alternator.mat', 'alternator', '-v7.3');
+save('results/LundellAlternator/rectifier.mat', 'rectifier', '-v7.3');
+save('results/LundellAlternator/electrical_load.mat', 'electrical_load', '-v7.3');
+save('results/LundellAlternator/battery.mat', 'battery', '-v7.3');

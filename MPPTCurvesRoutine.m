@@ -283,12 +283,12 @@ surf(n_alt, r_l, mpp_p);
 %% Armazenamento de figuras
 
 for i = 1:figure_index
-    fileName = sprintf('results/Figura_%d', i);
+    fileName = sprintf('results/MPPTCurves/Figura_%d', i);
     saveFigure(figure(i), fileName, 'fig');
 end
 
 %% Armazenamento dos resultados de simulação
 
-save('results/test_case_out.mat', 'test_case_out', '-v7.3');
-save('results/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
-save('results/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
+save('results/MPPTCurves/test_case_out.mat', 'test_case_out', '-v7.3');
+save('results/MPPTCurves/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
+save('results/MPPTCurves/mpp_matrix.mat', 'mpp_matrix', '-v7.3');

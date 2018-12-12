@@ -61,7 +61,7 @@ battery.v = simout.v_b;
 
 %% Armazenamento dos resultados de simulação
 
-save('results/ice.mat', 'ice', '-v7.3');
-save('results/alternator.mat', 'alternator', '-v7.3');
-save('results/rectifier.mat', 'rectifier', '-v7.3');
-save('results/battery.mat', 'battery', '-v7.3');
+save('results/AutomotiveEMS/ice.mat', 'ice', '-v7.3');
+save('results/AutomotiveEMS/alternator.mat', 'alternator', '-v7.3');
+save('results/AutomotiveEMS/rectifier.mat', 'rectifier', '-v7.3');
+save('results/AutomotiveEMS/battery.mat', 'battery', '-v7.3');
