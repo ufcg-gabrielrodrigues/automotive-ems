@@ -28,7 +28,7 @@ rectifier.filter.c = 10e-3;	% CapacitÃ¢ncia de filtro [F]
 
 %% Carga elétrica
 
-electrical_load.r = 0.5;
+electrical_load.r = 0.15;   % [Ohm]
 
 %% Esquemas de controle
 
@@ -123,7 +123,7 @@ mpp_target = [];
 
 try
     load('results/MPPTCurves/mpp_matrix.mat');
-    mpp_target = mpp_matrix(mpp_matrix(:, 3) == electrical_load.r, :);
+    mpp_target = mpp_matrix(round(mpp_matrix(:, 3), 3) == electrical_load.r, :);
 catch
     disp('MPP Matrix unavailable');
 end
@@ -159,7 +159,7 @@ end
 
 % Índice de figuras
 figure_index = 0;
-    
+
 % Laço de traço de figuras
 for control_scheme_index = 1:length(control_scheme_title)
     figure_index = figure_index + 1;
