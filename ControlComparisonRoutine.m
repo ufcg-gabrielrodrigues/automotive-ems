@@ -15,6 +15,11 @@ n_ice_f = 2e+3/iceToAltRotRatio;
 t_brake_i = t_f*0.20;
 t_brake_f = t_f*0.80;
 
+%% Alternador
+
+% Corrente de excitação máxima
+i_f_max = 3.0;  % [A]
+
 %% Retificador
 
 % Filtro passivo
