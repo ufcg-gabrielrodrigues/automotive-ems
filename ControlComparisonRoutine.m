@@ -2,7 +2,7 @@
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
 T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
-t_f = 5.0;  % Tempo total de simulação [s]
+t_f = 4.0;  % Tempo total de simulação [s]
 
 %% Motor a combustão interna
 
@@ -12,8 +12,9 @@ iceToAltRotRatio = 2.5;
 % Pontos de interesse do perfil de velocidade
 n_ice_i = 6e+3/iceToAltRotRatio;
 n_ice_f = 2e+3/iceToAltRotRatio;
-t_brake_i = t_f*0.20;
-t_brake_f = t_f*0.80;
+t_brake = 3e+0;                     % [s]
+t_brake_i = (t_f - t_brake)/2;      % [s]
+t_brake_f = t_brake_i + t_brake;    % [s]
 
 %% Alternador
 
