@@ -31,14 +31,23 @@ electrical_load.r = 0.5;
 
 %% Esquemas de controle
 
+% Lista de títulos por esquema de controle
+control_scheme_title = {'Esquema de controle convencional', ...
+    'Esquema de controle baseado em excita{\c{c}}{\~{a}}o maximizada', ...
+    'Esquema de controle baseado em rede neural', ...
+    'Esquema de controle baseado em superf{\''{i}}cie ajustada'};
+
 %
 conventionalControlScheme = Simulink.Variant('control_scheme == 1');
 
 %
-neuralControlScheme = Simulink.Variant('control_scheme == 2');
+fullExcitationCurrentControlScheme = Simulink.Variant('control_scheme == 2');
 
 %
-fittedControlScheme = Simulink.Variant('control_scheme == 3');
+neuralControlScheme = Simulink.Variant('control_scheme == 3');
+
+%
+fittedControlScheme = Simulink.Variant('control_scheme == 4');
 load('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
 
 %% Inicializa modelo no Simulink
@@ -59,7 +68,7 @@ simulationParameters.StopTime = num2str(t_f);   % [s]
 
 %% ExecuÃ§Ã£o da simulaÃ§Ã£o em ambiente Simulink
 
-for control_scheme_index = 1:3
+for control_scheme_index = 1:length(control_scheme_title)
     fprintf('Running control scheme #%d...\n', control_scheme_index);
     control_scheme = control_scheme_index;
     simout{control_scheme_index} = sim('ControlComparison', simulationParameters);
@@ -72,7 +81,7 @@ close_system('models/ControlComparison.slx');
 
 %% Registro de resultados obtidos na simulaÃ§Ã£o
 
-for control_scheme_index = 1:3
+for control_scheme_index = 1:length(control_scheme_title)
     % Motor a combustÃ£o interna
     ice.n{control_scheme_index} = simout{control_scheme_index}.n_ice;
     
@@ -149,14 +158,9 @@ end
 
 % Índice de figuras
 figure_index = 0;
-
-% Lista de títulos por esquema de controle
-title_case = {'Esquema de controle convencional', ...
-    'Esquema de controle baseado em rede neural', ...
-    'Esquema de controle baseado em superf{\''{i}}cie ajustada'};
     
 % Laço de traço de figuras
-for control_scheme_index = 1:3
+for control_scheme_index = 1:length(control_scheme_title)
     figure_index = figure_index + 1;
     figure(figure_index)
     
@@ -182,7 +186,7 @@ for control_scheme_index = 1:3
     legend('show');
     grid on;
     
-    suptitle(title_case{control_scheme_index});
+    suptitle(control_scheme_title{control_scheme_index});
 end
 
 %% Armazenamento de figuras
