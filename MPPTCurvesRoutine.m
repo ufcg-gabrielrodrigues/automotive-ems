@@ -10,9 +10,9 @@ rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = 3.0;                             % Corrente de excitação [A]
-n_alt_list = 2000:500:6000;                 % Velocidade do alternador [rpm]
-r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:5];	% Resistência de carga [Ohm]
+i_f_list = 0.5:0.5:4.0;                         % Corrente de excitação [A]
+n_alt_list = 2000:500:6000;                     % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:2.0];	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
@@ -38,7 +38,7 @@ end
 t_u = 2e-2; % [s]
 
 % Formação da estrutura de dados contendo o perfil
-u.Data = 0.0:0.01:1.0;
+u.Data = 0.0:0.05:1.0;
 u.Time = [0.0 (t_u * 2):t_u:(t_u * length(u.Data))];
 
 %% Inicializa modelo no Simulink
@@ -55,9 +55,12 @@ set_param('MPPTCurves/Solver Configuration', 'DoFixedCost', 'on');
 set_param('MPPTCurves/Solver Configuration', 'MaxNonlinIter', '20');
 
 % Parâmetros do 'solver' global
-simulationParameters.StopTime = num2str(u.Time(end) + t_u); % [s]
+set_param('MPPTCurves', 'StopTime', num2str(u.Time(end) + t_u));
 
-%% Execução da simulação em ambiente Simulink
+% Salva mundanças feitas no modelo
+save_system('MPPTCurves.slx');
+
+%% Configuração dos casos de teste como entrada do modelo no Simulink
 
 [num_cases, ~] = size(param_sweep);
 
@@ -67,16 +70,19 @@ for test_case_index = 1:num_cases
     n_alt = test_case(2);
     r_l = test_case(3);
     
-    % 
-    fprintf('Running test case %d/%d...\n', test_case_index, num_cases);
-    
-    %
-    simout{test_case_index} = sim('MPPTCurves', simulationParameters);
+    simIn(test_case_index) = Simulink.SimulationInput('MPPTCurves');
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/i_f', 'Value', num2str(i_f));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/n_alt', 'Value', num2str(n_alt));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/r_l', 'R', num2str(r_l));
 end
 
-%% Salva e finaliza modelo no Simulink
+%% Execução da simulação em ambiente Simulink
 
-save_system('MPPTCurves.slx');
+simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
+    'TransferBaseWorkspaceVariables', 'on');
+
+%% Finaliza modelo no Simulink
+
 close_system('MPPTCurves.slx');
 
 %% Registro de resultados obtidos no caso de teste
@@ -97,9 +103,9 @@ for test_case_index = 1:num_cases
     test_case_out(test_case_index).alternator.rotor.n = n_alt;
     test_case_out(test_case_index).alternator.rotor.l.i = i_f;
     
-    test_case_out(test_case_index).alternator.stator.input.e.value = simout{test_case_index}.e_a_abc;
-    test_case_out(test_case_index).alternator.stator.output.v = simout{test_case_index}.v_a_abc;
-    test_case_out(test_case_index).alternator.stator.output.i = simout{test_case_index}.i_a_abc;
+    test_case_out(test_case_index).alternator.stator.input.e.value = simOut{test_case_index}.e_a_abc;
+    test_case_out(test_case_index).alternator.stator.output.v = simOut{test_case_index}.v_a_abc;
+    test_case_out(test_case_index).alternator.stator.output.i = simOut{test_case_index}.i_a_abc;
     
     % Retificador
     test_case_out(test_case_index).rectifier.control.u = timeseries();
@@ -108,14 +114,14 @@ for test_case_index = 1:num_cases
     
     % Carga
     test_case_out(test_case_index).load.r = r_l;
-    test_case_out(test_case_index).load.p.inst = simout{test_case_index}.p_l;
-    test_case_out(test_case_index).load.p.avg = simout{test_case_index}.p_l;
+    test_case_out(test_case_index).load.p.inst = simOut{test_case_index}.p_l;
+    test_case_out(test_case_index).load.p.avg = simOut{test_case_index}.p_l;
     
-    p_time = simout{test_case_index}.p_l.Time;
+    p_time = simOut{test_case_index}.p_l.Time;
     
     for u_index = 2:length(u.Time)
         p_terms = find(p_time > (u.Time(u_index) - t_u) & p_time <= u.Time(u_index));
-        p_piece = simout{test_case_index}.p_l.Data(p_terms);
+        p_piece = simOut{test_case_index}.p_l.Data(p_terms);
         test_case_out(test_case_index).load.p.avg.Data(p_terms) = mean(p_piece);
     end
 end
