@@ -298,6 +298,5 @@ end
 %% Armazenamento dos resultados de simulação
 
 save('results/MPPTCurves/test_case_out.mat', 'test_case_out', '-v7.3');
-save('results/MPPTCurves/test_case_out.mat', 'test_case_out', '-v7.3');
 save('results/MPPTCurves/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
 save('results/MPPTCurves/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
