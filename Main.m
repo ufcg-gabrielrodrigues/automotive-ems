@@ -60,7 +60,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-Perreault2004Routine;
+ControlComparisonRoutine;
 
 %% Redefinição de parâmetros de alternador
 

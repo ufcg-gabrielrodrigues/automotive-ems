@@ -54,7 +54,7 @@ u.Time = [0.0 (t_u * 2):t_u:(t_u * length(u.Data))];
 
 %% Inicializa modelo no Simulink
 
-open_system('MPPTCurves.slx', 'loadonly');
+open_system('models/MPPTCurves.slx', 'loadonly');
 
 %% Parâmetros de simulação
 
@@ -69,7 +69,7 @@ set_param('MPPTCurves/Solver Configuration', 'MaxNonlinIter', '20');
 set_param('MPPTCurves', 'StopTime', num2str(u.Time(end) + t_u));
 
 % Salva mundanças feitas no modelo
-save_system('MPPTCurves.slx');
+save_system('models/MPPTCurves.slx');
 
 %% Configuração dos casos de teste como entrada do modelo no Simulink
 
@@ -117,7 +117,7 @@ end
 
 %% Finaliza modelo no Simulink
 
-close_system('MPPTCurves.slx');
+close_system('models/MPPTCurves.slx');
 
 %% Ajustes para iniciar tratamento e registro de resultados
 

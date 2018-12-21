@@ -1,8 +1,12 @@
+%% Inicializa modelo no Simulink
+
+open_system('models/ControlComparison.slx', 'loadonly');
+
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
 T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
-t_f = 4.0;  % Tempo total de simulação [s]
+t_f = 5e-0;	% Tempo total de simulação [s]
 
 %% Motor a combustão interna
 
@@ -12,14 +16,14 @@ iceToAltRotRatio = 2.5;
 % Pontos de interesse do perfil de velocidade
 n_ice_i = 6e+3/iceToAltRotRatio;
 n_ice_f = 2e+3/iceToAltRotRatio;
-t_brake = 3e+0;                     % [s]
+t_brake = 3e-0;                     % [s]
 t_brake_i = (t_f - t_brake)/2;      % [s]
 t_brake_f = t_brake_i + t_brake;    % [s]
 
 %% Alternador
 
 % Corrente de excita��o m�xima
-i_f_max = 3.6;  % [A]
+i_f_max = 3.0;  % [A]
 
 %% Retificador
 
@@ -49,11 +53,11 @@ neuralControlScheme = Simulink.Variant('control_scheme == 3');
 
 %
 fittedControlScheme = Simulink.Variant('control_scheme == 4');
-load('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
 
-%% Inicializa modelo no Simulink
-
-open_system('models/ControlComparison.slx', 'loadonly');
+fittedMPPSurfaceMat = matfile('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
+fittedMPPSurfaceCoeff = coeffvalues(fittedMPPSurfaceMat.fittedMPPSurface);
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'ControlComparison/Control scheme/Surface Fitted MPPT Control Scheme/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, 'p = zeros(13, 1)', ['p = [' num2str(fittedMPPSurfaceCoeff) ']']);
 
 %% Parâmetros de simulação
 
@@ -65,15 +69,31 @@ set_param('ControlComparison/Solver Configuration', 'DoFixedCost', 'on');
 set_param('ControlComparison/Solver Configuration', 'MaxNonlinIter', '20');
 
 % Parâmetros do 'solver' global
-simulationParameters.StopTime = num2str(t_f);   % [s]
+set_param('ControlComparison', 'StopTime', num2str(t_f));
+
+% Salva mundanças feitas no modelo
+save_system('models/ControlComparison.slx');
+
+%% Configuração dos esquemas de controle como entrada do modelo no Simulink
+
+% Inicializa��o da vari�vel que define o esquema de controle selecionado
+control_scheme = 1;
+
+% 
+for control_scheme_index = 1:length(control_scheme_title)
+    simIn(control_scheme_index) = Simulink.SimulationInput('ControlComparison');
+    simIn(control_scheme_index) = simIn(control_scheme_index).setVariable('control_scheme', control_scheme_index);
+end
 
 %% Execução da simulação em ambiente Simulink
 
-for control_scheme_index = 1:length(control_scheme_title)
-    fprintf('Running control scheme #%d...\n', control_scheme_index);
-    control_scheme = control_scheme_index;
-    simout{control_scheme_index} = sim('ControlComparison', simulationParameters);
-end
+% Execução da simulação paralelizada
+simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
+    'TransferBaseWorkspaceVariables', 'on');
+
+%% 
+
+blockHandle.Script = strrep(blockHandle.Script, ['p = [' num2str(fittedMPPSurfaceCoeff) ']'], 'p = zeros(13, 1)');
 
 %% Salva e finaliza modelo no Simulink
 
@@ -84,28 +104,28 @@ close_system('models/ControlComparison.slx');
 
 for control_scheme_index = 1:length(control_scheme_title)
     % Motor a combustão interna
-    ice.n{control_scheme_index} = simout{control_scheme_index}.n_ice;
+    ice.n{control_scheme_index} = simOut(control_scheme_index).n_ice;
     
     % Alternador
-    alternator.rotor.n{control_scheme_index} = simout{control_scheme_index}.n_r;
-    alternator.rotor.control.u{control_scheme_index} = simout{control_scheme_index}.u_i_f;
-    alternator.rotor.l.i{control_scheme_index} = simout{control_scheme_index}.i_f;
+    alternator.rotor.n{control_scheme_index} = simOut(control_scheme_index).n_r;
+    alternator.rotor.control.u{control_scheme_index} = simOut(control_scheme_index).u_i_f;
+    alternator.rotor.l.i{control_scheme_index} = simOut(control_scheme_index).i_f;
     
-    alternator.stator.input.e.value{control_scheme_index} = simout{control_scheme_index}.e_a_abc;
-    alternator.stator.output.v{control_scheme_index} = simout{control_scheme_index}.v_a_abc;
-    alternator.stator.output.i{control_scheme_index} = simout{control_scheme_index}.i_a_abc;
+    alternator.stator.input.e.value{control_scheme_index} = simOut(control_scheme_index).e_a_abc;
+    alternator.stator.output.v{control_scheme_index} = simOut(control_scheme_index).v_a_abc;
+    alternator.stator.output.i{control_scheme_index} = simOut(control_scheme_index).i_a_abc;
     
     % Retificador
-    rectifier.control.u{control_scheme_index} = simout{control_scheme_index}.u_smr;
+    rectifier.control.u{control_scheme_index} = simOut(control_scheme_index).u_smr;
     
     % Carga
-    electrical_load.v{control_scheme_index} = simout{control_scheme_index}.v_l;
-    electrical_load.i{control_scheme_index} = simout{control_scheme_index}.i_l;
-    electrical_load.z{control_scheme_index} = simout{control_scheme_index}.z_l;
-    electrical_load.p{control_scheme_index} = simout{control_scheme_index}.p_l;
+    electrical_load.v{control_scheme_index} = simOut(control_scheme_index).v_l;
+    electrical_load.i{control_scheme_index} = simOut(control_scheme_index).i_l;
+    electrical_load.z{control_scheme_index} = simOut(control_scheme_index).z_l;
+    electrical_load.p{control_scheme_index} = simOut(control_scheme_index).p_l;
     
     % Bateria
-    battery.v{control_scheme_index} = simout{control_scheme_index}.v_b;
+    battery.v{control_scheme_index} = simOut(control_scheme_index).v_b;
 end
 
 %% Armazenamento dos resultados de simulação
