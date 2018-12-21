@@ -19,7 +19,7 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 3.0;  % [A]
+i_f_max = 3.6;  % [A]
 
 %% Retificador
 
