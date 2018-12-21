@@ -1,6 +1,6 @@
 %% Partição da simulação
 
-sim_split_flag = true;      % Flag de particionamento
+sim_split_flag = false;     % Flag de particionamento
 sim_batches = 60;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
@@ -237,6 +237,44 @@ end
 
 figure_index = 0;
 leg_entries_per_columns = 3;
+
+%% Curvas de potência (comparadas por corrente de excitação)
+
+for n_alt = n_alt_list
+    
+    for r_l = r_l_list
+        
+        colors = distinguishable_colors(length(i_f_list));
+        color_index = 0;
+        
+        figure_index = figure_index + 1;
+        figure(figure_index)
+        
+        for i_f = i_f_list
+            color_index = color_index + 1;
+            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 3) == r_l));
+            
+            plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
+                'Color', colors(color_index, :), 'DisplayName', ...
+                ['$i_{f} = ' num2str(i_f) ' A$']);
+            hold on;
+            
+            legend('off');
+            legend('show');
+        end
+        
+        title(['Curvas de pot{\^{e}}ncia [$n_{alt} = ' num2str(n_alt) ...
+            ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+        xlabel('$u$');
+        ylabel('$P$ [W]');
+        leg = legend;
+        leg.Location = 'SouthOutside';
+        leg.NumColumns = ceil(length(i_f_list)/leg_entries_per_columns);
+        grid on;
+    end
+end
 
 %% Curvas de potência (comparadas por velocidade do alternador)
 
