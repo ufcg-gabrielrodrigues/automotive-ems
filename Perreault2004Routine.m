@@ -5,6 +5,7 @@ open_system('models/Perreault2004.slx', 'loadonly');
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
+T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
 t_f = 0.1;  % Tempo total de simulação [s]
 
 %% Motor a combustão interna
@@ -17,7 +18,7 @@ n_ice = 1800/iceToAltRotRatio;
 
 %% Alternador
 
-% Corrente de excita��o m�xima
+% Corrente de excita��o m�xima
 i_f_max = 3.6;  % [A]
 
 % Atualização de parâmetro: fator de acoplamento
@@ -30,9 +31,9 @@ blockHandle.Script = strrep(blockHandle.Script, 'k_v = 0', ['k_v = ' k_v_str]);
 % Filtro passivo
 rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 
-%% Carga el�trica
+%% Carga el�trica
 
-electrical_load.r = 0.15;   % [Ohm]
+electrical_load.r = 1.0e+0; % [Ohm]
 
 %% Parâmetros de simulação
 
