@@ -10,13 +10,18 @@ else
     previousVars{1} = who;
 end
 
+%% Tipos de conexão do circuito de estator
+
+y = 1;
+delta = 2;
+
 %% Executa script de determinação de parâmetros de acordo com alternador
 %  selecionado
 
 switch alternatorCase
     case 'Sarafianos2015'
         AlternatorParametersSarafianos;
-    case 'Rodrigues2018'
+    case 'Rodrigues2019'
         disp('Indisponivel');
 end
 

@@ -13,15 +13,16 @@ end
 
 %% Características explícitas do alternador utilizado
 
-n = 3;          % Número de fases
-p = 8;          % Número de pares de polos por fase
-slots = 48;     % Número de ranhuras no estator
-r_a = 0.03;     % Resistência de estator (por fase) a 20 oC
-r_f = 1.90;     % Resistência de rotor a 20 oC
-v_o = 13.5;     % Tensão de saída (CC)
-i_max_2k = 120; % Corrente máxima de saída a 2000 rpm e 25 oC
-i_max_4k = 170; % Corrente máxima de saída a 4000 rpm e 25 oC
-i_max_6k = 180; % Corrente máxima de saída a 6000 rpm e 25 oC
+connection = delta; % Tipo de conexão do circuito de estator
+n = 3;            	% Número de fases
+p = 8;            	% Número de pares de polos por fase
+slots = 48;        	% Número de ranhuras no estator
+r_a = 0.03;       	% Resistência de estator (por fase) a 20 oC
+r_f = 1.90;       	% Resistência de rotor a 20 oC
+v_o = 13.5;        	% Tensão de saída (CC)
+i_max_2k = 120;   	% Corrente máxima de saída a 2000 rpm e 25 oC
+i_max_4k = 170;    	% Corrente máxima de saída a 4000 rpm e 25 oC
+i_max_6k = 180;    	% Corrente máxima de saída a 6000 rpm e 25 oC
 
 %% Registro das características explícitas em arquivo .MAT
 
@@ -33,8 +34,8 @@ explicitAlternatorCharacteristics = strcat(currentFolder, ...
     '/explicitAlternatorCharacteristics.mat');
 
 % Registro das características no destino previamente especificado
-save(explicitAlternatorCharacteristics, 'n', 'p', 'slots', 'r_a', 'r_f', 'v_o', ...
-    'i_max_2k', 'i_max_4k', 'i_max_6k');
+save(explicitAlternatorCharacteristics, 'connection', 'n', 'p', 'slots', ...
+    'r_a', 'r_f', 'v_o', 'i_max_2k', 'i_max_4k', 'i_max_6k');
 
 %% Exclusão das variáveis excedentes
 

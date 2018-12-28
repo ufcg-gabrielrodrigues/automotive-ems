@@ -36,7 +36,7 @@ addpath(root);
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = false;
+alternatorFittingFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -54,13 +54,17 @@ l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     'l == 1e-6', ['l == ' l_a_str]);
 
+% Tipos de conexão do circuito de estator
+yStatorConnection = Simulink.Variant('alternator.stator.connection == 1');
+deltaStatorConnection = Simulink.Variant('alternator.stator.connection == 2');
+
 %% Retificador
 
 RectifierParametersEMS;
 
 %% Rotina de simulação
 
-Perreault2004Routine;
+ControlComparisonRoutine;
 
 %% Redefinição de parâmetros de alternador
 
