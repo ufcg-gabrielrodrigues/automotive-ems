@@ -6,7 +6,7 @@ open_system('models/ControlComparison.slx', 'loadonly');
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
 T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
-t_f = 5e-0;	% Tempo total de simulação [s]
+t_f = 4e-0;	% Tempo total de simulação [s]
 
 %% Motor a combustão interna
 
@@ -23,7 +23,7 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 %% Alternador
 
 % Corrente de excita��o m�xima
-i_f_max = 3.0;  % [A]
+i_f_max = 3.5;  % [A]
 
 %% Retificador
 
@@ -32,15 +32,14 @@ rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 
 %% Carga el�trica
 
-electrical_load.r = 0.15;   % [Ohm]
+electrical_load.r = 1.0e+0;	% [Ohm]
 
 %% Esquemas de controle
 
 % Lista de t�tulos por esquema de controle
 control_scheme_title = {'Esquema de controle convencional', ...
     'Esquema de controle baseado em excita{\c{c}}{\~{a}}o maximizada', ...
-    'Esquema de controle baseado em rede neural', ...
-    'Esquema de controle baseado em superf{\''{i}}cie ajustada'};
+    'Esquema de controle baseado em rede neural'};
 
 %
 conventionalControlScheme = Simulink.Variant('control_scheme == 1');
@@ -50,14 +49,7 @@ fullExcitationCurrentControlScheme = Simulink.Variant('control_scheme == 2');
 
 %
 neuralControlScheme = Simulink.Variant('control_scheme == 3');
-
-%
-fittedControlScheme = Simulink.Variant('control_scheme == 4');
-
-fittedMPPSurfaceMat = matfile('src/control_scheme/fitted_mpp_surface/fittedMPPSurface.mat');
-fittedMPPSurfaceCoeff = coeffvalues(fittedMPPSurfaceMat.fittedMPPSurface);
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'ControlComparison/Control scheme/Surface Fitted MPPT Control Scheme/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'p = zeros(13, 1)', ['p = [' num2str(fittedMPPSurfaceCoeff) ']']);
+normalizationFactor = [4.0e+0 6.0e+3 2.0e+0];
 
 %% Parâmetros de simulação
 
@@ -90,10 +82,6 @@ end
 % Execução da simulação paralelizada
 simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
     'TransferBaseWorkspaceVariables', 'on');
-
-%% 
-
-blockHandle.Script = strrep(blockHandle.Script, ['p = [' num2str(fittedMPPSurfaceCoeff) ']'], 'p = zeros(13, 1)');
 
 %% Salva e finaliza modelo no Simulink
 
@@ -143,7 +131,8 @@ mpp_target = [];
 
 try
     load('results/MPPTCurves/mpp_matrix.mat');
-    mpp_target = mpp_matrix(round(mpp_matrix(:, 3), 3) == electrical_load.r, :);
+    mpp_target = mpp_matrix(round(mpp_matrix(:, 1), 3) == i_f_max & ...
+        round(mpp_matrix(:, 3), 3) == electrical_load.r, :);
 catch
     disp('MPP Matrix unavailable');
 end
