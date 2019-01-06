@@ -126,42 +126,58 @@ save('results/ControlComparison/battery.mat', 'battery', '-v7.3');
 
 %% Montagem de séries temporais de valores esperados relativos aos MPPs
 
-% Carregamento de matrix de dados de pontos de máxima potência
+% Carregamento de mapa de dados de pontos de máxima potência
 mpp_target = [];
 
 try
-    load('results/MPPTCurves/mpp_matrix.mat');
-    mpp_target = mpp_matrix(round(mpp_matrix(:, 1), 3) == i_f_max & ...
-        round(mpp_matrix(:, 3), 3) == electrical_load.r, :);
+    load('results/MPPTCurves/mpp_map.mat');
 catch
-    disp('MPP Matrix unavailable');
+    disp('MPP Map unavailable');
 end
 
-% Caso a matriz tenha sido carregada com sucesso, executar a rotina
-if (~isempty(mpp_target))
-    % Remoção de valores fora da região de interesse de velocidade
-    n_r_min = min(iceToAltRotRatio*[n_ice_i n_ice_f]);
-    n_r_max = max(iceToAltRotRatio*[n_ice_i n_ice_f]);
+% Caso o arquivo tenha sido carregado com sucesso, executar a rotina
+if (exist('mpp_u_3d', 'var'))
+    % Inicialização dos pontos de interesse para comparação com as
+    % estratégias de controle
+    target_points = 20;
+    t_target = round(linspace(t_brake_i, t_brake_f, target_points)', 5);
+    i_f = zeros(target_points, 1);
+    n_alt = zeros(target_points, 1);
     
-    mpp_target((mpp_target(:, 2) < n_r_min) | (mpp_target(:, 2) > n_r_max), :) = [];
-    
-    % Determinação da equação da reta que descreve a variação de velocidade
-    a = iceToAltRotRatio*(n_ice_f - n_ice_i)/(t_brake_f - t_brake_i);
-    b = iceToAltRotRatio*n_ice_i - a*t_brake_i;
-    
-    % Determinação dos instantes correspondente aos valores de interesse da
-    % velocidade
-    time = (mpp_target(:, 2) - b)/a;
-    
-    % Ordenação da matriz de casos esperados com relação ao tempo
-    mpp_target = [time mpp_target];
-    [~, sorted_indexes] = sort(mpp_target(:, 1), 'ascend');
-    mpp_target = mpp_target(sorted_indexes, :);
-    
-    % Montagem das séries temporais relativas ao ciclo de trabalho e à
-    % potência
-    mpp_target_u = timeseries(mpp_target(:, 5), mpp_target(:, 1));
-    mpp_target_p = timeseries(mpp_target(:, 6), mpp_target(:, 1));
+    % Laço para determinar MPPs ideais para cada estratégia de controle
+    for control_scheme_index = 1:length(control_scheme_title)
+        % Armazenamento das variáveis de interesse
+        t = round(alternator.rotor.l.i{control_scheme_index}.time, 10);
+        i_f = alternator.rotor.l.i{control_scheme_index}.data;
+        n_alt = alternator.rotor.n{control_scheme_index}.data;
+        
+        % Determinação dos índices dos pontos de interesse
+        target_elements = ismember(t, t_target);
+        
+        t = t(target_elements);
+        i_f = i_f(target_elements);
+        n_alt = n_alt(target_elements);
+        
+        % Remoção de pontos idênticos
+        [~, target_elements, ~] = unique(t, 'first');
+        
+        t = t(target_elements);
+        i_f = i_f(target_elements);
+        n_alt = n_alt(target_elements);
+        r_l = electrical_load.r.*ones(target_points, 1);
+        
+        % Determinação dos MPPs ideais via interpolação
+        mpp_target_u_tmp = interpn(i_f_list, n_alt_list, r_l_list, mpp_u_3d, i_f, n_alt, r_l, 'spline', -1);
+        mpp_target_p_tmp = interpn(i_f_list, n_alt_list, r_l_list, mpp_p_3d, i_f, n_alt, r_l, 'spline', -1);
+        
+        % Formação das séries temporais dos MPPs ideais
+        mpp_target_u_tmp = timeseries(mpp_target_u_tmp, t);
+        mpp_target_p_tmp = timeseries(mpp_target_p_tmp, t);
+        
+        % Armazenamento das variáveis para traço de figuras
+        mpp_target_u{control_scheme_index} = mpp_target_u_tmp;
+        mpp_target_p{control_scheme_index} = mpp_target_p_tmp;
+    end
 end
 
 %% Análise de potência e ciclo de trabalho para cada esquema de controle
@@ -169,34 +185,52 @@ end
 % Índice de figuras
 figure_index = 0;
 
-% Laço de traço de figuras
-for control_scheme_index = 1:length(control_scheme_title)
-    figure_index = figure_index + 1;
-    figure(figure_index)
+% Caso o arquivo tenha sido carregado com sucesso, executar a rotina
+if (exist('mpp_u_3d', 'var'))
     
-    subplot(2, 1, 1)
-    plot(electrical_load.p{control_scheme_index}, 'b-', 'DisplayName', '$P_{l}$');
-    hold on;
-    plot(mpp_target_p, 'ro', 'DisplayName', '$P_{MPP}^{*}$');
-    hold off;
-    title('Pot{\^{e}}ncia el{\''{e}}trica consumida pela carga');
-    xlabel('$t$ [s]');
-    ylabel('$P_{l}$ [W]');
-    legend('show');
-    grid on;
-    
-    subplot(2, 1, 2)
-    plot(rectifier.control.u{control_scheme_index}, 'b-', 'DisplayName', '$d_{SMR}$');
-    hold on;
-    plot(mpp_target_u, 'ro', 'DisplayName', '$d_{MPP}^{*}$');
-    hold off;
-    title('Ciclo de trabalho das chaves do retificador semi-controlado');
-    xlabel('$t$ [s]');
-    ylabel('$d_{SMR}$');
-    legend('show');
-    grid on;
-    
-    suptitle(control_scheme_title{control_scheme_index});
+    % Laço de traço de figuras
+    for control_scheme_index = 1:length(control_scheme_title)
+        figure_index = figure_index + 1;
+        figure(figure_index)
+        
+        subplot(4, 1, 1)
+        plot(electrical_load.p{control_scheme_index}, 'b-', 'DisplayName', '$P_{l}$');
+        hold on;
+        plot(mpp_target_p{control_scheme_index}, 'ro', 'DisplayName', '$P_{MPP}^{*}$');
+        hold off;
+        title('Pot{\^{e}}ncia el{\''{e}}trica consumida pela carga');
+        xlabel('$t$ [s]');
+        ylabel('$P_{l}$ [W]');
+        legend('show');
+        grid on;
+        
+        subplot(4, 1, 2)
+        plot(rectifier.control.u{control_scheme_index}, 'b-', 'DisplayName', '$d_{SMR}$');
+        hold on;
+        plot(mpp_target_u{control_scheme_index}, 'ro', 'DisplayName', '$d_{MPP}^{*}$');
+        hold off;
+        title('Ciclo de trabalho das chaves do retificador semi-controlado');
+        xlabel('$t$ [s]');
+        ylabel('$d_{SMR}$');
+        legend('show');
+        grid on;
+        
+        subplot(4, 1, 3)
+        plot(alternator.rotor.l.i{control_scheme_index});
+        title('Corrente de excita{\c{c}}{\~{a}}o do alternador');
+        xlabel('$t$ [s]');
+        ylabel('$i_{f} [A]$');
+        grid on;
+        
+        subplot(4, 1, 4)
+        plot(alternator.rotor.n{control_scheme_index});
+        title('Velocidade do alternador');
+        xlabel('$t$ [s]');
+        ylabel('$n_{alt} [rpm]$');
+        grid on;
+        
+        suptitle(control_scheme_title{control_scheme_index});
+    end
 end
 
 %% Armazenamento de figuras

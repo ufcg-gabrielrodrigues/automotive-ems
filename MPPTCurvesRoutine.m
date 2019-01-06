@@ -1,6 +1,6 @@
 %% Partição da simulação
 
-sim_split_flag = false;     % Flag de particionamento
+sim_split_flag = true;      % Flag de particionamento
 sim_batches = 60;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
@@ -235,8 +235,8 @@ end
 
 %% Identificação de pontos de máxima potência
 
-mpp_u_3d = zeros(length(r_l_list), length(n_alt_list), length(i_f_list));
-mpp_p_3d = zeros(length(r_l_list), length(n_alt_list), length(i_f_list));
+mpp_u_3d = zeros(length(i_f_list), length(n_alt_list), length(r_l_list));
+mpp_p_3d = zeros(length(i_f_list), length(n_alt_list), length(r_l_list));
 
 mpp_matrix = [param_sweep zeros(num_cases, 2)];
 case_index = 0;
@@ -270,8 +270,8 @@ for i_f = i_f_list
             mpp_matrix(case_index, 4) = u_max;
             mpp_matrix(case_index, 5) = p_max;
             
-            mpp_u_3d(r_l_index, n_alt_index, i_f_index) = u_max;
-            mpp_p_3d(r_l_index, n_alt_index, i_f_index) = p_max;
+            mpp_u_3d(i_f_index, n_alt_index, r_l_index) = u_max;
+            mpp_p_3d(i_f_index, n_alt_index, r_l_index) = p_max;
         end
         
     end
@@ -515,3 +515,5 @@ end
 
 save('results/MPPTCurves/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
 save('results/MPPTCurves/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
+save('results/MPPTCurves/mpp_map.mat', 'i_f_list', 'n_alt_list', 'r_l_list', ...
+    'mpp_u_3d', 'mpp_p_3d', '-v7.3');
