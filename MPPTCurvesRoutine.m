@@ -1,6 +1,6 @@
 %% Partição da simulação
 
-sim_split_flag = true;      % Flag de particionamento
+sim_split_flag = true;    	% Flag de particionamento
 sim_batches = 60;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
@@ -21,9 +21,9 @@ rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [0.01 0.5:0.5:4.0];                  % Corrente de excitação [A]
-n_alt_list = 1500:500:6000;                     % Velocidade do alternador [rpm]
-r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:2.0];	% Resistência de carga [Ohm]
+i_f_list = [0.01 0.5:0.5:4.0]';                 % Corrente de excitação [A]
+n_alt_list = (1500:500:6000)';                  % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
@@ -31,14 +31,17 @@ param_sweep = [];
 for index_i_f = 1:length(i_f_list)
     
     n_alt_sweep = [];
+    [r_l_dim, ~] = size(r_l_list);
     
     for index_n_alt = 1:length(n_alt_list)
-        n_alt_tmp = n_alt_list(index_n_alt) * ones(length(r_l_list), 1);
-        n_alt_tmp = [n_alt_tmp, r_l_list'];
+        n_alt_tmp = n_alt_list(index_n_alt) * ones(r_l_dim, 1);
+        n_alt_tmp = [n_alt_tmp, r_l_list];
         n_alt_sweep = [n_alt_sweep; n_alt_tmp];
     end
     
-    i_f_tmp = i_f_list(index_i_f) * ones(length(n_alt_sweep), 1);
+    [n_alt_sweep_dim, ~] = size(n_alt_sweep);
+    
+    i_f_tmp = i_f_list(index_i_f) * ones(n_alt_sweep_dim, 1);
     i_f_tmp = [i_f_tmp, n_alt_sweep];
     param_sweep = [param_sweep; i_f_tmp];
 end
