@@ -1,6 +1,6 @@
 %% Partição da simulação
 
-sim_split_flag = true;    	% Flag de particionamento
+sim_split_flag = false;    	% Flag de particionamento
 sim_batches = 60;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
@@ -248,15 +248,15 @@ i_f_index = 0;
 n_alt_index = 0;
 r_l_index = 0;
 
-for i_f = i_f_list
+for i_f = i_f_list'
     i_f_index = i_f_index + 1;
     n_alt_index = 0;
     
-    for n_alt = n_alt_list
+    for n_alt = n_alt_list'
         n_alt_index = n_alt_index + 1;
         r_l_index = 0;
         
-        for r_l = r_l_list
+        for r_l = r_l_list'
             r_l_index = r_l_index + 1;
             case_index = case_index + 1;
             
@@ -305,9 +305,9 @@ leg_entries_per_columns = 3;
 %% Curvas de potência 
 
 % Comparadas por corrente de excitação
-for n_alt = n_alt_list
+for n_alt = n_alt_list'
     
-    for r_l = r_l_list
+    for r_l = r_l_list'
         
         colors = distinguishable_colors(length(i_f_list));
         color_index = 0;
@@ -315,7 +315,7 @@ for n_alt = n_alt_list
         figure_index = figure_index + 1;
         figure(figure_index)
         
-        for i_f = i_f_list
+        for i_f = i_f_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
                 & (test_case_matrix(:, 2) == n_alt) ...
@@ -342,9 +342,9 @@ for n_alt = n_alt_list
 end
 
 % Comparadas por velocidade do alternador
-for i_f = i_f_list
+for i_f = i_f_list'
     
-    for r_l = r_l_list
+    for r_l = r_l_list'
         
         colors = distinguishable_colors(length(n_alt_list));
         color_index = 0;
@@ -352,7 +352,7 @@ for i_f = i_f_list
         figure_index = figure_index + 1;
         figure(figure_index)
         
-        for n_alt = n_alt_list
+        for n_alt = n_alt_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
                 & (test_case_matrix(:, 2) == n_alt) ...
@@ -379,9 +379,9 @@ for i_f = i_f_list
 end
 
 % Comparadas por carga
-for i_f = i_f_list
+for i_f = i_f_list'
     
-    for n_alt = n_alt_list
+    for n_alt = n_alt_list'
         
         colors = distinguishable_colors(length(r_l_list));
         color_index = 0;
@@ -389,7 +389,7 @@ for i_f = i_f_list
         figure_index = figure_index + 1;
         figure(figure_index)
         
-        for r_l = r_l_list
+        for r_l = r_l_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
                 & (test_case_matrix(:, 2) == n_alt) ...
@@ -418,9 +418,9 @@ end
 %% Relação dos pontos de máxima potência com variáveis do sistema
 
 % Relação com a corrente de excitação
-for n_alt = n_alt_list
+for n_alt = n_alt_list'
     
-    for r_l = r_l_list
+    for r_l = r_l_list'
         
         curve_indexes = find((mpp_matrix(:, 2) == n_alt) & (mpp_matrix(:, 3) == r_l));
         
@@ -431,6 +431,7 @@ for n_alt = n_alt_list
         plot(mpp_matrix(curve_indexes, 1), mpp_matrix(curve_indexes, 4), 'o-');
         xlabel('$i_{f} [A]$');
         ylabel('$u$');
+        ylim([0 1]);
         grid on;
         
         subplot(2, 1, 2)
@@ -446,9 +447,9 @@ for n_alt = n_alt_list
 end
 
 % Relação com a velocidade do alternador
-for i_f = i_f_list
+for i_f = i_f_list'
     
-    for r_l = r_l_list
+    for r_l = r_l_list'
         
         curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 3) == r_l));
         
@@ -459,6 +460,7 @@ for i_f = i_f_list
         plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 4), 'o-');
         xlabel('$n_{alt} [rpm]$');
         ylabel('$u$');
+        ylim([0 1]);
         grid on;
         
         subplot(2, 1, 2)
@@ -474,9 +476,9 @@ for i_f = i_f_list
 end
 
 % Relação com a impedância de carga
-for i_f = i_f_list
+for i_f = i_f_list'
     
-    for n_alt = n_alt_list
+    for n_alt = n_alt_list'
         
         curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 2) == n_alt));
         
@@ -487,6 +489,7 @@ for i_f = i_f_list
         plot(mpp_matrix(curve_indexes, 3), mpp_matrix(curve_indexes, 4), 'o-');
         xlabel('$r_{l} [\Omega]$');
         ylabel('$u$');
+        ylim([0 1]);
         grid on;
         
         subplot(2, 1, 2)
