@@ -1,5 +1,6 @@
-%% Parâmetros relativos ao alternador utilizado no Sistema de Gerenciamento
-%  de Energia (EMS)
+%% Características relativos ao alternador (Bosch LiX 180 A, 2.4 kW) 
+%  utilizado no artigo de Sarafianos (2015): "Characterisation and
+%  Modelling of Automotive Lundell Alternators"
 
 %% Registro de variáveis existente no workspace antes da execução do script
 
@@ -13,7 +14,7 @@ end
 %% Realiza nova iteração de análise das características do alternador ou
 %  apenas carrega os resultados de uma iteração passada
 
-if (alternatorFittingFlag)
+if (alternatorCalcParamFlag)
     %% Realiza nova análise dos dados explícitos e implícitos disponíveis
     %  em Sarafianos (2015) e disponibiliza características do alternador
     

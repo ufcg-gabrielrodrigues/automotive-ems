@@ -36,21 +36,29 @@ addpath(root);
 
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
-alternatorFittingFlag = true;
+alternatorCalcParamFlag = true;
 
 % Escolha do alternador a ser utilizado
-alternatorCase = 'Sarafianos2015';
+alternatorCase = 'Rivas2004';
 
 % Executa script que determina parâmetros do alternador
 AlternatorParametersEMS;
 
-% Atualização de parâmetro: força contra eletromotriz
-e_a_str = regexprep(func2str(alternator.stator.input.e.function), '@\(.+?\)', '');
+% Atualização de parâmetro: constante de acoplamento el�trico
+if (isfield(alternator.k_e, 'function'))
+    k_e_str = regexprep(func2str(alternator.stator.k_e.function), '@\(.+?\)', '');
+else
+    k_e_str = num2str(alternator.k_e.value);
+end
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    'e == 0', ['e == ' e_a_str]);
+    'k_e == 0', ['k_e == ' k_e_str]);
 
 % Atualização de parâmetro: indutância própria de estator
-l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+if (isfield(alternator.stator.l, 'function'))
+    l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+else
+    l_a_str = num2str(alternator.stator.l.value);
+end
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     'l == 1e-6', ['l == ' l_a_str]);
 
@@ -60,17 +68,26 @@ deltaStatorConnection = Simulink.Variant('alternator.stator.connection == 2');
 
 %% Retificador
 
+% Determina realização ou não de nova iteração para determinação de
+% parâmetros
+rectifierCalcParamFlag = true;
+
+% Escolha do retificador a ser utilizado
+rectifierCase = 'Rivas2004';
+
+% Executa script que determina parâmetros do retificador
 RectifierParametersEMS;
 
 %% Rotina de simulação
 
-MPPTCurvesRoutine;
+Perreault2004Routine;
 
 %% Redefinição de parâmetros de alternador
 
-% Atualização de parâmetro para valor padrão: força contra eletromotriz
+% Atualização de parâmetro para valor padrão: constante de acoplamento
+% el�trico
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    ['e == ' e_a_str], 'e == 0');
+    ['k_e == ' k_e_str], 'k_e == 0');
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...

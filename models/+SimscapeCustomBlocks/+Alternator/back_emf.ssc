@@ -3,7 +3,7 @@ component back_emf
     % Description.
     
     inputs
-        i_f = 0;            % Excitation current:left
+        i_f = { 0, 'A' };   % Excitation current:left
         n_r = { 0, 'rpm' };	% Rotor speed:left
     end
     outputs
@@ -15,10 +15,10 @@ component back_emf
         p = 1;	% Number of pole pairs
     end
     variables
-        theta_r = { 0, 'rad' };     % Rotor position
-        omega_r = { 0, 'rad/s' };	% Rotor speed
-        omega_a = { 0, 'rad/s' };	% Alternator electrical frequency
-        e = { 0, 'rpm' };           % Back EMF peak
+        omega_r = { 0, 'rad/s' };       % Rotor speed
+        omega_e = { 0, 'rad/s' };       % Alternator electrical frequency
+        k_e = { 0, 'V/((rad/s)*(A))' }  % Electrical coupling constant
+        e = { 0, 'V' };                 % Back EMF peak
     end
     function setup
         if (floor(p) ~= p)
@@ -31,11 +31,11 @@ component back_emf
     end
     equations
         omega_r == n_r*2*pi/60;
-        theta_r == integ(omega_r);
-        omega_a == p*omega_r;
-        e == 0;
-        e_a == e*cos(omega_a*time + theta_r)*{1, 'V/rpm'};
-        e_b == e*cos(omega_a*time + theta_r + 2*pi/3)*{1, 'V/rpm'};
-        e_c == e*cos(omega_a*time + theta_r - 2*pi/3)*{1, 'V/rpm'};
+        omega_e == p*omega_r;
+        k_e == 0;
+        e == k_e*omega_e*i_f;
+        e_a == e*cos(omega_e*time);
+        e_b == e*cos(omega_e*time + 2*pi/3);
+        e_c == e*cos(omega_e*time - 2*pi/3);
     end
 end

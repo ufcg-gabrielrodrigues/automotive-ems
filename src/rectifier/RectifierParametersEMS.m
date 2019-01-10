@@ -10,18 +10,17 @@ else
     previousVars{1} = who;
 end
 
-%% Parâmetros de circuito
+%% Executa script de determinação de parâmetros de acordo com retificador
+%  selecionado
 
-% Diodos
-rectifier.d.v_on = 0.8;             % Tensão de polarização [V]
-rectifier.d.r_on = 10e-3;           % Resistência de condução [Ohm]
-
-% MOSFETs
-rectifier.s.v_gs_on = 10;           % Tensão gate-source para acionamento dos MOSFETs do circuito retificador [V]
-
-%% Parâmetros de controle
-
-rectifier.control.pwm.f_s = 10e+3;  % Frequência de chaveamento dos PWMs de controle do circuito retificador [Hz]
+switch rectifierCase
+    case 'Rivas2004'
+        RectifierParametersRivas;
+    case 'Sarafianos2015'
+        RectifierParametersSarafianos;
+    case 'Rodrigues2019'
+        disp('Indisponivel');
+end
 
 %% Exclusão das variáveis excedentes
 

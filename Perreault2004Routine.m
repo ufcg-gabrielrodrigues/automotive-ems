@@ -4,32 +4,31 @@ open_system('models/Perreault2004.slx', 'loadonly');
 
 %% Parâmetros temporais
 
-T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
-T_k = 1e-4; % Passo de amostragem global de rotinas de controle [s]
+T_s = 1e-7; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
+T_k = 1e-5; % Passo de amostragem global de rotinas de controle [s]
 t_f = 0.1;  % Tempo total de simulação [s]
-
-%% Motor a combustão interna
-
-% Razão entre a polia do motor a combustão e a polia do alternador
-iceToAltRotRatio = 2.5;
-
-% Velocidade
-n_ice = 1800/iceToAltRotRatio;
 
 %% Alternador
 
+% Velocidade
+alternator.rotor.n = 1800;
+
 % Corrente de excita��o m�xima
-i_f_max = 3.6;  % [A]
+alternator.rotor.l.i = 3.6; % [A]
 
 % Atualização de parâmetro: fator de acoplamento
-k_v_str = regexprep(func2str(alternator.k_v), '@\(.+?\)', '');
+if (isfield(alternator.k_e, 'function'))
+    k_e_str = regexprep(func2str(alternator.stator.k_e.function), '@\(.+?\)', '');
+else
+    k_e_str = num2str(alternator.k_e.value);
+end
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'k_v = 0', ['k_v = ' k_v_str]);
+blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0', ['k_e = ' k_e_str]);
 
 %% Retificador
 
 % Filtro passivo
-rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
+rectifier.filter.c = 60e-6;	% Capacitância de filtro [F]
 
 %% Carga el�trica
 
@@ -63,13 +62,7 @@ close_system('models/Perreault2004.slx');
 
 %% Registro de resultados obtidos na simulação
 
-% Motor a combustão interna
-ice.n = n_ice;
-
 % Alternador
-alternator.rotor.n = simout.n_r;
-alternator.rotor.l.i = i_f_max;
-
 alternator.stator.input.e.value = simout.e_a_abc;
 alternator.stator.output.v = simout.v_a_abc;
 alternator.stator.output.i = simout.i_a_abc;

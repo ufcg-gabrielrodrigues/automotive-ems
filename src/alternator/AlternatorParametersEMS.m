@@ -19,6 +19,8 @@ delta = 2;
 %  selecionado
 
 switch alternatorCase
+    case 'Rivas2004'
+        AlternatorParametersRivas;
     case 'Sarafianos2015'
         AlternatorParametersSarafianos;
     case 'Rodrigues2019'
