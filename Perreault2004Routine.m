@@ -32,7 +32,8 @@ rectifier.filter.c = 60e-6;	% Capacitância de filtro [F]
 
 %% Carga el�trica
 
-electrical_load.r = 1.0e+0; % [Ohm]
+electrical_load.battery.v_nom = 50.0;   % [V]
+electrical_load.r = 1.0;                % [Ohm]
 
 %% Parâmetros de simulação
 
@@ -73,12 +74,10 @@ rectifier.control.u = simout.u_smr;
 % Carga
 electrical_load.v = simout.v_l;
 electrical_load.i = simout.i_l;
-electrical_load.z = simout.z_l;
 electrical_load.p = simout.p_l;
 
 %% Armazenamento dos resultados de simulação
 
-save('results/Perreault2004/ice.mat', 'ice', '-v7.3');
 save('results/Perreault2004/alternator.mat', 'alternator', '-v7.3');
 save('results/Perreault2004/rectifier.mat', 'rectifier', '-v7.3');
 save('results/Perreault2004/electrical_load.mat', 'electrical_load', '-v7.3');
