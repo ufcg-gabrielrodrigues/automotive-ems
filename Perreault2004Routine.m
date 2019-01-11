@@ -23,7 +23,7 @@ else
     k_e_str = num2str(alternator.k_e.value);
 end
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0', ['k_e = ' k_e_str]);
+blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str ';']);
 
 %% Retificador
 
@@ -53,7 +53,7 @@ simout = sim('Perreault2004', simulationParameters);
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
-blockHandle.Script = strrep(blockHandle.Script, ['k_v = ' k_v_str], 'k_v = 0');
+blockHandle.Script = strrep(blockHandle.Script, ['k_e = ' k_e_str ';'], 'k_e = 0;');
 
 %% Salva e finaliza modelo no Simulink
 

@@ -30,9 +30,9 @@ component back_emf
         end
     end
     equations
-        omega_r == n_r*2*pi/60;
+        omega_r == n_r;
         omega_e == p*omega_r;
-        k_e == 0;
+        k_e == { 0, 'V/((rad/s)*(A))' };
         e == k_e*omega_e*i_f;
         e_a == e*cos(omega_e*time);
         e_b == e*cos(omega_e*time + 2*pi/3);

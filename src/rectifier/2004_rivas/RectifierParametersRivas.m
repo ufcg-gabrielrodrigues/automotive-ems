@@ -17,6 +17,9 @@ end
 if (rectifierCalcParamFlag)
     %% Registro de parâmetros definidos em estrutura que representa o retificador
     
+    % MOSFETs
+    rectifier.s.v_gs_on = 10;           % Tensão gate-source para acionamento dos MOSFETs do circuito retificador [V]
+    
     % Parâmetros de controle
     rectifier.control.pwm.f_s = 1.0e+5; % Frequência de chaveamento dos PWMs de controle do circuito retificador [Hz]
     

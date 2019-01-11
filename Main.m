@@ -51,7 +51,7 @@ else
     k_e_str = num2str(alternator.k_e.value);
 end
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    'k_e == 0', ['k_e == ' k_e_str]);
+    'k_e == { 0, ''V/((rad/s)*(A))'' }', ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' }']);
 
 % Atualização de parâmetro: indutância própria de estator
 if (isfield(alternator.stator.l, 'function'))
@@ -87,7 +87,7 @@ Perreault2004Routine;
 % Atualização de parâmetro para valor padrão: constante de acoplamento
 % el�trico
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    ['k_e == ' k_e_str], 'k_e == 0');
+    ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' }'], 'k_e == { 0, ''V/((rad/s)*(A))'' }');
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
