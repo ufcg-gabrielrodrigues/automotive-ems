@@ -39,7 +39,7 @@ addpath(root);
 alternatorCalcParamFlag = true;
 
 % Escolha do alternador a ser utilizado
-alternatorCase = 'Rivas2004';
+alternatorCase = 'Sarafianos2015';
 
 % Executa script que determina parâmetros do alternador
 AlternatorParametersEMS;
@@ -73,14 +73,14 @@ deltaStatorConnection = Simulink.Variant('alternator.stator.connection == 2');
 rectifierCalcParamFlag = true;
 
 % Escolha do retificador a ser utilizado
-rectifierCase = 'Rivas2004';
+rectifierCase = 'Sarafianos2015';
 
 % Executa script que determina parâmetros do retificador
 RectifierParametersEMS;
 
 %% Rotina de simulação
 
-Perreault2004Routine;
+LundellAlternatorRoutine;
 
 %% Redefinição de parâmetros de alternador
 
