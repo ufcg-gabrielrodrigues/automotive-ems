@@ -3,12 +3,12 @@ component stator_inductance
     % Description.
     
     inputs
-        i_f = 0;    % Excitation current:left
+        i_f = { 0, 'A' };   % Excitation current:left
     end
     outputs
-        l = 1e-6;   % Stator Inductance:right
+        l = { 1e-6, 'H' };  % Stator Inductance:right
     end
     equations
-        l == 1e-6;
+        l == { 1e-6, 'H' };
     end
 end

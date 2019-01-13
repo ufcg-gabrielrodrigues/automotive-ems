@@ -59,15 +59,16 @@ replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', .
     k_e_default, k_e);
 
 % Atualização de parâmetro: indutância própria de estator
-l_a_default = 'l == 1e-6;';
+l_a_default = 'l == { 1e-6, ''H'' };';
 
 if (isfield(alternator.stator.l, 'function'))
     l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+    l_a_str = strrep(l_a_str, 'i_f', '(i_f*{1,''1/A''})');
 else
     l_a_str = num2str(alternator.stator.l.value);
 end
 
-l_a = ['l == ' l_a_str ';'];
+l_a = ['l == { ' l_a_str ', ''H'' };'];
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
     l_a_default, l_a);
 
@@ -89,7 +90,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-LundellAlternatorRoutine;
+ControlComparisonRoutine;
 
 %% Redefinição de parâmetros de alternador
 

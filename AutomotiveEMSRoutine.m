@@ -3,11 +3,6 @@
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 t_f = 3.0;  % Tempo total de simulação [s]
 
-%% Retificador
-
-% Filtro passivo
-rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
-
 %% 
 
 n_ice_option = 3;

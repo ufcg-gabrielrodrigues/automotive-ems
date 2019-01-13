@@ -7,11 +7,6 @@ t_f = 5e-1; % Tempo total de simulação [s]
 
 alternator.rotor.n = 2000;  % Valocidade do rotor [rpm]
 
-%% Retificador
-
-% Filtro passivo
-rectifier.filter.c = 47e-3;	% Capacitância de filtro [F]
-
 %% Carga el�trica
 
 electrical_load.r = 13.5/35;          	% Resistência de carga [Ohm]

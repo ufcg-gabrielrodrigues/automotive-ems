@@ -25,11 +25,6 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 % Corrente de excitação máxima
 i_f_max = 3.5;  % [A]
 
-%% Retificador
-
-% Filtro passivo
-rectifier.filter.c = 10e-3;	% CapacitÃ¢ncia de filtro [F]
-
 %% Carga elétrica
 
 electrical_load.r = 1.0e+0;	% [Ohm]

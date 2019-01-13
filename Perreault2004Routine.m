@@ -25,11 +25,6 @@ end
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str ';']);
 
-%% Retificador
-
-% Filtro passivo
-rectifier.filter.c = 60e-6;	% Capacitância de filtro [F]
-
 %% Carga el�trica
 
 electrical_load.battery.v_nom = 50.0;   % [V]

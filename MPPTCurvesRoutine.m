@@ -13,11 +13,6 @@ raw_storage_path = 'results/MPPTCurves/';
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 
-%% Retificador
-
-% Filtro passivo
-rectifier.filter.c = 10e-3;	% Capacitância de filtro [F]
-
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
