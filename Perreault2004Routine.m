@@ -64,7 +64,7 @@ close_system('models/Perreault2004.slx');
 %% Registro de resultados obtidos na simulação
 
 % Alternador
-alternator.stator.input.e.value = simout.e_a_abc;
+alternator.stator.input.e = simout.e_a_abc;
 alternator.stator.output.v = simout.v_a_abc;
 alternator.stator.output.i = simout.i_a_abc;
 

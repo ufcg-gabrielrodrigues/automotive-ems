@@ -17,6 +17,7 @@ component back_emf
     variables
         omega_r = { 0, 'rad/s' };       % Rotor speed
         omega_e = { 0, 'rad/s' };       % Alternator electrical frequency
+        theta_e = { 0, 'rad' };         % Alternator electrical argument 
         k_e = { 0, 'V/((rad/s)*(A))' }  % Electrical coupling constant
         e = { 0, 'V' };                 % Back EMF peak
     end
@@ -32,10 +33,11 @@ component back_emf
     equations
         omega_r == n_r;
         omega_e == p*omega_r;
+        theta_e == integ(omega_e);
         k_e == { 0, 'V/((rad/s)*(A))' };
         e == k_e*omega_e*i_f;
-        e_a == e*cos(omega_e*time);
-        e_b == e*cos(omega_e*time + 2*pi/3);
-        e_c == e*cos(omega_e*time - 2*pi/3);
+        e_a == e*cos(theta_e);
+        e_b == e*cos(theta_e + 2*pi/3);
+        e_c == e*cos(theta_e - 2*pi/3);
     end
 end

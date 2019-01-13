@@ -38,12 +38,10 @@ if (alternatorCalcParamFlag)
     alternator.rotor.control.pwm.f_s = 10e+3;                                   % Frequência de chaveamento do PWM de controle do circuito de excitação [Hz]
     alternator.stator.connection = connection;                                  % Tipo de conexão do circuito de estator
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
-    alternator.stator.input.e.function = extFunctionHandle(@(n_r, i_f) ...
-        n_r.*openCircuitVoltage(i_f));                                          % Tensão induzida por fase pelo circuito de excitação [V]
+    alternator.k_e.function = extFunctionHandle(@(i_f) ...
+        (openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));                      % Constante de acoplamento el�trico [V/((rad/s)*A)]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura a 20oC [Ohm]
-    alternator.k_v = extFunctionHandle(@(i_f) ...
-        (openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));                      % 
     
     %% Registro da estrutura que representa o alternador em arquivos .MAT
     

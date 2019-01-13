@@ -99,7 +99,7 @@ for control_scheme_index = 1:length(control_scheme_title)
     alternator.rotor.control.u{control_scheme_index} = simOut(control_scheme_index).u_i_f;
     alternator.rotor.l.i{control_scheme_index} = simOut(control_scheme_index).i_f;
     
-    alternator.stator.input.e.value{control_scheme_index} = simOut(control_scheme_index).e_a_abc;
+    alternator.stator.input.e{control_scheme_index} = simOut(control_scheme_index).e_a_abc;
     alternator.stator.output.v{control_scheme_index} = simOut(control_scheme_index).v_a_abc;
     alternator.stator.output.i{control_scheme_index} = simOut(control_scheme_index).i_a_abc;
     

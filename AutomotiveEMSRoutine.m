@@ -47,7 +47,7 @@ ice.n = simout.n_ice;
 alternator.rotor.control.u = simout.u_i_f;
 alternator.rotor.l.i = simout.i_f;
 
-alternator.stator.input.e.value = simout.e_a_abc;
+alternator.stator.input.e = simout.e_a_abc;
 alternator.stator.output.v = simout.v_a_abc;
 alternator.stator.output.i = simout.i_a_abc;
 

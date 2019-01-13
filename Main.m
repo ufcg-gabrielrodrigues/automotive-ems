@@ -45,22 +45,31 @@ alternatorCase = 'Sarafianos2015';
 AlternatorParametersEMS;
 
 % Atualização de parâmetro: constante de acoplamento el�trico
+k_e_default = 'k_e == { 0, ''V/((rad/s)*(A))'' };';
+
 if (isfield(alternator.k_e, 'function'))
-    k_e_str = regexprep(func2str(alternator.stator.k_e.function), '@\(.+?\)', '');
+    k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
+    k_e_str = strrep(k_e_str, 'i_f', '(i_f*{1,''1/A''})');
 else
     k_e_str = num2str(alternator.k_e.value);
 end
+
+k_e = ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' };'];
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    'k_e == { 0, ''V/((rad/s)*(A))'' }', ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' }']);
+    k_e_default, k_e);
 
 % Atualização de parâmetro: indutância própria de estator
+l_a_default = 'l == 1e-6;';
+
 if (isfield(alternator.stator.l, 'function'))
     l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
 else
     l_a_str = num2str(alternator.stator.l.value);
 end
+
+l_a = ['l == ' l_a_str ';'];
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
-    'l == 1e-6', ['l == ' l_a_str]);
+    l_a_default, l_a);
 
 % Tipos de conexão do circuito de estator
 yStatorConnection = Simulink.Variant('alternator.stator.connection == 1');
@@ -87,11 +96,11 @@ LundellAlternatorRoutine;
 % Atualização de parâmetro para valor padrão: constante de acoplamento
 % el�trico
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' }'], 'k_e == { 0, ''V/((rad/s)*(A))'' }');
+    k_e, k_e_default);
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
-    ['l == ' l_a_str], 'l == 1e-6');
+    l_a, l_a_default);
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB
