@@ -23,11 +23,11 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 3.5;  % [A]
+i_f_max = 4.75; % [A]
 
 %% Carga elétrica
 
-electrical_load.r = 1.0e+0;	% [Ohm]
+electrical_load.r = 1.5e-1;	% [Ohm]
 
 %% Esquemas de controle
 
