@@ -90,7 +90,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-LundellAlternatorRoutine;
+MPPTCurvesRoutine;
 
 %% Redefinição de parâmetros de alternador
 

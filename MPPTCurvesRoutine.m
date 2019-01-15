@@ -1,24 +1,30 @@
 %% Partição da simulação
 
-sim_split_flag = false;    	% Flag de particionamento
+sim_split_flag = true;    	% Flag de particionamento
 sim_batches = 60;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
 
 % Diretório
-raw_storage_path = 'results/MPPTCurves/';
-% raw_storage_path = 'D:/Users/gabriel.rodrigues/MATLAB/Projects/AutomotiveEMS/results/MPPTCurves/[12-14] Variant i_f - u_step 0.01/60-splitted/';
+% raw_storage_path = 'results/MPPTCurves/';
+raw_storage_path = 'D:/Users/gabriel.rodrigues/MATLAB/Projects/AutomotiveEMS/results/MPPTCurves/[19-01-15] Variant i_f - u_step 0.01/60-splitted/';
 
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 
+%% Alternador
+
+% Efeito t�rmico na resistência do circuito de estator
+T = 150;                      	% [oC]
+alternator.stator.r.value = alternator.stator.r.function(T);
+
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [0.01 0.5:0.5:4.0]';                 % Corrente de excitação [A]
-n_alt_list = (1500:500:6000)';                  % Velocidade do alternador [rpm]
-r_l_list = [0.01 0.05:0.05:0.45 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
+i_f_list = (0.5:0.5:5.0)';                      % Corrente de excitação [A]
+n_alt_list = (2000:500:7500)';                  % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.05:0.05:0.40 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
@@ -132,8 +138,6 @@ for batch_index = 1:sim_batches
     if (sim_split_flag)
         filename = [raw_storage_path 'simOut/simOut_' num2str(batch_index) '.mat'];
         load(filename);
-%         simOut = tmp;
-%         clear tmp;
     end
     
     % Laço de iterações por casos de teste
