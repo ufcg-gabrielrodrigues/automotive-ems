@@ -74,8 +74,14 @@ close_system('models/LundellAlternator.slx');
 
 % Laço de iterações por casos de teste
 for test_case_index = 1:num_cases
+    % Caso de teste
+    test_case_out(test_case_index).test_case = param_sweep(test_case_index, :);
+    n_r = test_case_out(test_case_index).test_case(1);
+    i_dc = test_case_out(test_case_index).test_case(2);
+    v_dc = test_case_out(test_case_index).test_case(3);
+    
     % Alternador
-    test_case_out(test_case_index).alternator.rotor.n = simOut(test_case_index).n_r;
+    test_case_out(test_case_index).alternator.rotor.n = n_r;
     test_case_out(test_case_index).alternator.rotor.l.i = simOut(test_case_index).i_f;
 
     test_case_out(test_case_index).alternator.stator.input.e = simOut(test_case_index).e_a_abc;
@@ -88,6 +94,7 @@ for test_case_index = 1:num_cases
     test_case_out(test_case_index).battery.v = simOut(test_case_index).v_b;
 
     % Carga
+    test_case_out(test_case_index).electrical_load.r = v_dc/i_dc;
     test_case_out(test_case_index).electrical_load.v = simOut(test_case_index).v_l;
     test_case_out(test_case_index).electrical_load.i = simOut(test_case_index).i_l;
     test_case_out(test_case_index).electrical_load.p = simOut(test_case_index).p_l;
