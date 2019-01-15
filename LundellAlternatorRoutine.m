@@ -1,11 +1,15 @@
 %% Par√¢metros temporais
 
 T_s = 1e-6; % Passo de c√°lculo utilizado pelo 'solver' [s]
-t_f = 5e-1; % Tempo total de simula√ß√£o [s]
+t_f = 1e-1; % Tempo total de simula√ß√£o [s]
 
 %% Alternador
 
-alternator.rotor.n = 2.0e-0;    % Valocidade do rotor [rpm]
+% Corrente de excitaÁ„o m·xima
+i_f_max = 5.0e-0;               % [A]
+
+% Velocidade do rotor
+alternator.rotor.n = 2.0e+3;    % [rpm]
 
 %% Carga elÈtrica
 

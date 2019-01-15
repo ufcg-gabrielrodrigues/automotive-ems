@@ -90,7 +90,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-ControlComparisonRoutine;
+LundellAlternatorRoutine;
 
 %% Redefinição de parâmetros de alternador
 
