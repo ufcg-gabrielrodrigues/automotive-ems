@@ -4,14 +4,14 @@ open_system('models/Perreault2004.slx', 'loadonly');
 
 %% Parâmetros temporais
 
-T_s = 1e-7; % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
-T_k = 1e-5; % Passo de amostragem global de rotinas de controle [s]
-t_f = 0.1;  % Tempo total de simulação [s]
+T_s = 1.0e-7;   % Passo de cálculo utilizado pelo 'solver' local para sistemas físicos [s]
+T_k = 1.0e-5;   % Passo de amostragem global de rotinas de controle [s]
+t_f = 2.0e-2;   % Tempo total de simulação [s]
 
 %% Alternador
 
 % Velocidade
-alternator.rotor.n = 1800;
+alternator.rotor.n = 5000;
 
 % Corrente de excita��o m�xima
 alternator.rotor.l.i = 3.6; % [A]
@@ -28,7 +28,7 @@ blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str ';
 %% Carga el�trica
 
 electrical_load.battery.v_nom = 50.0;   % [V]
-electrical_load.r = 1.0;                % [Ohm]
+electrical_load.r = 1.00;              	% [Ohm]
 
 %% Parâmetros de simulação
 
