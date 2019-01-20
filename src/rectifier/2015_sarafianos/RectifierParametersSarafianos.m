@@ -25,7 +25,7 @@ if (rectifierCalcParamFlag)
     rectifier.s.v_gs_on = 10;           % Tensão gate-source para acionamento dos MOSFETs do circuito retificador [V]
     
     % Filtro passivo
-    rectifier.filter.c = 470e-6;        % Capacitância de filtro [F]
+    rectifier.filter.c = 10e-3;         % Capacitância de filtro [F]
     
     % Parâmetros de controle
     rectifier.control.pwm.f_s = 1.0e+4; % Frequência de chaveamento dos PWMs de controle do circuito retificador [Hz]

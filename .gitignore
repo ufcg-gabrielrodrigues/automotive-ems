@@ -10,3 +10,6 @@ sscprj/
 *.mat
 *.pdf
 *.slxc
+*.fig
+*.png
+*.asv
