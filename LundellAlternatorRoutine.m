@@ -34,10 +34,10 @@ simulated_results = [1.960 12.70 27.20;
 
 %% Alternador
 
-% Corrente de excitação m�xima
+% Corrente de excitação máxima
 i_f_max = 5.0e-0;               % [A]
 
-% Efeito t�rmico na resistência do circuito de estator
+% Efeito térmico na resistência do circuito de estator
 T = 32;                         % [oC]
 alternator.stator.r.value = alternator.stator.r.function(T);
 
@@ -127,7 +127,7 @@ end
 
 %% Traço de resultados
 
-% Inicialização do �ndice de figuras
+% Inicialização do índice de figuras
 figure_index = 0;
 
 % Laço de iterações por casos de teste

@@ -22,16 +22,16 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 
 %% Alternador
 
-% Corrente de excitaÁ„o m·xima
+% Corrente de excita√ß√£o m√°xima
 i_f_max = 4.75; % [A]
 
-%% Carga elÈtrica
+%% Carga el√©trica
 
 electrical_load.r = 1.5e-1;	% [Ohm]
 
 %% Esquemas de controle
 
-% Lista de tÌtulos por esquema de controle
+% Lista de t√≠tulos por esquema de controle
 control_scheme_title = {'Esquema de controle convencional', ...
     'Esquema de controle baseado em excita{\c{c}}{\~{a}}o maximizada', ...
     'Esquema de controle baseado em rede neural'};
@@ -44,7 +44,7 @@ fullExcitationCurrentControlScheme = Simulink.Variant('control_scheme == 2');
 
 %
 neuralControlScheme = Simulink.Variant('control_scheme == 3');
-normalizationFactor = [4.0e+0 6.0e+3 2.0e+0];
+normalizationFactor = [5.0e+0 7.5e+3 2.0e+0];
 
 %% Par√¢metros de simula√ß√£o
 
@@ -63,7 +63,7 @@ save_system('models/ControlComparison.slx');
 
 %% Configura√ß√£o dos esquemas de controle como entrada do modelo no Simulink
 
-% InicializaÁ„o da vari·vel que define o esquema de controle selecionado
+% Inicializa√ß√£o da vari√°vel que define o esquema de controle selecionado
 control_scheme = 1;
 
 % 
@@ -119,9 +119,9 @@ save('results/ControlComparison/rectifier.mat', 'rectifier', '-v7.3');
 save('results/ControlComparison/electrical_load.mat', 'electrical_load', '-v7.3');
 save('results/ControlComparison/battery.mat', 'battery', '-v7.3');
 
-%% Montagem de sÈries temporais de valores esperados relativos aos MPPs
+%% Montagem de s√©ries temporais de valores esperados relativos aos MPPs
 
-% Carregamento de mapa de dados de pontos de m·xima potÍncia
+% Carregamento de mapa de dados de pontos de m√°xima pot√™ncia
 mpp_target = [];
 
 try
@@ -132,28 +132,28 @@ end
 
 % Caso o arquivo tenha sido carregado com sucesso, executar a rotina
 if (exist('mpp_u_3d', 'var'))
-    % InicializaÁ„o dos pontos de interesse para comparaÁ„o com as
-    % estratÈgias de controle
+    % Inicializa√ß√£o dos pontos de interesse para compara√ß√£o com as
+    % estrat√©gias de controle
     target_points = 20;
     t_target = round(linspace(t_brake_i, t_brake_f, target_points)', 5);
     i_f = zeros(target_points, 1);
     n_alt = zeros(target_points, 1);
     
-    % LaÁo para determinar MPPs ideais para cada estratÈgia de controle
+    % La√ßo para determinar MPPs ideais para cada estrat√©gia de controle
     for control_scheme_index = 1:length(control_scheme_title)
-        % Armazenamento das vari·veis de interesse
+        % Armazenamento das vari√°veis de interesse
         t = round(alternator.rotor.l.i{control_scheme_index}.time, 10);
         i_f = alternator.rotor.l.i{control_scheme_index}.data;
         n_alt = alternator.rotor.n{control_scheme_index}.data;
         
-        % DeterminaÁ„o dos Ìndices dos pontos de interesse
+        % Determina√ß√£o dos √≠ndices dos pontos de interesse
         target_elements = ismember(t, t_target);
         
         t = t(target_elements);
         i_f = i_f(target_elements);
         n_alt = n_alt(target_elements);
         
-        % RemoÁ„o de pontos idÍnticos
+        % Remo√ß√£oo de pontos id√™nticos
         [~, target_elements, ~] = unique(t, 'first');
         
         t = t(target_elements);
@@ -161,29 +161,29 @@ if (exist('mpp_u_3d', 'var'))
         n_alt = n_alt(target_elements);
         r_l = electrical_load.r.*ones(target_points, 1);
         
-        % DeterminaÁ„o dos MPPs ideais via interpolaÁ„o
+        % Determina√ß√£o dos MPPs ideais via interpola√ß√£o
         mpp_target_u_tmp = interpn(i_f_list, n_alt_list, r_l_list, mpp_u_3d, i_f, n_alt, r_l, 'spline', -1);
         mpp_target_p_tmp = interpn(i_f_list, n_alt_list, r_l_list, mpp_p_3d, i_f, n_alt, r_l, 'spline', -1);
         
-        % FormaÁ„o das sÈries temporais dos MPPs ideais
+        % Forma√ß√£o das s√©ries temporais dos MPPs ideais
         mpp_target_u_tmp = timeseries(mpp_target_u_tmp, t);
         mpp_target_p_tmp = timeseries(mpp_target_p_tmp, t);
         
-        % Armazenamento das vari·veis para traÁo de figuras
+        % Armazenamento das vari√°veis para tra√ßo de figuras
         mpp_target_u{control_scheme_index} = mpp_target_u_tmp;
         mpp_target_p{control_scheme_index} = mpp_target_p_tmp;
     end
 end
 
-%% An·lise de potÍncia e ciclo de trabalho para cada esquema de controle
+%% An√°lise de pot√™ncia e ciclo de trabalho para cada esquema de controle
 
-% Õndice de figuras
+% √çndice de figuras
 figure_index = 0;
 
 % Caso o arquivo tenha sido carregado com sucesso, executar a rotina
 if (exist('mpp_u_3d', 'var'))
     
-    % LaÁo de traÁo de figuras
+    % La√ßo de tra√ßo de figuras
     for control_scheme_index = 1:length(control_scheme_title)
         figure_index = figure_index + 1;
         figure(figure_index)

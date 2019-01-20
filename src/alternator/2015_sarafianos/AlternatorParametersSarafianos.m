@@ -43,7 +43,7 @@ if (alternatorCalcParamFlag)
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value_ref = r_a;                                      	% Resistência por fase do circuito de armadura na temperatura de referência [Ohm]
     alternator.stator.r.T_ref = 20;                                           	% Temperatura de referência para da resistência por fase do circuito de armadura [oC]
-    alternator.stator.r.alpha = 0.004041;                                     	% Coeficiente de temperatura da resistência para o material condutor (cobre) [1/oC]
+    alternator.stator.r.alpha = 0.0068;                                     	% Coeficiente de temperatura da resistência para o material condutor (cobre) [1/oC]
     alternator.stator.r.function = @(T) alternator.stator.r.value_ref * ...
         (1 + alternator.stator.r.alpha * (T - alternator.stator.r.T_ref));      % Função para determinação da resistência de acordo com a temperatura
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura na temperatura do condutor [Ohm]

@@ -12,7 +12,7 @@ T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 i_f = 4.5;                      % Corrente de excitação [A]
 T_list = [50 150 200]';         % Temperatura dos enrolamentos de estator [oC]
 n_alt_list = [2000 3500 7500]'; % Velocidade do alternador [rpm]
-r_l_list = [0.15 1.0]';         % Resistência de carga [Ohm]
+r_l_list = [0.5 1.0]';          % Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
@@ -77,7 +77,7 @@ for test_case_index = 1:num_cases
     
     simIn(test_case_index) = Simulink.SimulationInput('ThermalAnalysis');
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/i_f', 'Value', num2str(i_f));
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/Alternator/Stator Resistance', 'Value', num2str(r_s));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/Alternator/Stator Resistance', 'constant', num2str(r_s));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/n_alt', 'Value', num2str(n_alt));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/r_l', 'R', num2str(r_l));
 end
@@ -148,11 +148,11 @@ case_length = length(u.Time) - 1;
 test_case_matrix = zeros(num_cases * case_length, 5);
 
 % Laço de iterações por casos de teste
-for test_case_index = 1:num_cases/sim_batches
+for test_case_index = 1:num_cases
     
     case_interval = (case_length * (test_case_index - 1) + 1):(case_length * test_case_index);
     
-    test_case_matrix(case_interval, 1) = test_case_out(test_case_index).alternator.rotor.l.i;
+    test_case_matrix(case_interval, 1) = param_sweep(test_case_index, 1);
     test_case_matrix(case_interval, 2) = test_case_out(test_case_index).alternator.rotor.n;
     test_case_matrix(case_interval, 3) = test_case_out(test_case_index).electrical_load.r;
     test_case_matrix(case_interval, 4) = test_case_out(test_case_index).rectifier.control.u.Data(1:(end - 1), 1);
