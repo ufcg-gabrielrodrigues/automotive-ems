@@ -1,13 +1,13 @@
 %% Partição da simulação
 
-sim_split_flag = true;    	% Flag de particionamento
-sim_batches = 60;           % Quantidade de partições
+sim_split_flag = false;    	% Flag de particionamento
+sim_batches = 66;           % Quantidade de partições
 
 %% Armazenamento de resultados brutos
 
 % Diretório
-% raw_storage_path = 'results/MPPTCurves/';
-raw_storage_path = 'D:/Users/gabriel.rodrigues/MATLAB/Projects/AutomotiveEMS/results/MPPTCurves/[19-01-15] Variant i_f - u_step 0.01/60-splitted/';
+raw_storage_path = 'results/MPPTCurves/';
+% raw_storage_path = 'D:/Users/gabriel.rodrigues/MATLAB/Projects/AutomotiveEMS/results/MPPTCurves/[19-01-20] Variant i_f - u_step 0.01/6-splitted/';
 
 %% Parâmetros temporais
 
@@ -15,14 +15,14 @@ T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 
 %% Alternador
 
-% Efeito t�rmico na resistência do circuito de estator
-T = 150;                      	% [oC]
+% Efeito térmico na resistência do circuito de estator
+T = 150;	% [oC]
 alternator.stator.r.value = alternator.stator.r.function(T);
 
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = (0.5:0.5:5.0)';                      % Corrente de excitação [A]
+i_f_list = [0.01 (0.5:0.5:5.0)]';               % Corrente de excitação [A]
 n_alt_list = (2000:500:7500)';                  % Velocidade do alternador [rpm]
 r_l_list = [0.01 0.05:0.05:0.40 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
 
@@ -50,7 +50,7 @@ end
 %% Perfil temporal do ciclo de trabalho
 
 % Período de simulação por valor de ciclo de trabalho
-t_u = 2e-2; % [s]
+t_u = 1e-2; % [s]
 
 % Formação da estrutura de dados contendo o perfil
 u.Data = 0.0:0.01:1.0;
@@ -340,79 +340,79 @@ for n_alt = n_alt_list'
     end
 end
 
-% Comparadas por velocidade do alternador
-for i_f = i_f_list'
-    
-    for r_l = r_l_list'
-        
-        colors = distinguishable_colors(length(n_alt_list));
-        color_index = 0;
-        
-        figure_index = figure_index + 1;
-        figure(figure_index)
-        
-        for n_alt = n_alt_list'
-            color_index = color_index + 1;
-            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
-                & (test_case_matrix(:, 3) == r_l));
-            
-            plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
-                'Color', colors(color_index, :), 'DisplayName', ...
-                ['$n_{alt} = ' num2str(n_alt) ' rpm$']);
-            hold on;
-            
-            legend('off');
-            legend('show');
-        end
-        
-        title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
-            ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
-        xlabel('$u$');
-        ylabel('$P [W]$');
-        leg = legend;
-        leg.Location = 'SouthOutside';
-        leg.NumColumns = ceil(length(n_alt_list)/leg_entries_per_columns);
-        grid on;
-    end
-end
-
-% Comparadas por carga
-for i_f = i_f_list'
-    
-    for n_alt = n_alt_list'
-        
-        colors = distinguishable_colors(length(r_l_list));
-        color_index = 0;
-        
-        figure_index = figure_index + 1;
-        figure(figure_index)
-        
-        for r_l = r_l_list'
-            color_index = color_index + 1;
-            curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
-                & (test_case_matrix(:, 3) == r_l));
-            
-            plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
-                'Color', colors(color_index, :), 'DisplayName', ...
-                ['$r_{l} = ' num2str(r_l, '%1.2f') ' \Omega$']);
-            hold on;
-            
-            legend('off');
-            legend('show');
-        end
-        
-        title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
-            ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
-        xlabel('$u$');
-        ylabel('$P [W]$');
-        leg = legend;
-        leg.Location = 'SouthOutside';
-        leg.NumColumns = ceil(length(r_l_list)/leg_entries_per_columns);
-        grid on;
-    end
-end
+% % Comparadas por velocidade do alternador
+% for i_f = i_f_list'
+%     
+%     for r_l = r_l_list'
+%         
+%         colors = distinguishable_colors(length(n_alt_list));
+%         color_index = 0;
+%         
+%         figure_index = figure_index + 1;
+%         figure(figure_index)
+%         
+%         for n_alt = n_alt_list'
+%             color_index = color_index + 1;
+%             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+%                 & (test_case_matrix(:, 2) == n_alt) ...
+%                 & (test_case_matrix(:, 3) == r_l));
+%             
+%             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
+%                 'Color', colors(color_index, :), 'DisplayName', ...
+%                 ['$n_{alt} = ' num2str(n_alt) ' rpm$']);
+%             hold on;
+%             
+%             legend('off');
+%             legend('show');
+%         end
+%         
+%         title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
+%             ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+%         xlabel('$u$');
+%         ylabel('$P [W]$');
+%         leg = legend;
+%         leg.Location = 'SouthOutside';
+%         leg.NumColumns = ceil(length(n_alt_list)/leg_entries_per_columns);
+%         grid on;
+%     end
+% end
+% 
+% % Comparadas por carga
+% for i_f = i_f_list'
+%     
+%     for n_alt = n_alt_list'
+%         
+%         colors = distinguishable_colors(length(r_l_list));
+%         color_index = 0;
+%         
+%         figure_index = figure_index + 1;
+%         figure(figure_index)
+%         
+%         for r_l = r_l_list'
+%             color_index = color_index + 1;
+%             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
+%                 & (test_case_matrix(:, 2) == n_alt) ...
+%                 & (test_case_matrix(:, 3) == r_l));
+%             
+%             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
+%                 'Color', colors(color_index, :), 'DisplayName', ...
+%                 ['$r_{l} = ' num2str(r_l, '%1.2f') ' \Omega$']);
+%             hold on;
+%             
+%             legend('off');
+%             legend('show');
+%         end
+%         
+%         title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
+%             ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
+%         xlabel('$u$');
+%         ylabel('$P [W]$');
+%         leg = legend;
+%         leg.Location = 'SouthOutside';
+%         leg.NumColumns = ceil(length(r_l_list)/leg_entries_per_columns);
+%         grid on;
+%     end
+% end
 
 %% Relação dos pontos de máxima potência com variáveis do sistema
 
@@ -445,63 +445,63 @@ for n_alt = n_alt_list'
     end
 end
 
-% Relação com a velocidade do alternador
-for i_f = i_f_list'
-    
-    for r_l = r_l_list'
-        
-        curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 3) == r_l));
-        
-        figure_index = figure_index + 1;
-        figure(figure_index)
-        
-        subplot(2, 1, 1)
-        plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 4), 'o-');
-        xlabel('$n_{alt} [rpm]$');
-        ylabel('$u$');
-        ylim([0 1]);
-        grid on;
-        
-        subplot(2, 1, 2)
-        plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 5), 'o-');
-        xlabel('$n_{alt} [rpm]$');
-        ylabel('$P [W]$');
-        grid on;
-        
-        suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
-            'pot{\^{e}}ncia e a velocidade do alternador [$i_{f} = ' ...
-            num2str(i_f) ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
-    end
-end
-
-% Relação com a impedância de carga
-for i_f = i_f_list'
-    
-    for n_alt = n_alt_list'
-        
-        curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 2) == n_alt));
-        
-        figure_index = figure_index + 1;
-        figure(figure_index)
-        
-        subplot(2, 1, 1)
-        plot(mpp_matrix(curve_indexes, 3), mpp_matrix(curve_indexes, 4), 'o-');
-        xlabel('$r_{l} [\Omega]$');
-        ylabel('$u$');
-        ylim([0 1]);
-        grid on;
-        
-        subplot(2, 1, 2)
-        plot(mpp_matrix(curve_indexes, 3), mpp_matrix(curve_indexes, 5), 'o-');
-        xlabel('$r_{l} [\Omega]$');
-        ylabel('$P [W]$');
-        grid on;
-        
-        suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
-            'pot{\^{e}}ncia e a imped{\^{a}}ncia de carga [$i_{f} = ' ...
-            num2str(i_f) ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
-    end
-end
+% % Relação com a velocidade do alternador
+% for i_f = i_f_list'
+%     
+%     for r_l = r_l_list'
+%         
+%         curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 3) == r_l));
+%         
+%         figure_index = figure_index + 1;
+%         figure(figure_index)
+%         
+%         subplot(2, 1, 1)
+%         plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 4), 'o-');
+%         xlabel('$n_{alt} [rpm]$');
+%         ylabel('$u$');
+%         ylim([0 1]);
+%         grid on;
+%         
+%         subplot(2, 1, 2)
+%         plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 5), 'o-');
+%         xlabel('$n_{alt} [rpm]$');
+%         ylabel('$P [W]$');
+%         grid on;
+%         
+%         suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
+%             'pot{\^{e}}ncia e a velocidade do alternador [$i_{f} = ' ...
+%             num2str(i_f) ' A$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+%     end
+% end
+% 
+% % Relação com a impedância de carga
+% for i_f = i_f_list'
+%     
+%     for n_alt = n_alt_list'
+%         
+%         curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 2) == n_alt));
+%         
+%         figure_index = figure_index + 1;
+%         figure(figure_index)
+%         
+%         subplot(2, 1, 1)
+%         plot(mpp_matrix(curve_indexes, 3), mpp_matrix(curve_indexes, 4), 'o-');
+%         xlabel('$r_{l} [\Omega]$');
+%         ylabel('$u$');
+%         ylim([0 1]);
+%         grid on;
+%         
+%         subplot(2, 1, 2)
+%         plot(mpp_matrix(curve_indexes, 3), mpp_matrix(curve_indexes, 5), 'o-');
+%         xlabel('$r_{l} [\Omega]$');
+%         ylabel('$P [W]$');
+%         grid on;
+%         
+%         suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
+%             'pot{\^{e}}ncia e a imped{\^{a}}ncia de carga [$i_{f} = ' ...
+%             num2str(i_f) ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
+%     end
+% end
 
 %% Armazenamento de figuras
 

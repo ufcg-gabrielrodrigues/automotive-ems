@@ -18,7 +18,7 @@ alternator.rotor.l.i = 3.6; % [A]
 
 % Atualização de parâmetro: fator de acoplamento
 if (isfield(alternator.k_e, 'function'))
-    k_e_str = regexprep(func2str(alternator.stator.k_e.function), '@\(.+?\)', '');
+    k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
 else
     k_e_str = num2str(alternator.k_e.value);
 end
