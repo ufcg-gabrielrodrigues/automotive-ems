@@ -23,18 +23,23 @@ t_brake_f = t_brake_i + t_brake;    % [s]
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 4.75; % [A]
+i_f_max = 4.5;  % [A]
+
+% Efeito térmico na resistência do circuito de estator
+T = 150;        % [oC]
+alternator.stator.r.value = alternator.stator.r.function(T);
 
 %% Carga elétrica
 
-electrical_load.r = 1.5e-1;	% [Ohm]
+electrical_load.r = 1.0e-0;	% [Ohm]
 
 %% Esquemas de controle
 
 % Lista de títulos por esquema de controle
 control_scheme_title = {'Esquema de controle convencional', ...
     'Esquema de controle baseado em excita{\c{c}}{\~{a}}o maximizada', ...
-    'Esquema de controle baseado em rede neural'};
+    'Esquema de controle baseado em rede neural (2 entradas)', ...
+    'Esquema de controle baseado em rede neural (3 entradas)'};
 
 %
 conventionalControlScheme = Simulink.Variant('control_scheme == 1');
@@ -42,9 +47,15 @@ conventionalControlScheme = Simulink.Variant('control_scheme == 1');
 %
 fullExcitationCurrentControlScheme = Simulink.Variant('control_scheme == 2');
 
-%
-neuralControlScheme = Simulink.Variant('control_scheme == 3');
-normalizationFactor = [5.0e+0 7.5e+3 2.0e+0];
+% 
+normalizationFactor2In = [1 1];
+% normalizationFactor2In = [7.5e+3 2.0e+0];
+neural2InControlScheme = Simulink.Variant('control_scheme == 3');
+
+% 
+normalizationFactor3In = [1 1 1];
+% normalizationFactor3In = [5.0e+0 7.5e+3 2.0e+0];
+neural3InControlScheme = Simulink.Variant('control_scheme == 4');
 
 %% Parâmetros de simulação
 
@@ -177,7 +188,7 @@ end
 
 %% Análise de potência e ciclo de trabalho para cada esquema de controle
 
-% Índice de figuras
+% �?ndice de figuras
 figure_index = 0;
 
 % Caso o arquivo tenha sido carregado com sucesso, executar a rotina
