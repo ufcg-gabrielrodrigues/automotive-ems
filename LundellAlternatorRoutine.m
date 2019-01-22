@@ -1,7 +1,7 @@
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
-t_f = 5e-1; % Tempo total de simulação [s]
+t_f = 2e-1; % Tempo total de simulação [s]
 
 %% Varredura de parâmetros
 
@@ -130,6 +130,9 @@ end
 % Inicialização do índice de figuras
 figure_index = 0;
 
+% Cópia do vetor de tempo da simulação
+time = test_case_out(test_case_index).alternator.rotor.l.i.time;
+
 % Laço de iterações por casos de teste
 for test_case_index = 1:num_cases
     
@@ -142,12 +145,20 @@ for test_case_index = 1:num_cases
     plot([0 t_f], [experimental_results(test_case_index, 1) experimental_results(test_case_index, 1)], 'r--');
     hold on;
     plot([0 t_f], [simulated_results(test_case_index, 1) simulated_results(test_case_index, 1)], 'g--');
+    hold on;
+    error_exp = abs(experimental_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
+    plot(time, error_exp, 'r:');
+    hold on;
+    error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
+    plot(time, error_sim, 'g:');
     xlabel('$t [s]$');
     ylabel('$i_{f} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.rotor.l.i.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 1)])]);
     title('Compara{\c{c}}{\~{a}}o de corrente de excita{\c{c}}{\~{a}}o');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', 'Location', 'best');
+        'Resultado simulado referenciado', ...
+        'Erro absoluto relativo ao resultado experimental referenciado', ...
+        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
     
     subplot(3, 1, 2)
@@ -156,12 +167,20 @@ for test_case_index = 1:num_cases
     plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
     hold on;
     plot([0 t_f], [simulated_results(test_case_index, 2) simulated_results(test_case_index, 2)], 'g--');
+    hold on;
+    error_exp = abs(experimental_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
+    plot(time, error_exp, 'r:');
+    hold on;
+    error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
+    plot(time, error_sim, 'g:');
     xlabel('$t [s]$');
     ylabel('$v_{ll}^{RMS} [V]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
     title('Compara{\c{c}}{\~{a}}o da tens{\~{a}}o terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', 'Location', 'best');
+        'Resultado simulado referenciado', ...
+        'Erro absoluto relativo ao resultado experimental referenciado', ...
+        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
     
     subplot(3, 1, 3)
@@ -170,12 +189,20 @@ for test_case_index = 1:num_cases
     plot([0 t_f], [experimental_results(test_case_index, 3) experimental_results(test_case_index, 3)], 'r--');
     hold on;
     plot([0 t_f], [simulated_results(test_case_index, 3) simulated_results(test_case_index, 3)], 'g--');
+    hold on;
+    error_exp = abs(experimental_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
+    plot(time, error_exp, 'r:');
+    hold on;
+    error_sim = abs(simulated_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
+    plot(time, error_sim, 'g:');
     xlabel('$t [s]$');
     ylabel('$i_{l}^{RMS} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
     title('Compara{\c{c}}{\~{a}}o da corrente terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', 'Location', 'best');
+        'Resultado simulado referenciado', ...
+        'Erro absoluto relativo ao resultado experimental referenciado', ...
+        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
     
     suptitle(['Caso de teste: $n_{r} =$ ' num2str(test_case_out(test_case_index).alternator.rotor.n) ...
