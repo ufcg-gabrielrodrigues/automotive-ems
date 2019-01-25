@@ -39,7 +39,7 @@ if (alternatorCalcParamFlag)
     alternator.stator.connection = connection;                                  % Tipo de conexão do circuito de estator
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
     alternator.k_e.function = extFunctionHandle(@(i_f) ...
-        sqrt(2).*(openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));          	% Constante de acoplamento el�trico [V/((rad/s)*A)]
+        sqrt(2).*(openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));          	% Constante de acoplamento elétrico [V/((rad/s)*A)]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value_ref = r_a;                                      	% Resistência por fase do circuito de armadura na temperatura de referência [Ohm]
     alternator.stator.r.T_ref = 20;                                           	% Temperatura de referência para da resistência por fase do circuito de armadura [oC]

@@ -22,7 +22,7 @@ if (alternatorCalcParamFlag)
     alternator.stator.connection = y;                           % Tipo de conexão do circuito de estator
     alternator.stator.l.value = 120e-6;                         % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = 37e-3;                          % Resistência por fase do circuito de armadura [Ohm]
-    alternator.k_e.value = 10.716*sqrt(2)/((2*pi*180)*(3.6));	% Constante de acoplamento el�trico [V/((rad/s)*A)]
+    alternator.k_e.value = 10.716*sqrt(2)/((2*pi*180)*(3.6));	% Constante de acoplamento elétrico [V/((rad/s)*A)]
     
     %% Registro da estrutura que representa o alternador em arquivos .MAT
     

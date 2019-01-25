@@ -188,7 +188,7 @@ end
 
 %% Análise de potência e ciclo de trabalho para cada esquema de controle
 
-% �?ndice de figuras
+% Índice de figuras
 figure_index = 0;
 
 % Caso o arquivo tenha sido carregado com sucesso, executar a rotina
