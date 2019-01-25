@@ -11,7 +11,7 @@ T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
 % Lista de parâmetros a serem varridos individualmente
 i_f = 4.5;                      % Corrente de excitação [A]
 T_list = [50 150 200]';         % Temperatura dos enrolamentos de estator [oC]
-n_alt_list = [2000 3500 7500]'; % Velocidade do alternador [rpm]
+n_r_list = [2000 3500 7500]'; % Velocidade do alternador [rpm]
 r_l_list = [0.5 1.0]';          % Resistência de carga [Ohm]
 
 % Formação das casos de varredura
@@ -19,19 +19,19 @@ param_sweep = [];
 
 for index_T = 1:length(T_list)
     
-    n_alt_sweep = [];
+    n_r_sweep = [];
     [r_l_dim, ~] = size(r_l_list);
     
-    for index_n_alt = 1:length(n_alt_list)
-        n_alt_tmp = n_alt_list(index_n_alt) * ones(r_l_dim, 1);
-        n_alt_tmp = [n_alt_tmp, r_l_list];
-        n_alt_sweep = [n_alt_sweep; n_alt_tmp];
+    for index_n_r = 1:length(n_r_list)
+        n_r_tmp = n_r_list(index_n_r) * ones(r_l_dim, 1);
+        n_r_tmp = [n_r_tmp, r_l_list];
+        n_r_sweep = [n_r_sweep; n_r_tmp];
     end
     
-    [n_alt_sweep_dim, ~] = size(n_alt_sweep);
+    [n_r_sweep_dim, ~] = size(n_r_sweep);
     
-    T_tmp = T_list(index_T) * ones(n_alt_sweep_dim, 1);
-    T_tmp = [T_tmp, n_alt_sweep];
+    T_tmp = T_list(index_T) * ones(n_r_sweep_dim, 1);
+    T_tmp = [T_tmp, n_r_sweep];
     param_sweep = [param_sweep; T_tmp];
 end
 
@@ -70,7 +70,7 @@ save_system('models/ThermalAnalysis.slx');
 for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
     T = test_case(1);
-    n_alt = test_case(2);
+    n_r = test_case(2);
     r_l = test_case(3);
     
     r_s = alternator.stator.r.function(T);
@@ -78,7 +78,7 @@ for test_case_index = 1:num_cases
     simIn(test_case_index) = Simulink.SimulationInput('ThermalAnalysis');
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/i_f', 'Value', num2str(i_f));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/Alternator/Stator Resistance', 'constant', num2str(r_s));
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/n_alt', 'Value', num2str(n_alt));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/n_r', 'Value', num2str(n_r));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('ThermalAnalysis/r_l', 'R', num2str(r_l));
 end
 
@@ -106,11 +106,11 @@ for test_case_index = 1:num_cases
     
     % Valor de variáveis correspondentes ao caso de teste
     T = test_case(1);
-    n_alt = test_case(2);
+    n_r = test_case(2);
     r_l = test_case(3);
     
     % Alternador
-    test_case_out(test_case_index).alternator.rotor.n = n_alt;
+    test_case_out(test_case_index).alternator.rotor.n = n_r;
     test_case_out(test_case_index).alternator.rotor.l.i = i_f;
     
     test_case_out(test_case_index).alternator.stator.r.T = T;
@@ -161,22 +161,22 @@ end
 
 %% Identificação de pontos de máxima potência
 
-mpp_u_3d = zeros(length(T_list), length(n_alt_list), length(r_l_list));
-mpp_p_3d = zeros(length(T_list), length(n_alt_list), length(r_l_list));
+mpp_u_3d = zeros(length(T_list), length(n_r_list), length(r_l_list));
+mpp_p_3d = zeros(length(T_list), length(n_r_list), length(r_l_list));
 
 mpp_matrix = [param_sweep zeros(num_cases, 2)];
 case_index = 0;
 
 T_index = 0;
-n_alt_index = 0;
+n_r_index = 0;
 r_l_index = 0;
 
 for T = T_list'
     T_index = T_index + 1;
-    n_alt_index = 0;
+    n_r_index = 0;
     
-    for n_alt = n_alt_list'
-        n_alt_index = n_alt_index + 1;
+    for n_r = n_r_list'
+        n_r_index = n_r_index + 1;
         r_l_index = 0;
         
         for r_l = r_l_list'
@@ -184,7 +184,7 @@ for T = T_list'
             case_index = case_index + 1;
             
             curve_indexes = find((test_case_matrix(:, 1) == T) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             u = test_case_matrix(curve_indexes, 4);
@@ -196,29 +196,29 @@ for T = T_list'
             mpp_matrix(case_index, 4) = u_max;
             mpp_matrix(case_index, 5) = p_max;
             
-            mpp_u_3d(T_index, n_alt_index, r_l_index) = u_max;
-            mpp_p_3d(T_index, n_alt_index, r_l_index) = p_max;
+            mpp_u_3d(T_index, n_r_index, r_l_index) = u_max;
+            mpp_p_3d(T_index, n_r_index, r_l_index) = p_max;
         end
         
     end
 end
 
 % % 
-% [n_alt, r_l] = meshgrid(n_alt_list, r_l_list);
-% mpp_u = reshape(mpp_u_3d, length(r_l_list), length(n_alt_list));
-% mpp_p = reshape(mpp_p_3d, length(r_l_list), length(n_alt_list));
+% [n_r, r_l] = meshgrid(n_r_list, r_l_list);
+% mpp_u = reshape(mpp_u_3d, length(r_l_list), length(n_r_list));
+% mpp_p = reshape(mpp_p_3d, length(r_l_list), length(n_r_list));
 % 
 % %
 % figure_index = figure_index + 1;
 % figure(figure_index)
 % 
-% surf(n_alt, r_l, mpp_u);
+% surf(n_r, r_l, mpp_u);
 % 
 % % 
 % figure_index = figure_index + 1;
 % figure(figure_index)
 % 
-% surf(n_alt, r_l, mpp_p);
+% surf(n_r, r_l, mpp_p);
 
 %% Parâmetros auxiliares para figuras
 
@@ -228,7 +228,7 @@ leg_entries_per_columns = 3;
 %% Curvas de potência 
 
 % Comparadas por temperatura de enrolamento do estator
-for n_alt = n_alt_list'
+for n_r = n_r_list'
     
     for r_l = r_l_list'
         
@@ -241,7 +241,7 @@ for n_alt = n_alt_list'
         for T = T_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == T) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
@@ -253,7 +253,7 @@ for n_alt = n_alt_list'
             legend('show');
         end
         
-        title(['Curvas de pot{\^{e}}ncia [$n_{alt} = ' num2str(n_alt) ...
+        title(['Curvas de pot{\^{e}}ncia [$n_{r} = ' num2str(n_r) ...
             ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
         xlabel('$u$');
         ylabel('$P [W]$');
@@ -267,11 +267,11 @@ end
 %% Relação dos pontos de máxima potência com variáveis do sistema
 
 % Relação com a temperatura de enrolamento do estator
-for n_alt = n_alt_list'
+for n_r = n_r_list'
     
     for r_l = r_l_list'
         
-        curve_indexes = find((mpp_matrix(:, 2) == n_alt) & (mpp_matrix(:, 3) == r_l));
+        curve_indexes = find((mpp_matrix(:, 2) == n_r) & (mpp_matrix(:, 3) == r_l));
         
         figure_index = figure_index + 1;
         figure(figure_index)
@@ -290,8 +290,8 @@ for n_alt = n_alt_list'
         grid on;
         
         suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
-            'pot{\^{e}}ncia e a temperatura de enrolamento do estator [$n_{alt} = ' ...
-            num2str(n_alt) ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+            'pot{\^{e}}ncia e a temperatura de enrolamento do estator [$n_{r} = ' ...
+            num2str(n_r) ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
     end
 end
 
@@ -307,5 +307,5 @@ end
 save('results/ThermalAnalysis/test_case_out.mat', 'test_case_out', '-v7.3');
 save('results/ThermalAnalysis/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
 save('results/ThermalAnalysis/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
-save('results/ThermalAnalysis/mpp_map.mat', 'T_list', 'n_alt_list', 'r_l_list', ...
+save('results/ThermalAnalysis/mpp_map.mat', 'T_list', 'n_r_list', 'r_l_list', ...
     'mpp_u_3d', 'mpp_p_3d', '-v7.3');

@@ -22,28 +22,28 @@ alternator.stator.r.value = alternator.stator.r.function(T);
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [0.01 (0.5:0.5:5.0)]';               % Corrente de excitação [A]
-n_alt_list = (2000:500:7500)';                  % Velocidade do alternador [rpm]
-r_l_list = [0.01 0.05:0.05:0.40 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
+i_f_list = 3;               % Corrente de excitação [A]
+n_r_list = 3000;                  % Velocidade do alternador [rpm]
+r_l_list = [1 2 3 4]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
 
 for index_i_f = 1:length(i_f_list)
     
-    n_alt_sweep = [];
+    n_r_sweep = [];
     [r_l_dim, ~] = size(r_l_list);
     
-    for index_n_alt = 1:length(n_alt_list)
-        n_alt_tmp = n_alt_list(index_n_alt) * ones(r_l_dim, 1);
-        n_alt_tmp = [n_alt_tmp, r_l_list];
-        n_alt_sweep = [n_alt_sweep; n_alt_tmp];
+    for index_n_r = 1:length(n_r_list)
+        n_r_tmp = n_r_list(index_n_r) * ones(r_l_dim, 1);
+        n_r_tmp = [n_r_tmp, r_l_list];
+        n_r_sweep = [n_r_sweep; n_r_tmp];
     end
     
-    [n_alt_sweep_dim, ~] = size(n_alt_sweep);
+    [n_r_sweep_dim, ~] = size(n_r_sweep);
     
-    i_f_tmp = i_f_list(index_i_f) * ones(n_alt_sweep_dim, 1);
-    i_f_tmp = [i_f_tmp, n_alt_sweep];
+    i_f_tmp = i_f_list(index_i_f) * ones(n_r_sweep_dim, 1);
+    i_f_tmp = [i_f_tmp, n_r_sweep];
     param_sweep = [param_sweep; i_f_tmp];
 end
 
@@ -82,12 +82,12 @@ save_system('models/MPPTCurves.slx');
 for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
     i_f = test_case(1);
-    n_alt = test_case(2);
+    n_r = test_case(2);
     r_l = test_case(3);
     
     simIn(test_case_index) = Simulink.SimulationInput('MPPTCurves');
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/i_f', 'Value', num2str(i_f));
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/n_alt', 'Value', num2str(n_alt));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/n_r', 'Value', num2str(n_r));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('MPPTCurves/r_l', 'R', num2str(r_l));
 end
 
@@ -153,11 +153,11 @@ for batch_index = 1:sim_batches
         
         % Valor de variáveis correspondentes ao caso de teste
         i_f = test_case(1);
-        n_alt = test_case(2);
+        n_r = test_case(2);
         r_l = test_case(3);
         
         % Alternador
-        test_case_out(test_case_index).alternator.rotor.n = n_alt;
+        test_case_out(test_case_index).alternator.rotor.n = n_r;
         test_case_out(test_case_index).alternator.rotor.l.i = i_f;
         
         test_case_out(test_case_index).alternator.stator.input.e.value = simOut(test_case_index).e_a_abc;
@@ -237,22 +237,22 @@ end
 
 %% Identificação de pontos de máxima potência
 
-mpp_u_3d = zeros(length(i_f_list), length(n_alt_list), length(r_l_list));
-mpp_p_3d = zeros(length(i_f_list), length(n_alt_list), length(r_l_list));
+mpp_u_3d = zeros(length(i_f_list), length(n_r_list), length(r_l_list));
+mpp_p_3d = zeros(length(i_f_list), length(n_r_list), length(r_l_list));
 
 mpp_matrix = [param_sweep zeros(num_cases, 2)];
 case_index = 0;
 
 i_f_index = 0;
-n_alt_index = 0;
+n_r_index = 0;
 r_l_index = 0;
 
 for i_f = i_f_list'
     i_f_index = i_f_index + 1;
-    n_alt_index = 0;
+    n_r_index = 0;
     
-    for n_alt = n_alt_list'
-        n_alt_index = n_alt_index + 1;
+    for n_r = n_r_list'
+        n_r_index = n_r_index + 1;
         r_l_index = 0;
         
         for r_l = r_l_list'
@@ -260,7 +260,7 @@ for i_f = i_f_list'
             case_index = case_index + 1;
             
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             u = test_case_matrix(curve_indexes, 4);
@@ -272,29 +272,29 @@ for i_f = i_f_list'
             mpp_matrix(case_index, 4) = u_max;
             mpp_matrix(case_index, 5) = p_max;
             
-            mpp_u_3d(i_f_index, n_alt_index, r_l_index) = u_max;
-            mpp_p_3d(i_f_index, n_alt_index, r_l_index) = p_max;
+            mpp_u_3d(i_f_index, n_r_index, r_l_index) = u_max;
+            mpp_p_3d(i_f_index, n_r_index, r_l_index) = p_max;
         end
         
     end
 end
 
 % % 
-% [n_alt, r_l] = meshgrid(n_alt_list, r_l_list);
-% mpp_u = reshape(mpp_u_3d, length(r_l_list), length(n_alt_list));
-% mpp_p = reshape(mpp_p_3d, length(r_l_list), length(n_alt_list));
+% [n_r, r_l] = meshgrid(n_r_list, r_l_list);
+% mpp_u = reshape(mpp_u_3d, length(r_l_list), length(n_r_list));
+% mpp_p = reshape(mpp_p_3d, length(r_l_list), length(n_r_list));
 % 
 % %
 % figure_index = figure_index + 1;
 % figure(figure_index)
 % 
-% surf(n_alt, r_l, mpp_u);
+% surf(n_r, r_l, mpp_u);
 % 
 % % 
 % figure_index = figure_index + 1;
 % figure(figure_index)
 % 
-% surf(n_alt, r_l, mpp_p);
+% surf(n_r, r_l, mpp_p);
 
 %% Parâmetros auxiliares para figuras
 
@@ -304,7 +304,7 @@ leg_entries_per_columns = 3;
 %% Curvas de potência 
 
 % Comparadas por corrente de excitação
-for n_alt = n_alt_list'
+for n_r = n_r_list'
     
     for r_l = r_l_list'
         
@@ -317,7 +317,7 @@ for n_alt = n_alt_list'
         for i_f = i_f_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
@@ -329,7 +329,7 @@ for n_alt = n_alt_list'
             legend('show');
         end
         
-        title(['Curvas de pot{\^{e}}ncia [$n_{alt} = ' num2str(n_alt) ...
+        title(['Curvas de pot{\^{e}}ncia [$n_{r} = ' num2str(n_r) ...
             ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
         xlabel('$u$');
         ylabel('$P [W]$');
@@ -345,21 +345,21 @@ for i_f = i_f_list'
     
     for r_l = r_l_list'
         
-        colors = distinguishable_colors(length(n_alt_list));
+        colors = distinguishable_colors(length(n_r_list));
         color_index = 0;
         
         figure_index = figure_index + 1;
         figure(figure_index)
         
-        for n_alt = n_alt_list'
+        for n_r = n_r_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
                 'Color', colors(color_index, :), 'DisplayName', ...
-                ['$n_{alt} = ' num2str(n_alt) ' rpm$']);
+                ['$n_{r} = ' num2str(n_r) ' rpm$']);
             hold on;
             
             legend('off');
@@ -372,7 +372,7 @@ for i_f = i_f_list'
         ylabel('$P [W]$');
         leg = legend;
         leg.Location = 'SouthOutside';
-        leg.NumColumns = ceil(length(n_alt_list)/leg_entries_per_columns);
+        leg.NumColumns = ceil(length(n_r_list)/leg_entries_per_columns);
         grid on;
     end
 end
@@ -380,7 +380,7 @@ end
 % Comparadas por carga
 for i_f = i_f_list'
     
-    for n_alt = n_alt_list'
+    for n_r = n_r_list'
         
         colors = distinguishable_colors(length(r_l_list));
         color_index = 0;
@@ -391,7 +391,7 @@ for i_f = i_f_list'
         for r_l = r_l_list'
             color_index = color_index + 1;
             curve_indexes = find((test_case_matrix(:, 1) == i_f) ...
-                & (test_case_matrix(:, 2) == n_alt) ...
+                & (test_case_matrix(:, 2) == n_r) ...
                 & (test_case_matrix(:, 3) == r_l));
             
             plot(test_case_matrix(curve_indexes, 4), test_case_matrix(curve_indexes, 5), ...
@@ -404,7 +404,7 @@ for i_f = i_f_list'
         end
         
         title(['Curvas de pot{\^{e}}ncia [$i_{f} = ' num2str(i_f) ...
-            ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
+            ' A$; $n_{r} = ' num2str(n_r) ' rpm$]']);
         xlabel('$u$');
         ylabel('$P [W]$');
         leg = legend;
@@ -417,11 +417,11 @@ end
 %% Relação dos pontos de máxima potência com variáveis do sistema
 
 % Relação com a corrente de excitação
-for n_alt = n_alt_list'
+for n_r = n_r_list'
     
     for r_l = r_l_list'
         
-        curve_indexes = find((mpp_matrix(:, 2) == n_alt) & (mpp_matrix(:, 3) == r_l));
+        curve_indexes = find((mpp_matrix(:, 2) == n_r) & (mpp_matrix(:, 3) == r_l));
         
         figure_index = figure_index + 1;
         figure(figure_index)
@@ -440,8 +440,8 @@ for n_alt = n_alt_list'
         grid on;
         
         suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
-            'pot{\^{e}}ncia e a corrente de excita{\c{c}}{\~{a}}o [$n_{alt} = ' ...
-            num2str(n_alt) ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
+            'pot{\^{e}}ncia e a corrente de excita{\c{c}}{\~{a}}o [$n_{r} = ' ...
+            num2str(n_r) ' rpm$; $r_{l} = ' num2str(r_l) ' \Omega$]']);
     end
 end
 
@@ -457,14 +457,14 @@ for i_f = i_f_list'
         
         subplot(2, 1, 1)
         plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 4), 'o-');
-        xlabel('$n_{alt} [rpm]$');
+        xlabel('$n_{r} [rpm]$');
         ylabel('$u$');
         ylim([0 1]);
         grid on;
         
         subplot(2, 1, 2)
         plot(mpp_matrix(curve_indexes, 2), mpp_matrix(curve_indexes, 5), 'o-');
-        xlabel('$n_{alt} [rpm]$');
+        xlabel('$n_{r} [rpm]$');
         ylabel('$P [W]$');
         grid on;
         
@@ -477,9 +477,9 @@ end
 % Relação com a impedância de carga
 for i_f = i_f_list'
     
-    for n_alt = n_alt_list'
+    for n_r = n_r_list'
         
-        curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 2) == n_alt));
+        curve_indexes = find((mpp_matrix(:, 1) == i_f) & (mpp_matrix(:, 2) == n_r));
         
         figure_index = figure_index + 1;
         figure(figure_index)
@@ -499,7 +499,7 @@ for i_f = i_f_list'
         
         suptitle(['Rela{\c{c}}{\~{a}}o entre o ponto de m{\''{a}}xima ' ...
             'pot{\^{e}}ncia e a imped{\^{a}}ncia de carga [$i_{f} = ' ...
-            num2str(i_f) ' A$; $n_{alt} = ' num2str(n_alt) ' rpm$]']);
+            num2str(i_f) ' A$; $n_{r} = ' num2str(n_r) ' rpm$]']);
     end
 end
 
@@ -514,11 +514,10 @@ end
 
 % Tratamento para simulação particionada
 if (~sim_split_flag)
-    filename = [raw_storage_path 'test_case_out.mat'];
-    save(filename, 'test_case_out', '-v7.3');
+    save('results/MPPTCurves/test_case_out.mat', 'test_case_out', '-v7.3');
 end
 
 save('results/MPPTCurves/test_case_matrix.mat', 'test_case_matrix', '-v7.3');
 save('results/MPPTCurves/mpp_matrix.mat', 'mpp_matrix', '-v7.3');
-save('results/MPPTCurves/mpp_map.mat', 'i_f_list', 'n_alt_list', 'r_l_list', ...
+save('results/MPPTCurves/mpp_map.mat', 'i_f_list', 'n_r_list', 'r_l_list', ...
     'mpp_u_3d', 'mpp_p_3d', '-v7.3');
