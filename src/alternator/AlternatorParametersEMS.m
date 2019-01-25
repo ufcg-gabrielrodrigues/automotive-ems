@@ -10,11 +10,6 @@ else
     previousVars{1} = who;
 end
 
-%% Tipos de conexão do circuito de estator
-
-y = 1;
-delta = 2;
-
 %% Executa script de determinação de parâmetros de acordo com alternador
 %  selecionado
 

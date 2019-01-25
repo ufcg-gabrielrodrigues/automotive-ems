@@ -13,7 +13,7 @@ t_f = 2.0e-2;   % Tempo total de simulação [s]
 % Velocidade
 alternator.rotor.n = 5000;
 
-% Corrente de excita��o m�xima
+% Corrente de excitação máxima
 alternator.rotor.l.i = 3.6; % [A]
 
 % Atualização de parâmetro: fator de acoplamento
@@ -22,10 +22,15 @@ if (isfield(alternator.k_e, 'function'))
 else
     k_e_str = num2str(alternator.k_e.value);
 end
+
+if (alternator.stator.connection == delta)
+    k_e_str = [k_e_str './sqrt(3)'];
+end
+    
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str ';']);
 
-%% Carga el�trica
+%% Carga elétrica
 
 electrical_load.battery.v_nom = 50.0;   % [V]
 electrical_load.r = 1.00;              	% [Ohm]

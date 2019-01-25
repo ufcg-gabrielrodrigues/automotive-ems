@@ -34,6 +34,10 @@ addpath(root);
 
 %% Alternador
 
+% Tipos de conexão do circuito de estator
+y = 1;
+delta = 2;
+
 % Determina realização ou não de nova iteração para determinação de
 % parâmetros
 alternatorCalcParamFlag = true;
@@ -44,7 +48,7 @@ alternatorCase = 'Sarafianos2015';
 % Executa script que determina parâmetros do alternador
 AlternatorParametersEMS;
 
-% Atualização de parâmetro: constante de acoplamento el�trico
+% Atualização de parâmetro: constante de acoplamento elétrico
 k_e_default = 'k_e == { 0, ''V/((rad/s)*(A))'' };';
 
 if (isfield(alternator.k_e, 'function'))
@@ -95,7 +99,7 @@ MPPTCurvesRoutine;
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: constante de acoplamento
-% el�trico
+% elétrico
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
     k_e, k_e_default);
 
