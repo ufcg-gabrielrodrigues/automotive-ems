@@ -17,6 +17,8 @@ alternator.rotor.n = 5000;
 alternator.rotor.l.i = 3.6; % [A]
 
 % Atualização de parâmetro: fator de acoplamento
+k_e_default_local = 'k_e = 0;';
+
 if (isfield(alternator.k_e, 'function'))
     k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
 else
@@ -26,9 +28,10 @@ end
 if (alternator.stator.connection == delta)
     k_e_str = [k_e_str './sqrt(3)'];
 end
-    
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str ';']);
+
+k_e_local = ['k_e = ' k_e_str ';'];
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
 %% Carga elétrica
 
@@ -54,7 +57,8 @@ simout = sim('Perreault2004', simulationParameters);
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
-blockHandle.Script = strrep(blockHandle.Script, ['k_e = ' k_e_str ';'], 'k_e = 0;');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
 
 %% Salva e finaliza modelo no Simulink
 

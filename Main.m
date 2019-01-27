@@ -63,18 +63,18 @@ replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', .
     k_e_default, k_e);
 
 % Atualização de parâmetro: indutância própria de estator
-l_a_default = 'l == { 1e-6, ''H'' };';
+l_s_default = 'l == { 1e-6, ''H'' };';
 
 if (isfield(alternator.stator.l, 'function'))
-    l_a_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
-    l_a_str = strrep(l_a_str, 'i_f', '(i_f*{1,''1/A''})');
+    l_s_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+    l_s_str = strrep(l_s_str, 'i_f', '(i_f*{1,''1/A''})');
 else
-    l_a_str = num2str(alternator.stator.l.value);
+    l_s_str = num2str(alternator.stator.l.value);
 end
 
-l_a = ['l == { ' l_a_str ', ''H'' };'];
+l_s = ['l == { ' l_s_str ', ''H'' };'];
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
-    l_a_default, l_a);
+    l_s_default, l_s);
 
 % Tipos de conexão do circuito de estator
 yStatorConnection = Simulink.Variant('alternator.stator.connection == 1');
@@ -105,7 +105,7 @@ replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', .
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...
-    l_a, l_a_default);
+    l_s, l_s_default);
 
 %% Remoção do diretório principal e seus subdiretórios dos caminhos de 
 %  busca do MATLAB

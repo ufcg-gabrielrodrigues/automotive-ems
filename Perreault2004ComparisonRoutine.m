@@ -11,10 +11,12 @@ t_f = 2.0e-1;   % Tempo total de simulação [s]
 %% Esquemas de controle
 
 % Lista de títulos por esquema de controle
+% control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
+%     'Esquema de controle baseado em casamento de imped{\^{a}}ncias', ...
+%     'Esquema de controle baseado em rede neural (2 entradas)', ...
+%     'Esquema de controle baseado em rede neural (3 entradas)'};
 control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
-    'Esquema de controle baseado em casamento de imped{\^{a}}ncias', ...
-    'Esquema de controle baseado em rede neural (2 entradas)', ...
-    'Esquema de controle baseado em rede neural (3 entradas)'};
+    'Esquema de controle baseado em casamento de imped{\^{a}}ncias'};
 
 %
 perreault2004ControlScheme = Simulink.Variant('control_scheme == 1');
@@ -42,34 +44,38 @@ T = 150;        % [oC]
 alternator.stator.r.value = alternator.stator.r.function(T);
 
 % Atualização de parâmetro: fator de acoplamento
+k_e_default_local = 'k_e = 0;';
+
 if (isfield(alternator.k_e, 'function'))
     k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
-    k_e_str_local = strrep(k_e_str, '(i_f*{1,''1/A''})', 'i_f');
 else
-    k_e_str_local = num2str(alternator.k_e.value);
+    k_e_str = num2str(alternator.k_e.value);
 end
 
 if (alternator.stator.connection == delta)
     k_e_str = [k_e_str './sqrt(3)'];
 end
 
+k_e_local = ['k_e = ' k_e_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str_local ';']);
+blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
 % Atualização de parâmetro: indutância própria de estator
+l_s_default_local = 'l_s = 1e-6;';
+
 if (isfield(alternator.stator.l, 'function'))
     l_s_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
-    l_s_str_local = strrep(l_s_str, '(i_f*{1,''1/A''})', 'i_f');
 else
-    l_s_str_local = num2str(alternator.stator.l.value);
+    l_s_str = num2str(alternator.stator.l.value);
 end
 
 if (alternator.stator.connection == delta)
     l_s_str = [l_s_str './3'];
 end
 
+l_s_local = ['l_s = ' l_s_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, 'l_s = 1e-6;', ['l_s = ' l_s_str_local ';']);
+blockHandle.Script = strrep(blockHandle.Script, l_s_default_local, l_s_local);
 
 %% Bateria
 
@@ -78,7 +84,9 @@ battery.v_nom = 50.0;   % [V]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-n_r_list = (2000:500:7500)';    % Velocidade do alternador [rpm]
+% n_r_list = (2000:500:7500)';    % Velocidade do alternador [rpm]
+% r_l_list = (0.5:0.5:2.0)';      % Resistência de carga [Ohm]
+n_r_list = 3000;    % Velocidade do alternador [rpm]
 r_l_list = (0.5:0.5:2.0)';      % Resistência de carga [Ohm]
 
 % Formação das casos de varredura
@@ -145,10 +153,12 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
-blockHandle.Script = strrep(blockHandle.Script, ['k_e = ' k_e_str_local ';'], 'k_e = 0;');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
-blockHandle.Script = strrep(blockHandle.Script, ['l_s = ' l_s_str_local ';'], 'l_s = 1e-6;');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, l_s_local, l_s_default_local);
 
 %% Finaliza modelo no Simulink
 
@@ -205,49 +215,52 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.p, 'r-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.p, 'g-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
     title(['Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga ($n_{r} = ' ...
         num2str(test_cases(test_case_index, 1)) '$ $[rpm]$; $r_{l} = ' ...
         num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
     grid on;
     
     subplot(3, 1, 2)
     plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.v, 'r-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.v, 'g-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
     title(['Tens{\~{a}}o sobre a carga ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$v_{l}$ $[V]$');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
     grid on;
     
     subplot(3, 1, 3)
     plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.z, 'r-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.z, 'g-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
-    hold on;
-    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
+%     hold on;
+%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
     title(['Imped{\^{a}}ncia de carga observada ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$z_{l}$ $[\Omega]$');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
     grid on;
 end
 
