@@ -48,6 +48,11 @@ if (isfield(alternator.k_e, 'function'))
 else
     k_e_str_local = num2str(alternator.k_e.value);
 end
+
+if (alternator.stator.connection == delta)
+    k_e_str = [k_e_str './sqrt(3)'];
+end
+
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str_local ';']);
 
@@ -58,6 +63,11 @@ if (isfield(alternator.stator.l, 'function'))
 else
     l_s_str_local = num2str(alternator.stator.l.value);
 end
+
+if (alternator.stator.connection == delta)
+    l_s_str = [l_s_str './3'];
+end
+
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, 'l_s = 1e-6;', ['l_s = ' l_s_str_local ';']);
 
@@ -197,13 +207,15 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.p, 'g-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
+    hold on;
+    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
     title(['Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga ($n_{r} = ' ...
         num2str(test_cases(test_case_index, 1)) '$ $[rpm]$; $r_{l} = ' ...
         num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
-    legend('Load Matching [Perreault (2004)]', 'RNA (2 entradas)', 'RNA (3 entradas)', ...
-        'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
     grid on;
     
     subplot(3, 1, 2)
@@ -212,12 +224,14 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.v, 'g-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
+    hold on;
+    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
     title(['Tens{\~{a}}o sobre a carga ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$v_{l}$ $[V]$');
-    legend('Load Matching [Perreault (2004)]', 'RNA (2 entradas)', 'RNA (3 entradas)', ...
-        'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
     grid on;
     
     subplot(3, 1, 3)
@@ -226,12 +240,14 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.z, 'g-');
     hold on;
     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
+    hold on;
+    plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
     title(['Imped{\^{a}}ncia de carga observada ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$z_{l}$ $[\Omega]$');
-    legend('Load Matching [Perreault (2004)]', 'RNA (2 entradas)', 'RNA (3 entradas)', ...
-        'Location', 'best');
+    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
+        'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
     grid on;
 end
 

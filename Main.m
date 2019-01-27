@@ -94,7 +94,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-MPPTCurvesRoutine;
+Perreault2004ComparisonRoutine;
 
 %% Redefinição de parâmetros de alternador
 
