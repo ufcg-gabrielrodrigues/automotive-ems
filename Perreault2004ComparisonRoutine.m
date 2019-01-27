@@ -12,6 +12,7 @@ t_f = 2.0e-1;   % Tempo total de simulação [s]
 
 % Lista de títulos por esquema de controle
 control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
+    'Esquema de controle baseado em casamento de imped{\^{a}}ncias', ...
     'Esquema de controle baseado em rede neural (2 entradas)', ...
     'Esquema de controle baseado em rede neural (3 entradas)'};
 
@@ -19,14 +20,17 @@ control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
 perreault2004ControlScheme = Simulink.Variant('control_scheme == 1');
 
 % 
+impedanceMatchingControlScheme = Simulink.Variant('control_scheme == 2');
+
+% 
 normalizationFactor2In = [1 1];
 % normalizationFactor2In = [7.5e+3 2.0e+0];
-neural2InControlScheme = Simulink.Variant('control_scheme == 2');
+neural2InControlScheme = Simulink.Variant('control_scheme == 3');
 
 % 
 normalizationFactor3In = [1 1 1];
 % normalizationFactor3In = [5.0e+0 7.5e+3 2.0e+0];
-neural3InControlScheme = Simulink.Variant('control_scheme == 3');
+neural3InControlScheme = Simulink.Variant('control_scheme == 4');
 
 %% Alternador
 
@@ -46,6 +50,16 @@ else
 end
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, 'k_e = 0;', ['k_e = ' k_e_str_local ';']);
+
+% Atualização de parâmetro: indutância própria de estator
+if (isfield(alternator.stator.l, 'function'))
+    l_s_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+    l_s_str_local = strrep(l_s_str, '(i_f*{1,''1/A''})', 'i_f');
+else
+    l_s_str_local = num2str(alternator.stator.l.value);
+end
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, 'l_s = 1e-6;', ['l_s = ' l_s_str_local ';']);
 
 %% Bateria
 
@@ -122,6 +136,9 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
 blockHandle.Script = strrep(blockHandle.Script, ['k_e = ' k_e_str_local ';'], 'k_e = 0;');
+
+% Atualização de parâmetro para valor padrão: indutância própria de estator
+blockHandle.Script = strrep(blockHandle.Script, ['l_s = ' l_s_str_local ';'], 'l_s = 1e-6;');
 
 %% Finaliza modelo no Simulink
 
