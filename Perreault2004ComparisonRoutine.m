@@ -210,13 +210,13 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     
     subplot(3, 1, 1)
     
-    plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.p, 'r-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.p, 'r-');
     hold on;
-    plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.p, 'g-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.p, 'g-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
     title(['Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga ($n_{r} = ' ...
         num2str(test_cases(test_case_index, 1)) '$ $[rpm]$; $r_{l} = ' ...
         num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
@@ -228,13 +228,13 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     grid on;
     
     subplot(3, 1, 2)
-    plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.v, 'r-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.v, 'r-');
     hold on;
-    plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.v, 'g-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.v, 'g-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
     title(['Tens{\~{a}}o sobre a carga ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
@@ -245,13 +245,13 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     grid on;
     
     subplot(3, 1, 3)
-    plot(test_case_out(length(control_scheme_title)*0 + test_case_index).electrical_load.z, 'r-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.z, 'r-');
     hold on;
-    plot(test_case_out(length(control_scheme_title)*1 + test_case_index).electrical_load.z, 'g-');
+    plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.z, 'g-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
 %     hold on;
-%     plot(test_case_out(length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
+%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
     title(['Imped{\^{a}}ncia de carga observada ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
