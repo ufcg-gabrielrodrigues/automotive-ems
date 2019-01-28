@@ -26,7 +26,7 @@ else
 end
 
 if (alternator.stator.connection == delta)
-    k_e_str = [k_e_str './sqrt(3)'];
+    k_e_str = ['(' k_e_str ')./sqrt(3)'];
 end
 
 k_e_local = ['k_e = ' k_e_str ';'];

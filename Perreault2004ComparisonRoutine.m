@@ -6,7 +6,7 @@ open_system('models/Perreault2004Comparison.slx', 'loadonly');
 
 T_s = 1.0e-6;   % Passo de cálculo utilizado pelo 'solver' [s]
 T_k = 1.0e-4;   % Passo de amostragem global de rotinas de controle [s]
-t_f = 2.0e-1;   % Tempo total de simulação [s]
+t_f = 3.0e-1;   % Tempo total de simulação [s]
 
 %% Esquemas de controle
 
@@ -53,7 +53,7 @@ else
 end
 
 if (alternator.stator.connection == delta)
-    k_e_str = [k_e_str './sqrt(3)'];
+    k_e_str = ['(' k_e_str ')./sqrt(3)'];
 end
 
 k_e_local = ['k_e = ' k_e_str ';'];
@@ -69,9 +69,9 @@ else
     l_s_str = num2str(alternator.stator.l.value);
 end
 
-if (alternator.stator.connection == delta)
-    l_s_str = [l_s_str './3'];
-end
+% if (alternator.stator.connection == delta)
+%     l_s_str = ['(' l_s_str ')./3'];
+% end
 
 l_s_local = ['l_s = ' l_s_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
@@ -84,9 +84,7 @@ battery.v_nom = 50.0;   % [V]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-% n_r_list = (2000:500:7500)';    % Velocidade do alternador [rpm]
-% r_l_list = (0.5:0.5:2.0)';      % Resistência de carga [Ohm]
-n_r_list = 3000;    % Velocidade do alternador [rpm]
+n_r_list = (2000:500:7500)';    % Velocidade do alternador [rpm]
 r_l_list = (0.5:0.5:2.0)';      % Resistência de carga [Ohm]
 
 % Formação das casos de varredura
