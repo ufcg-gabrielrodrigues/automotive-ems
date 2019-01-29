@@ -23,6 +23,10 @@ load_model = 1;
 
 %% Alternador
 
+% Efeito térmico na resistência do circuito de estator
+T = 150;	% [oC]
+alternator.stator.r.value = alternator.stator.r.function(T);
+
 % Fator de acoplamento
 if (isfield(alternator.k_e, 'function'))
     k_e = @(i_f) alternator.k_e.function(i_f);
