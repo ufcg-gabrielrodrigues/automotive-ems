@@ -69,9 +69,9 @@ else
     l_s_str = num2str(alternator.stator.l.value);
 end
 
-% if (alternator.stator.connection == delta)
-%     l_s_str = ['(' l_s_str ')./3'];
-% end
+if (alternator.stator.connection == delta)
+    l_s_str = ['(' l_s_str ')./3'];
+end
 
 l_s_local = ['l_s = ' l_s_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
