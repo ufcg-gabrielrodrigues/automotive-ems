@@ -94,7 +94,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-PowerCurvesRoutine;
+PowerAnalysisRoutine;
 
 %% Redefinição de parâmetros de alternador
 
