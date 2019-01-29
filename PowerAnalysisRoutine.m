@@ -49,18 +49,18 @@ if (alternator.stator.connection == delta)
     l_s = @(i_f) l_s(i_f)./3;
 end
 
-% Fun√ß√£o de c·lculo da frequÍncia elÈtrica
+% Fun√ß√£o de c√°lculo da frequ√™ncia el√©trica
 omega_e = @(n_r) n_r.*(2.*pi./60).*alternator.p;
 
-% FunÁ„o de c·lculo da tens„o induzida no estator
+% Fun√ß√£o de c√°lculo da tens√£o induzida no estator
 v_s = @(n_r, i_f) k_e(i_f).*omega_e(n_r).*i_f;
 
-%% Modelos analÌticos para c·lculo de potÍncia
+%% Modelos anal√≠ticos para c√°lculo de pot√™ncia
 
-% Carga de tens„o constante
+% Carga de tens√£o constante
 P_v_o = @(n_r, i_f, v_o) (3.*v_o./pi).*(sqrt(v_s(n_r, i_f).^2 - (2.*v_o./pi).^2))./(omega_e(n_r).*l_s(i_f));
 
-% Carga de imped‚ncia constante
+% Carga de imped√¢ncia constante
 P_z_o = @(n_r, i_f, z_o) ((3.*pi.*v_s(n_r, i_f)).^2.*z_o)./((pi.^2.*omega_e(n_r).*l_s(i_f)).^2 + (6.*z_o).^2);
 
 %% Varredura de par√¢metros
@@ -70,6 +70,10 @@ i_f_max = 4.5;                    	% Corrente de excita√ß√£o m√°xima [A]
 n_r_list = (2000:500:7500)';       	% Velocidade do alternador [rpm]
 v_o_list = (0.0:1.0:80.0)';       	% Tens√£o de sa√≠da [V]
 z_o_list = [0.01 0.05:0.05:2.0]';   % Imped√¢ncia de sa√≠da [Ohm]
+
+%% Inicializa√ß√£o do √≠ndice de figuras
+
+figure_index = 0;
 
 %% Par√¢metros de simula√ß√£o
 
@@ -110,10 +114,10 @@ for n_r_index = 1:length(n_r_list)
     end
 end
 
-% TransformaÁ„o de matriz de entradas em vetor
+% Transforma√ß√£o de matriz de entradas em vetor
 simIn = reshape(simIn, [length(v_o_list)*length(n_r_list) 1]);
 
-%% An·lise do efeito da variaÁ„o da tens„o na carga
+%% An√°lise do efeito da varia√ß√£o da tens√£o na carga
 
 % Modelo anal√≠tico
 P_v_o_ana = P_v_o(n_r_grid, i_f_max, v_o_grid);
@@ -131,8 +135,9 @@ for n_r_index = 1:length(n_r_list)
     end
 end
 
-% TraÁo dos resultados
-figure(1)
+% Tra√ßo dos resultados
+figure_index = figure_index + 1;
+figure(figure_index)
 
 colors = distinguishable_colors(length(n_r_list));
 color_index = 0;
@@ -180,10 +185,10 @@ for n_r_index = 1:length(n_r_list)
     end
 end
 
-% TransformaÁ„o de matriz de entradas em vetor
+% Transforma√ß√£o de matriz de entradas em vetor
 simIn = reshape(simIn, [length(z_o_list)*length(n_r_list) 1]);
 
-%% An·lise do efeito da variaÁ„o da imped‚ncia da carga
+%% An√°lise do efeito da varia√ß√£o da imped√¢ncia da carga
 
 % Modelo anal√≠tico
 P_z_o_ana = P_z_o(n_r_grid, i_f_max, z_o_grid);
@@ -201,8 +206,9 @@ for n_r_index = 1:length(n_r_list)
     end
 end
 
-% TraÁo dos resultados
-figure(2)
+% Tra√ßo dos resultados
+figure_index = figure_index + 1;
+figure(figure_index)
 
 colors = distinguishable_colors(length(n_r_list));
 color_index = 0;
