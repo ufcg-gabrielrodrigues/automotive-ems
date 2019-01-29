@@ -22,9 +22,9 @@ alternator.stator.r.value = alternator.stator.r.function(T);
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = 3;               % Corrente de excitação [A]
-n_r_list = 3000;                  % Velocidade do alternador [rpm]
-r_l_list = [1 2 3 4]';	% Resistência de carga [Ohm]
+i_f_list = (0.5:0.5:5.0)';                      % Corrente de excitação [A]
+n_alt_list = (2000:500:7500)';                  % Velocidade do alternador [rpm]
+r_l_list = [0.01 0.05:0.05:0.40 0.5:0.5:2.0]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
