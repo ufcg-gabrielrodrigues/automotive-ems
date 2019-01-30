@@ -127,6 +127,7 @@ P_v_o_ana(imag(P_v_o_ana) ~= 0) = 0;
 simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
     'TransferBaseWorkspaceVariables', 'on');
 
+simIn = reshape(simIn, [length(v_o_list) length(n_r_list)]);
 simOut = reshape(simOut, [length(v_o_list) length(n_r_list)]);
 
 for n_r_index = 1:length(n_r_list)
@@ -160,6 +161,26 @@ ylabel('$P$ $[W]$');
 leg = legend;
 leg.Location = 'NorthWest';
 grid on;
+
+%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela tens„o da carga
+
+%
+mpp_v_o_ana = zeros(length(n_r_list), 3);
+mpp_v_o_sim = zeros(length(n_r_list), 3);
+
+% 
+mpp_v_o_ana(:, 1) = n_r_list;
+[mpp_v_o_ana(:, 3), mpp_v_o_ana(:, 2)] = max(P_v_o_ana, [], 1);
+mpp_v_o_ana(:, 2) = v_o_list(mpp_v_o_ana(:, 2));
+
+% 
+mpp_v_o_sim(:, 1) = n_r_list;
+[mpp_v_o_sim(:, 3), mpp_v_o_sim(:, 2)] = max(P_v_o_sim, [], 1);
+mpp_v_o_sim(:, 2) = v_o_list(mpp_v_o_sim(:, 2));
+
+%% Armazenamento dos resultados de simula√ß√£o
+
+save('results/PowerAnalysis/P_v_o.mat', 'simIn', 'simOut', '-v7.3');
 
 %% Configura√ß√£o dos casos de teste para carga de imped√¢ncia constante
 
@@ -198,6 +219,7 @@ P_z_o_ana(imag(P_z_o_ana) ~= 0) = 0;
 simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
     'TransferBaseWorkspaceVariables', 'on');
 
+simIn = reshape(simIn, [length(z_o_list) length(n_r_list)]);
 simOut = reshape(simOut, [length(z_o_list) length(n_r_list)]);
 
 for n_r_index = 1:length(n_r_list)
@@ -232,9 +254,34 @@ leg = legend;
 leg.Location = 'NorthWest';
 grid on;
 
+%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela imped‚ncia da carga
+
+%
+mpp_z_o_ana = zeros(length(n_r_list), 3);
+mpp_z_o_sim = zeros(length(n_r_list), 3);
+
+% 
+mpp_z_o_ana(:, 1) = n_r_list;
+[mpp_z_o_ana(:, 3), mpp_z_o_ana(:, 2)] = max(P_z_o_ana, [], 1);
+mpp_z_o_ana(:, 2) = z_o_list(mpp_z_o_ana(:, 2));
+
+% 
+mpp_z_o_sim(:, 1) = n_r_list;
+[mpp_z_o_sim(:, 3), mpp_z_o_sim(:, 2)] = max(P_z_o_sim, [], 1);
+mpp_z_o_sim(:, 2) = z_o_list(mpp_z_o_sim(:, 2));
+
+%% Armazenamento dos resultados de simula√ß√£o
+
+save('results/PowerAnalysis/P_z_o.mat', 'simIn', 'simOut', '-v7.3');
+
 %% Armazenamento de figuras
 
 for i = 1:figure_index
     fileName = sprintf('results/PowerAnalysis/Figura_%d', i);
     saveFigure(figure(i), fileName, 'fig');
 end
+
+%% Armazenamento dos resultados de simula√ß√£o
+
+save('results/PowerAnalysis/simEnv.mat', 'alternator', 'rectifier', 'n_r_list', ...
+    'v_o_list', 'z_o_list', '-v7.3');
