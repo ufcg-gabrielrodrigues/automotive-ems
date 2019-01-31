@@ -9,6 +9,6 @@ component stator_inductance
         l = { 1e-6, 'H' };  % Stator Inductance:right
     end
     equations
-        l == { 2.3506e-06.*(i_f*{1,'1/A'}).^3+-2.0922e-05.*(i_f*{1,'1/A'}).^2+1.9623e-05.*(i_f*{1,'1/A'}).^1+0.00029608.*(i_f*{1,'1/A'}).^0, 'H' };
+        l == { 1e-6, 'H' };
     end
 end
