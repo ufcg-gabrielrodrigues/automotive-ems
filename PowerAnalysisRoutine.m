@@ -73,7 +73,7 @@ z_o_list = [0.01 0.05:0.05:2.0]';   % Impedância de saída [Ohm]
 
 %% Parâmetros auxiliares para figuras
 
-% Índice de figuras
+% �?ndice de figuras
 figure_index = 0;
 
 % Cores
@@ -156,6 +156,12 @@ v_o_mpp_ana = v_o_list(v_o_mpp_index_ana);
 [P_v_o_mpp_sim, v_o_mpp_index_sim] = max(P_v_o_sim, [], 3);
 v_o_mpp_sim = v_o_list(v_o_mpp_index_sim);
 
+%% Ajuste de superf�cie de tens�o de m�xima pot�ncia
+
+v_o_mpp_fun = '(k_i1*i_f + k_i2*i_f^2 + k_i3*i_f^3)*omega_e*i_f*pi/(2*sqrt(2)) + (a*i_f + b*omega_e*i_f + c)';
+v_o_mpp_fit = customSurfaceFit((alternator.p*2*pi/60)*squeeze(n_r_grid(:, :, 1)), ...
+    squeeze(i_f_grid(:, :, 1)), v_o_mpp_sim, v_o_mpp_fun, 'omega_e', 'i_f', 'v_o', zeros(6, 1));
+
 %% Traço dos resultados relativos à variação da tensão da carga
 
 % 
@@ -222,10 +228,47 @@ for n_r_index = 1:length(n_r_list)
     grid on;
 end
 
+% 
+figure_index = figure_index + 1;
+figure(figure_index)
+
+h_mpp_ana = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), v_o_mpp_ana);
+colormap(spring);
+freezeColors;
+hold on;
+h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), v_o_mpp_sim);
+colormap(winter);
+
+title('Superf{\''i}cies de tens{\~{a}}o de m{\''{a}}xima pot{\^{e}}ncia');
+xlabel('$n_r$ $[rpm]$');
+ylabel('$i_f$ $[A]$');
+zlabel('$v_o$ $[V]$');
+legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
+    'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
+grid on;
+
+figure_index = figure_index + 1;
+figure(figure_index)
+
+h_mpp_ana = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), P_v_o_mpp_ana);
+colormap(spring);
+freezeColors;
+hold on;
+h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), P_v_o_mpp_sim);
+colormap(winter);
+
+title('Superf{\''i}cies de m{\''{a}}xima pot{\^{e}}ncia');
+xlabel('$n_r$ $[rpm]$');
+ylabel('$i_f$ $[A]$');
+zlabel('$P_o$ $[W]$');
+legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
+    'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
+grid on;
+
 %% Armazenamento dos resultados de simulação
 
 save('results/PowerAnalysis/P_v_o.mat', 'simIn', 'simOut', 'P_v_o_ana', 'P_v_o_sim', ...
-    'P_v_o_mpp_ana', 'P_v_o_mpp_sim', 'v_o_mpp_ana', 'v_o_mpp_sim', '-v7.3');
+    'P_v_o_mpp_ana', 'P_v_o_mpp_sim', 'v_o_mpp_ana', 'v_o_mpp_sim', 'v_o_mpp_fit', '-v7.3');
 
 %% Configuração dos casos de teste para carga de impedância constante
 
@@ -287,6 +330,12 @@ z_o_mpp_ana = z_o_list(z_o_mpp_index_ana);
 % 
 [P_z_o_mpp_sim, z_o_mpp_index_sim] = max(P_z_o_sim, [], 3);
 z_o_mpp_sim = z_o_list(z_o_mpp_index_sim);
+
+%% Ajuste de superf�cie de imped�ncia de m�xima pot�ncia
+
+z_o_mpp_fun = '(pi^2/(2*sqrt(7)))*omega_e*(l_i0 + l_i1*i_f + l_i2*i_f^2 + l_i3*i_f^3)';
+z_o_mpp_fit = customSurfaceFit((alternator.p*2*pi/60)*squeeze(n_r_grid(:, :, 1)), ...
+    squeeze(i_f_grid(:, :, 1)), z_o_mpp_sim, z_o_mpp_fun, 'omega_e', 'i_f', 'z_o', zeros(4, 1));
 
 %% Traço dos resultados relativos à variação da impedância da carga
 
@@ -354,10 +403,47 @@ for n_r_index = 1:length(n_r_list)
     grid on;
 end
 
+% 
+figure_index = figure_index + 1;
+figure(figure_index)
+
+h_mpp_ana = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), z_o_mpp_ana);
+colormap(spring);
+freezeColors;
+hold on;
+h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), z_o_mpp_sim);
+colormap(winter);
+
+title('Superf{\''i}cies de imped{\^{a}}ncia de m{\''{a}}xima pot{\^{e}}ncia');
+xlabel('$n_r$ $[rpm]$');
+ylabel('$i_f$ $[A]$');
+zlabel('$z_o$ $[\Omega]$');
+legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
+    'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
+grid on;
+
+figure_index = figure_index + 1;
+figure(figure_index)
+
+h_mpp_ana = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), P_z_o_mpp_ana);
+colormap(spring);
+freezeColors;
+hold on;
+h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), P_z_o_mpp_sim);
+colormap(winter);
+
+title('Superf{\''i}cies de m{\''{a}}xima pot{\^{e}}ncia');
+xlabel('$n_r$ $[rpm]$');
+ylabel('$i_f$ $[A]$');
+zlabel('$P_o$ $[W]$');
+legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
+    'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
+grid on;
+
 %% Armazenamento dos resultados de simulação
 
 save('results/PowerAnalysis/P_z_o.mat', 'simIn', 'simOut', 'P_z_o_ana', 'P_z_o_sim', ...
-    'P_z_o_mpp_ana', 'P_z_o_mpp_sim', 'z_o_mpp_ana', 'z_o_mpp_sim', '-v7.3');
+    'P_z_o_mpp_ana', 'P_z_o_mpp_sim', 'z_o_mpp_ana', 'z_o_mpp_sim', 'z_o_mpp_fit', '-v7.3');
 
 %% Armazenamento de figuras
 
