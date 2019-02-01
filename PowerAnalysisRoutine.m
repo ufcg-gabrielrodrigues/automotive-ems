@@ -71,9 +71,13 @@ n_r_list = (2000:500:7500)';       	% Velocidade do alternador [rpm]
 v_o_list = (0.0:1.0:80.0)';       	% Tens√£o de sa√≠da [V]
 z_o_list = [0.01 0.05:0.05:2.0]';   % Imped√¢ncia de sa√≠da [Ohm]
 
-%% Inicializa√ß√£o do √≠ndice de figuras
+%% Par‚metros auxiliares para figuras
 
+% 
 figure_index = 0;
+
+% 
+colors = distinguishable_colors(length(n_r_list));
 
 %% Par√¢metros de simula√ß√£o
 
@@ -141,9 +145,17 @@ for i_f_index = 1:length(i_f_list)
     end
 end
 
-% Tra√ßo dos resultados
-colors = distinguishable_colors(length(n_r_list));
-color_index = 0;
+%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela tens„o da carga
+
+% 
+[P_v_o_mpp_ana, v_o_mpp_index_ana] = max(P_v_o_ana, [], 3);
+v_o_mpp_ana = v_o_list(v_o_mpp_index_ana);
+
+% 
+[P_v_o_mpp_sim, v_o_mpp_index_sim] = max(P_v_o_sim, [], 3);
+v_o_mpp_sim = v_o_list(v_o_mpp_index_sim);
+
+%% Tra√ßo dos resultados relativos ‡ variaÁ„o da tens„o da carga
 
 for i_f_index = 1:length(i_f_list)
     
@@ -155,16 +167,14 @@ for i_f_index = 1:length(i_f_list)
         plot(v_o_list, squeeze(P_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors(n_r_index, :), ...
             'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
         hold on;
-        [P_o_mpp, v_o_mpp_index] = max(P_v_o_ana(n_r_index, i_f_index, :), [], 3);
-        plot(v_o_list(v_o_mpp_index), P_o_mpp, 'o', 'Color', colors(n_r_index, :), ...
-            'HandleVisibility', 'off');
+        plot(v_o_mpp_ana(n_r_index, i_f_index, :), P_v_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
         hold on;
         plot(v_o_list, squeeze(P_v_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors(n_r_index, :), ...
             'HandleVisibility', 'off');
         hold on;
-        [P_o_mpp, v_o_mpp_index] = max(P_v_o_sim(n_r_index, i_f_index, :), [], 3);
-        plot(v_o_list(v_o_mpp_index), P_o_mpp, 'o', 'Color', colors(n_r_index, :), ...
-            'HandleVisibility', 'off');
+        plot(v_o_mpp_sim(n_r_index, i_f_index, :), P_v_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
         
         legend('off');
         legend('show');
@@ -178,20 +188,10 @@ for i_f_index = 1:length(i_f_list)
     grid on;
 end
 
-%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela tens„o da carga
-
-% 
-[P_o_mpp_ana, v_o_mpp_index_ana] = max(P_v_o_ana, [], 3);
-v_o_mpp_ana = v_o_list(v_o_mpp_index_ana);
-
-% 
-[P_o_mpp_sim, v_o_mpp_index_sim] = max(P_v_o_sim, [], 3);
-v_o_mpp_sim = v_o_list(v_o_mpp_index_sim);
-
 %% Armazenamento dos resultados de simula√ß√£o
 
 save('results/PowerAnalysis/P_v_o.mat', 'simIn', 'simOut', 'P_v_o_ana', 'P_v_o_sim', ...
-    'P_o_mpp_ana', 'P_o_mpp_sim', 'v_o_mpp_ana', 'v_o_mpp_sim', '-v7.3');
+    'P_v_o_mpp_ana', 'P_v_o_mpp_sim', 'v_o_mpp_ana', 'v_o_mpp_sim', '-v7.3');
 
 %% Configura√ß√£o dos casos de teste para carga de imped√¢ncia constante
 
@@ -244,9 +244,17 @@ for i_f_index = 1:length(i_f_list)
     end
 end
 
-%% Tra√ßo dos resultados
-colors = distinguishable_colors(length(n_r_list));
-color_index = 0;
+%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela imped‚ncia da carga
+
+% 
+[P_z_o_mpp_ana, z_o_mpp_index_ana] = max(P_z_o_ana, [], 3);
+z_o_mpp_ana = z_o_list(z_o_mpp_index_ana);
+
+% 
+[P_z_o_mpp_sim, z_o_mpp_index_sim] = max(P_z_o_sim, [], 3);
+z_o_mpp_sim = z_o_list(z_o_mpp_index_sim);
+
+%% Tra√ßo dos resultados relativos ‡ variaÁ„o da imped‚ncia da carga
 
 for i_f_index = 1:length(i_f_list)
     
@@ -258,16 +266,14 @@ for i_f_index = 1:length(i_f_list)
         plot(z_o_list, squeeze(P_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors(n_r_index, :), ...
             'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
         hold on;
-        [P_o_mpp, z_o_mpp_index] = max(P_z_o_ana(n_r_index, i_f_index, :), [], 3);
-        plot(z_o_list(z_o_mpp_index), P_o_mpp, 'o', 'Color', colors(n_r_index, :), ...
-            'HandleVisibility', 'off');
+        plot(z_o_mpp_ana(n_r_index, i_f_index, :), P_z_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
         hold on;
         plot(z_o_list, squeeze(P_z_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors(n_r_index, :), ...
             'HandleVisibility', 'off');
         hold on;
-        [P_o_mpp, z_o_mpp_index] = max(P_z_o_sim(n_r_index, i_f_index, :), [], 3);
-        plot(z_o_list(z_o_mpp_index), P_o_mpp, 'o', 'Color', colors(n_r_index, :), ...
-            'HandleVisibility', 'off');
+        plot(z_o_mpp_sim(n_r_index, i_f_index, :), P_z_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
         
         legend('off');
         legend('show');
@@ -277,24 +283,14 @@ for i_f_index = 1:length(i_f_list)
     xlabel('$z_o$ $[\Omega]$');
     ylabel('$P$ $[W]$');
     leg = legend;
-    leg.Location = 'NorthWest';
+    leg.Location = 'NorthEast';
     grid on;
 end
-
-%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela imped‚ncia da carga
-
-% 
-[P_o_mpp_ana, z_o_mpp_index_ana] = max(P_z_o_ana, [], 3);
-z_o_mpp_ana = z_o_list(z_o_mpp_index_ana);
-
-% 
-[P_o_mpp_sim, z_o_mpp_index_sim] = max(P_z_o_sim, [], 3);
-z_o_mpp_sim = z_o_list(z_o_mpp_index_sim);
 
 %% Armazenamento dos resultados de simula√ß√£o
 
 save('results/PowerAnalysis/P_z_o.mat', 'simIn', 'simOut', 'P_z_o_ana', 'P_z_o_sim', ...
-    'P_o_mpp_ana', 'P_o_mpp_sim', 'z_o_mpp_ana', 'z_o_mpp_sim', '-v7.3');
+    'P_z_o_mpp_ana', 'P_z_o_mpp_sim', 'z_o_mpp_ana', 'z_o_mpp_sim', '-v7.3');
 
 %% Armazenamento de figuras
 
