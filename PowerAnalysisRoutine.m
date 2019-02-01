@@ -71,13 +71,14 @@ n_r_list = (2000:500:7500)';       	% Velocidade do alternador [rpm]
 v_o_list = (0.0:1.0:80.0)';       	% Tens√£o de sa√≠da [V]
 z_o_list = [0.01 0.05:0.05:2.0]';   % Imped√¢ncia de sa√≠da [Ohm]
 
-%% Par‚metros auxiliares para figuras
+%% Par√¢metros auxiliares para figuras
 
-% 
+% √çndice de figuras
 figure_index = 0;
 
-% 
-colors = distinguishable_colors(length(n_r_list));
+% Cores
+colors_n_r = distinguishable_colors(length(n_r_list));
+colors_i_f = distinguishable_colors(length(i_f_list));
 
 %% Par√¢metros de simula√ß√£o
 
@@ -145,7 +146,7 @@ for i_f_index = 1:length(i_f_list)
     end
 end
 
-%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela tens„o da carga
+%% Identifica√ß√£o dos pontos de m√°xima pot√™ncia indexados pela tens√£o da carga
 
 % 
 [P_v_o_mpp_ana, v_o_mpp_index_ana] = max(P_v_o_ana, [], 3);
@@ -155,8 +156,9 @@ v_o_mpp_ana = v_o_list(v_o_mpp_index_ana);
 [P_v_o_mpp_sim, v_o_mpp_index_sim] = max(P_v_o_sim, [], 3);
 v_o_mpp_sim = v_o_list(v_o_mpp_index_sim);
 
-%% Tra√ßo dos resultados relativos ‡ variaÁ„o da tens„o da carga
+%% Tra√ßo dos resultados relativos √† varia√ß√£o da tens√£o da carga
 
+% 
 for i_f_index = 1:length(i_f_list)
     
     figure_index = figure_index + 1;
@@ -164,17 +166,17 @@ for i_f_index = 1:length(i_f_list)
     
     for n_r_index = 1:length(n_r_list)
         
-        plot(v_o_list, squeeze(P_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors(n_r_index, :), ...
+        plot(v_o_list, squeeze(P_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_n_r(n_r_index, :), ...
             'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
         hold on;
         plot(v_o_mpp_ana(n_r_index, i_f_index, :), P_v_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
-            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
+            'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
         hold on;
-        plot(v_o_list, squeeze(P_v_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors(n_r_index, :), ...
+        plot(v_o_list, squeeze(P_v_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors_n_r(n_r_index, :), ...
             'HandleVisibility', 'off');
         hold on;
         plot(v_o_mpp_sim(n_r_index, i_f_index, :), P_v_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
-            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
+            'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
         
         legend('off');
         legend('show');
@@ -182,7 +184,39 @@ for i_f_index = 1:length(i_f_list)
     
     title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$)']);
     xlabel('$v_o$ $[V]$');
-    ylabel('$P$ $[W]$');
+    ylabel('$P_o$ $[W]$');
+    leg = legend;
+    leg.Location = 'NorthWest';
+    grid on;
+end
+
+% 
+for n_r_index = 1:length(n_r_list)
+    
+    figure_index = figure_index + 1;
+    figure(figure_index)
+    
+    for i_f_index = 1:length(i_f_list)
+        
+        plot(v_o_list, squeeze(P_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_i_f(i_f_index, :), ...
+            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index)) ' A$']);
+        hold on;
+        plot(v_o_mpp_ana(n_r_index, i_f_index, :), P_v_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
+        hold on;
+        plot(v_o_list, squeeze(P_v_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors_i_f(i_f_index, :), ...
+            'HandleVisibility', 'off');
+        hold on;
+        plot(v_o_mpp_sim(n_r_index, i_f_index, :), P_v_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
+        
+        legend('off');
+        legend('show');
+    end
+    
+    title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
+    xlabel('$v_o$ $[V]$');
+    ylabel('$P_o$ $[W]$');
     leg = legend;
     leg.Location = 'NorthWest';
     grid on;
@@ -244,7 +278,7 @@ for i_f_index = 1:length(i_f_list)
     end
 end
 
-%% IdentificaÁ„o dos pontos de m·xima potÍncia indexados pela imped‚ncia da carga
+%% Identifica√ß√£o dos pontos de m√°xima pot√™ncia indexados pela imped√¢ncia da carga
 
 % 
 [P_z_o_mpp_ana, z_o_mpp_index_ana] = max(P_z_o_ana, [], 3);
@@ -254,8 +288,9 @@ z_o_mpp_ana = z_o_list(z_o_mpp_index_ana);
 [P_z_o_mpp_sim, z_o_mpp_index_sim] = max(P_z_o_sim, [], 3);
 z_o_mpp_sim = z_o_list(z_o_mpp_index_sim);
 
-%% Tra√ßo dos resultados relativos ‡ variaÁ„o da imped‚ncia da carga
+%% Tra√ßo dos resultados relativos √† varia√ß√£o da imped√¢ncia da carga
 
+% 
 for i_f_index = 1:length(i_f_list)
     
     figure_index = figure_index + 1;
@@ -263,17 +298,17 @@ for i_f_index = 1:length(i_f_list)
     
     for n_r_index = 1:length(n_r_list)
         
-        plot(z_o_list, squeeze(P_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors(n_r_index, :), ...
+        plot(z_o_list, squeeze(P_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_n_r(n_r_index, :), ...
             'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
         hold on;
         plot(z_o_mpp_ana(n_r_index, i_f_index, :), P_z_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
-            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
+            'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
         hold on;
-        plot(z_o_list, squeeze(P_z_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors(n_r_index, :), ...
+        plot(z_o_list, squeeze(P_z_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors_n_r(n_r_index, :), ...
             'HandleVisibility', 'off');
         hold on;
         plot(z_o_mpp_sim(n_r_index, i_f_index, :), P_z_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
-            'Color', colors(n_r_index, :), 'HandleVisibility', 'off');
+            'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
         
         legend('off');
         legend('show');
@@ -281,7 +316,39 @@ for i_f_index = 1:length(i_f_list)
     
     title(['Curvas de pot{\^{e}}ncia indexadas pela imped{\^{a}}ncia da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$)']);
     xlabel('$z_o$ $[\Omega]$');
-    ylabel('$P$ $[W]$');
+    ylabel('$P_o$ $[W]$');
+    leg = legend;
+    leg.Location = 'NorthEast';
+    grid on;
+end
+
+% 
+for n_r_index = 1:length(n_r_list)
+    
+    figure_index = figure_index + 1;
+    figure(figure_index)
+    
+    for i_f_index = 1:length(i_f_list)
+        
+        plot(z_o_list, squeeze(P_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_i_f(i_f_index, :), ...
+            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index)) ' A$']);
+        hold on;
+        plot(z_o_mpp_ana(n_r_index, i_f_index, :), P_z_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
+        hold on;
+        plot(z_o_list, squeeze(P_z_o_sim(n_r_index, i_f_index, :)), '--', 'Color', colors_i_f(i_f_index, :), ...
+            'HandleVisibility', 'off');
+        hold on;
+        plot(z_o_mpp_sim(n_r_index, i_f_index, :), P_z_o_mpp_sim(n_r_index, i_f_index, :), 'o', ...
+            'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
+        
+        legend('off');
+        legend('show');
+    end
+    
+    title(['Curvas de pot{\^{e}}ncia indexadas pela imped{\^{a}}ncia da carga ($n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
+    xlabel('$z_o$ $[\Omega]$');
+    ylabel('$P_o$ $[W]$');
     leg = legend;
     leg.Location = 'NorthEast';
     grid on;
