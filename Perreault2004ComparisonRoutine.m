@@ -35,7 +35,7 @@ catch
 end
 
 v_x_default = 'v_x = v_o;';
-v_x = fitToString(v_o_mpp_fit);
+v_x = ['v_x = ' fitToString(v_o_mpp_fit) ';'];
 
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, v_x_default, v_x);
@@ -50,7 +50,7 @@ catch
 end
 
 z_x_default = 'z_x = z_o;';
-z_x = fitToString(z_o_mpp_fit);
+z_x = ['z_x = ' fitToString(z_o_mpp_fit) ';'];
 
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, z_x_default, z_x);
