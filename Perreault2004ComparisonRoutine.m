@@ -10,29 +10,50 @@ t_f = 3.0e-1;   % Tempo total de simulação [s]
 
 %% Esquemas de controle
 
+% Atualização dinâmica da tensão de saída para lei de controle
+dynamic_voltage_flag = false;
+
 % Lista de títulos por esquema de controle
-% control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
-%     'Esquema de controle baseado em casamento de imped{\^{a}}ncias', ...
-%     'Esquema de controle baseado em rede neural (2 entradas)', ...
-%     'Esquema de controle baseado em rede neural (3 entradas)'};
-control_scheme_title = {'Esquema de controle baseado em Perreault (2004)', ...
-    'Esquema de controle baseado em casamento de imped{\^{a}}ncias'};
+control_scheme_title = {'Esquema de controle baseado em casamento de tens{\~{a}o}', ...
+    'Esquema de controle baseado em casamento de imped{\^{a}}ncia', ...
+    'Esquema de controle baseado em casamento de tens{\~{a}o} ajustado', ...
+    'Esquema de controle baseado em casamento de imped{\^{a}}ncia ajustado'};
 
 %
-perreault2004ControlScheme = Simulink.Variant('control_scheme == 1');
+voltageMatchingControlScheme = Simulink.Variant('control_scheme == 1');
 
 % 
 impedanceMatchingControlScheme = Simulink.Variant('control_scheme == 2');
 
 % 
-normalizationFactor2In = [1 1];
-% normalizationFactor2In = [7.5e+3 2.0e+0];
-neural2InControlScheme = Simulink.Variant('control_scheme == 3');
+fittedVoltageMatchingControlScheme = Simulink.Variant('control_scheme == 3');
+
+try
+    load('results/PowerAnalysis/P_v_o.mat', 'v_o_mpp_fit');
+catch
+    disp('Não foi possível carregar a variável v_o_mpp_fit');
+end
+
+v_x_default = 'v_x = v_o;';
+v_x = fitToString(v_o_mpp_fit);
+
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, v_x_default, v_x);
 
 % 
-normalizationFactor3In = [1 1 1];
-% normalizationFactor3In = [5.0e+0 7.5e+3 2.0e+0];
-neural3InControlScheme = Simulink.Variant('control_scheme == 4');
+fittedImpedanceMatchingControlScheme = Simulink.Variant('control_scheme == 4');
+
+try
+    load('results/PowerAnalysis/P_z_o.mat', 'z_o_mpp_fit');
+catch
+    disp('Não foi possível carregar a variável z_o_mpp_fit');
+end
+
+z_x_default = 'z_x = z_o;';
+z_x = fitToString(z_o_mpp_fit);
+
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, z_x_default, z_x);
 
 %% Alternador
 
@@ -57,7 +78,7 @@ if (alternator.stator.connection == delta)
 end
 
 k_e_local = ['k_e = ' k_e_str ';'];
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
 % Atualização de parâmetro: indutância própria de estator
@@ -151,12 +172,20 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Perreault (2004)]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, l_s_local, l_s_default_local);
+
+% 
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, v_x, v_x_default);
+
+% 
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'Perreault2004Comparison/Control scheme/Load Matching Control [Fitted Impedance-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, z_x, z_x_default);
 
 %% Finaliza modelo no Simulink
 
@@ -213,52 +242,52 @@ for test_case_index = 1:num_cases/length(control_scheme_title)
     plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.p, 'r-');
     hold on;
     plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.p, 'g-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.p, 'b-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.p, 'k-');
     title(['Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga ($n_{r} = ' ...
         num2str(test_cases(test_case_index, 1)) '$ $[rpm]$; $r_{l} = ' ...
         num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
-%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
+    legend('Casamento de tens{\~{a}}o', 'Casamento de imped{\^{a}}ncia', ...
+        'Casamento de tens{\~{a}}o ajustado', 'Casamento de imped{\^{a}}ncia ajustado', ...
+        'Location', 'NorthEast');
     grid on;
     
     subplot(3, 1, 2)
     plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.v, 'r-');
     hold on;
     plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.v, 'g-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.v, 'b-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.v, 'k-');
     title(['Tens{\~{a}}o sobre a carga ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$v_{l}$ $[V]$');
-%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
+    legend('Casamento de tens{\~{a}}o', 'Casamento de imped{\^{a}}ncia', ...
+        'Casamento de tens{\~{a}}o ajustado', 'Casamento de imped{\^{a}}ncia ajustado', ...
+        'Location', 'NorthEast');
     grid on;
     
     subplot(3, 1, 3)
     plot(test_case_out(num_cases/length(control_scheme_title)*0 + test_case_index).electrical_load.z, 'r-');
     hold on;
     plot(test_case_out(num_cases/length(control_scheme_title)*1 + test_case_index).electrical_load.z, 'g-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
-%     hold on;
-%     plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*2 + test_case_index).electrical_load.z, 'b-');
+    hold on;
+    plot(test_case_out(num_cases/length(control_scheme_title)*3 + test_case_index).electrical_load.z, 'k-');
     title(['Imped{\^{a}}ncia de carga observada ($n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
         '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$)']);
     xlabel('$t$ $[s]$');
     ylabel('$z_{l}$ $[\Omega]$');
-%     legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', ...
-%         'RNA (2 entradas)', 'RNA (3 entradas)', 'Location', 'best');
-    legend('Perreault (2004)', 'Casamento de imped{\^{a}}ncia', 'Location', 'best');
+    legend('Casamento de tens{\~{a}}o', 'Casamento de imped{\^{a}}ncia', ...
+        'Casamento de tens{\~{a}}o ajustado', 'Casamento de imped{\^{a}}ncia ajustado', ...
+        'Location', 'NorthEast');
     grid on;
 end
 
