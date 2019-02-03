@@ -6,7 +6,7 @@ open_system('models/Perreault2004Comparison.slx', 'loadonly');
 
 T_s = 1.0e-6;   % Passo de cálculo utilizado pelo 'solver' [s]
 T_k = 1.0e-4;   % Passo de amostragem global de rotinas de controle [s]
-t_f = 3.0e-1;   % Tempo total de simulação [s]
+t_f = 5.0e-1;   % Tempo total de simulação [s]
 
 %% Esquemas de controle
 
@@ -100,7 +100,7 @@ blockHandle.Script = strrep(blockHandle.Script, l_s_default_local, l_s_local);
 
 %% Bateria
 
-battery.v_nom = 50.0;   % [V]
+battery.v_nom = 80.0;   % [V]
 
 %% Varredura de parâmetros
 
