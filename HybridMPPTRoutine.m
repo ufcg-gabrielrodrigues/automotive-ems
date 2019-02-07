@@ -94,7 +94,7 @@ for test_case_index = 1:num_cases
     r_l = test_case(3);
     
     simIn(test_case_index) = Simulink.SimulationInput('HybridMPPT');
-    simIn(test_case_index) = simIn(test_case_index).setVariable('HybridMPPT/dynamic_v_o','Value', num2str(dynamic_v_o));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/dynamic_v_o','Value', num2str(dynamic_v_o));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/n_r', 'Value', num2str(n_r));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/Load/r_l', 'R', num2str(r_l));
 end
