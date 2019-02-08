@@ -35,11 +35,10 @@ simulated_results = [1.960 12.70 27.20;
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 5.0e-0;               % [A]
+i_f_max = 5.0e-0;           % [A]
 
 % Efeito térmico na resistência do circuito de estator
-T = 32;                         % [oC]
-alternator.stator.r.value = alternator.stator.r.function(T);
+alternator.stator.r.T = 32; % [oC]
 
 %% Inicializa modelo no Simulink
 

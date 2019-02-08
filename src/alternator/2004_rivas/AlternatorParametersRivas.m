@@ -23,6 +23,10 @@ if (alternatorCalcParamFlag)
     alternator.stator.l.value = 120e-6;                         % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = 37e-3;                          % Resistência por fase do circuito de armadura [Ohm]
     alternator.k_e.value = 10.716*sqrt(2)/((2*pi*180)*(3.6));	% Constante de acoplamento elétrico [V/((rad/s)*A)]
+    alternator.stator.r.value = 37e-3;                      	% Resistência por fase do circuito de armadura na temperatura de referência [Ohm]
+    alternator.stator.r.T_ref = 20;                           	% Temperatura de referência da resistência por fase do circuito de armadura [oC]
+    alternator.stator.r.T = 20;                             	% Temperatura da resistência por fase do circuito de armadura [oC]
+    alternator.stator.r.alpha = 0;                              % Coeficiente de temperatura da resistência para o material condutor (cobre) [1/oC]
     
     %% Registro da estrutura que representa o alternador em arquivos .MAT
     
