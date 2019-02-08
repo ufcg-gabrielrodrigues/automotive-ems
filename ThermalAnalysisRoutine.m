@@ -127,14 +127,14 @@ for i_f_index = 1:length(i_f_list)
             legend('show');
             
         end
+        
+        title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$; $n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
+        xlabel('$v_o$ $[V]$');
+        ylabel('$P_o$ $[W]$');
+        leg = legend;
+        leg.Location = 'NorthWest';
+        grid on;
     end
-    
-    title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$; $n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
-    xlabel('$v_o$ $[V]$');
-    ylabel('$P_o$ $[W]$');
-    leg = legend;
-    leg.Location = 'NorthWest';
-    grid on;
 end
 
 %% Armazenamento de figuras
