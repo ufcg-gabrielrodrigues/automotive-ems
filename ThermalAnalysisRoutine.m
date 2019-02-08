@@ -10,10 +10,10 @@ t_f = 1.0e-2;   % Tempo total de simulação [s]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = (1.0:1.0:5.0)';      % Corrente de excitação máxima [A]
-n_r_list = (2000:1000:7000)';	% Velocidade do alternador [rpm]
-T_list = (20.0:15.0:200.0)';    % Temperaturas da resist�ncia de enrolamento de estator [Ohm]
-v_o_list = (0.0:1.0:80.0)';     % Tensão de saída [V]
+i_f_list = [1.0 3.0 4.5]';                  % Corrente de excitação máxima [A]
+n_r_list = [2000 3500 5000 7500]';          % Velocidade do alternador [rpm]
+T_list = [20.0 50.0 100.0 150.0 200.0]';    % Temperaturas da resist�ncia de enrolamento de estator [Ohm]
+v_o_list = (0.0:1.0:80.0)';                 % Tensão de saída [V]
 
 %% Parâmetros auxiliares para figuras
 
