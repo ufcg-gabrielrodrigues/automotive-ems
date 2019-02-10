@@ -5,6 +5,7 @@ open_system('models/HybridMPPT.slx', 'loadonly');
 %% Parâmetros temporais
 
 T_s = 1.0e-6;   % Passo de cálculo utilizado pelo 'solver' [s]
+T_r = 1.0e-5;   % Passo de amostragem global de leitura de vari�veis [s]
 T_k = 1.0e-4;   % Passo de amostragem global de rotinas de controle [s]
 t_f = 1.0e-0;   % Tempo total de simulação [s]
 
@@ -30,11 +31,10 @@ blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 4.5;  % [A]
+i_f_max = 4.5;                  % [A]
 
-% Efeito térmico na resistência do circuito de estator
-T = 150;        % [oC]
-alternator.stator.r.value = alternator.stator.r.function(T);
+% Temperatura da resistência do circuito de estator
+alternator.stator.r.T = 150;    % [oC]
 
 %% Bateria
 
@@ -43,14 +43,14 @@ battery.v_nom = 80.0;   % [V]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-dynamic_v_o_list = [false true]';   % Atualização dinâmica da tensão de saída para lei de controle
+dynamic_v_l_list = [false true]';   % Atualização dinâmica da tensão de saída para lei de controle
 n_r_list = (2000:500:7500)';        % Velocidade do alternador [rpm]
 r_l_list = [0.15 (0.5:0.5:2.0)]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
 
-for index_dynamic_v_o = 1:length(dynamic_v_o_list)
+for index_dynamic_v_l = 1:length(dynamic_v_l_list)
     
     n_r_sweep = [];
     [r_l_dim, ~] = size(r_l_list);
@@ -63,9 +63,9 @@ for index_dynamic_v_o = 1:length(dynamic_v_o_list)
     
     [n_r_sweep_dim, ~] = size(n_r_sweep);
     
-    dynamic_v_o_tmp = index_dynamic_v_o * ones(n_r_sweep_dim, 1);
-    dynamic_v_o_tmp = [dynamic_v_o_tmp, n_r_sweep];
-    param_sweep = [param_sweep; dynamic_v_o_tmp];
+    dynamic_v_l_tmp = index_dynamic_v_l * ones(n_r_sweep_dim, 1);
+    dynamic_v_l_tmp = [dynamic_v_l_tmp, n_r_sweep];
+    param_sweep = [param_sweep; dynamic_v_l_tmp];
 end
 
 %% Parâmetros de simulação
@@ -89,12 +89,12 @@ save_system('models/HybridMPPT.slx');
 
 for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
-    dynamic_v_o = test_case(1);
+    dynamic_v_l = test_case(1);
     n_r = test_case(2);
     r_l = test_case(3);
     
     simIn(test_case_index) = Simulink.SimulationInput('HybridMPPT');
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/dynamic_v_o','Value', num2str(dynamic_v_o));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/dynamic_v_l','Value', num2str(dynamic_v_l));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/n_r', 'Value', num2str(n_r));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/Load/r_l', 'R', num2str(r_l));
 end
@@ -124,12 +124,12 @@ for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
     
     % Valor de variáveis correspondentes ao caso de teste
-    dynamic_v_o = test_case(1);
+    dynamic_v_l = test_case(1);
     n_r = test_case(2);
     r_l = test_case(3);
     
     % Esquema de controle
-    test_case_out(test_case_index).dynamic_v_o = dynamic_v_o;
+    test_case_out(test_case_index).dynamic_v_l = dynamic_v_l;
     
     % Alternador
     test_case_out(test_case_index).alternator.rotor.n = n_r;
@@ -151,16 +151,16 @@ figure_index = 0;
 
 test_cases = param_sweep(param_sweep(:, 1) == 1, 2:3);
 
-for test_case_index = 1:num_cases/length(dynamic_v_o_list)
+for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     
     figure_index = figure_index + 1;
 	figure(figure_index)
     
     subplot(3, 1, 1)
     
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*0 + test_case_index).electrical_load.p, 'r-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).electrical_load.p, 'r-');
     hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*1 + test_case_index).electrical_load.p, 'g-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).electrical_load.p, 'g-');
     ylim([0 Inf]);
     title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
     xlabel('$t$ $[s]$');
@@ -170,9 +170,9 @@ for test_case_index = 1:num_cases/length(dynamic_v_o_list)
     grid on;
     
     subplot(3, 1, 2)
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*0 + test_case_index).electrical_load.v, 'r-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).electrical_load.v, 'r-');
     hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*1 + test_case_index).electrical_load.v, 'g-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).electrical_load.v, 'g-');
     ylim([0 Inf]);
     title('Tens{\~{a}}o sobre a carga');
     xlabel('$t$ $[s]$');
@@ -182,9 +182,9 @@ for test_case_index = 1:num_cases/length(dynamic_v_o_list)
     grid on;
     
     subplot(3, 1, 3)
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*0 + test_case_index).rectifier.control.u, 'r-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).rectifier.control.u, 'r-');
     hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_o_list)*1 + test_case_index).rectifier.control.u, 'g-');
+    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).rectifier.control.u, 'g-');
     ylim([0 Inf]);
     title('Ciclo de trabalho aplicado ao retificador');
     xlabel('$t$ $[s]$');
