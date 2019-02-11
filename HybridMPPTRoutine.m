@@ -36,6 +36,11 @@ i_f_max = 4.5;                  % [A]
 % Temperatura da resistência do circuito de estator
 alternator.stator.r.T = 150;    % [oC]
 
+%% Retificador
+
+% Parâmetros de controle
+rectifier.control.pwm.f_s = 1/T_k;  % Frequência de chaveamento dos PWMs de controle do circuito retificador [Hz]
+
 %% Bateria
 
 battery.v_nom = 80.0;   % [V]
