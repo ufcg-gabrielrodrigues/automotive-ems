@@ -49,8 +49,8 @@ battery.v_nom = 80.0;   % [V]
 
 % Lista de parâmetros a serem varridos individualmente
 dynamic_v_l_list = [false true]';   % Atualização dinâmica da tensão de saída para lei de controle
-n_r_list = [2000 7500]';        % Velocidade do alternador [rpm]
-r_l_list = 1.0;	% Resistência de carga [Ohm]
+n_r_list = (2000:500:7500)';        % Velocidade do alternador [rpm]
+r_l_list = [0.15 (0.5:0.5:2.0)]';	% Resistência de carga [Ohm]
 
 % Formação das casos de varredura
 param_sweep = [];
