@@ -5,9 +5,9 @@ open_system('models/HybridMPPT.slx', 'loadonly');
 %% Par√¢metros temporais
 
 T_s = 1.0e-6;   % Passo de c√°lculo utilizado pelo 'solver' [s]
-T_r = 1.0e-5;   % Passo de amostragem global de leitura de vari·veis [s]
+T_r = 1.0e-5;   % Passo de amostragem global de leitura de vari√°veis [s]
 T_k = 1.0e-4;   % Passo de amostragem global de rotinas de controle [s]
-t_f = 1.0e-0;   % Tempo total de simula√ß√£o [s]
+t_f = 5.0e-1;   % Tempo total de simula√ß√£o [s]
 
 %% Esquema de controle
 
@@ -150,6 +150,16 @@ for test_case_index = 1:num_cases
     test_case_out(test_case_index).electrical_load.p = simOut(test_case_index).p_l;
 end
 
+%% Carregamento de resultados de an·lise de potÍncia
+
+try
+    simEnv = load('results/PowerAnalysis/simEnv.mat', 'i_f_list', 'n_r_list');
+    P_v_o = load('results/PowerAnalysis/P_v_o.mat', 'P_v_o_mpp_sim');
+    power_analysis_flag = true;
+catch
+    power_analysis_flag = false;
+end
+
 %% Resultados comparativos
 
 figure_index = 0;
@@ -157,7 +167,16 @@ figure_index = 0;
 test_cases = param_sweep(param_sweep(:, 1) == 1, 2:3);
 
 for test_case_index = 1:num_cases/length(dynamic_v_l_list)
+    % 
+    i_f = i_f_max;
+    n_r = num2str(test_cases(test_case_index, 1));
+    r_l = num2str(test_cases(test_case_index, 2));
     
+    % 
+    i_f_index = find(simEnv.i_f_list == i_f);
+    n_r_index = find(simEnv.n_r_list == n_r);
+    
+    % 
     figure_index = figure_index + 1;
 	figure(figure_index)
     
@@ -166,12 +185,25 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).electrical_load.p, 'r-');
     hold on;
     plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).electrical_load.p, 'g-');
+    
+    if (power_analysis_flag)
+        hold on;
+        plot([0 t_f], P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], 'b--');
+    end
+    
     ylim([0 Inf]);
     title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
-    legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens„o na carga', ...
-        'Location', 'SouthEast');
+    
+    if (power_analysis_flag)
+        legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens„o na carga', ...
+            'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
+    else
+        legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens„o na carga', ...
+            'Location', 'SouthEast');
+    end
+    
     grid on;
     
     subplot(3, 1, 2)
@@ -198,8 +230,7 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
         'Location', 'SouthEast');
     grid on;
     
-    suptitle(['Caso de teste: $n_{r} = ' num2str(test_cases(test_case_index, 1)) ...
-        '$ $[rpm]$; $r_{l} = ' num2str(test_cases(test_case_index, 2)) '$ $[\Omega]$']);
+    suptitle(['Caso de teste: $n_{r} = ' n_r '$ $[rpm]$; $r_{l} = ' r_l '$ $[\Omega]$']);
 end
 
 %% Armazenamento de figuras
