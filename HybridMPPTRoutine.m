@@ -25,7 +25,7 @@ if (alternator.stator.connection == delta)
 end
 
 k_e_local = ['k_e = ' k_e_str ';'];
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Control [Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
 %% Alternador
@@ -113,7 +113,7 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 %% Redefinição de parâmetros de alternador
 
 % Atualização de parâmetro para valor padrão: fator de acoplamento
-blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Control [Voltage-based]/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
 
 %% Finaliza modelo no Simulink
@@ -150,7 +150,7 @@ for test_case_index = 1:num_cases
     test_case_out(test_case_index).electrical_load.p = simOut(test_case_index).p_l;
 end
 
-%% Carregamento de resultados de an�lise de pot�ncia
+%% Carregamento de resultados de an�lise de pot�ncia
 
 try
     simEnv = load('results/PowerAnalysis/simEnv.mat', 'i_f_list', 'n_r_list');
