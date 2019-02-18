@@ -94,7 +94,7 @@ RectifierParametersEMS;
 
 %% Rotina de simulação
 
-HybridMPPTRoutine;
+AutomotiveEMSRoutine;
 
 %% Redefinição de parâmetros de alternador
 

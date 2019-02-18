@@ -18,7 +18,7 @@ iceToAltRotRatio = 2.5;
 n_ice_i = 6e+3/iceToAltRotRatio;
 n_ice_f = 2e+3/iceToAltRotRatio;
 t_brake = 3e-0;                     % [s]
-t_brake_i = (t_f - t_brake)/2;      % [s]
+t_brake_i = (t_f - t_brake);        % [s]
 t_brake_f = t_brake_i + t_brake;    % [s]
 
 %% Esquema de controle
