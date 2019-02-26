@@ -48,7 +48,7 @@ battery.v_nom = 80.0;   % [V]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-dynamic_v_l_list = [false true]';   % Atualização dinâmica da tensão de saída para lei de controle
+dynamic_v_l_list = [false]';        % Atualização dinâmica da tensão de saída para lei de controle
 n_r_list = (2000:500:7500)';        % Velocidade do alternador [rpm]
 r_l_list = [0.15 (0.5:0.5:2.0)]';	% Resistência de carga [Ohm]
 
@@ -166,6 +166,15 @@ figure_index = 0;
 
 test_cases = param_sweep(param_sweep(:, 1) == 1, 2:3);
 
+% Cores
+if (power_analysis_flag)
+    colors = distinguishable_colors(length(dynamic_v_l_list) + 1);
+else
+    colors = distinguishable_colors(length(dynamic_v_l_list));
+end
+
+[color_dim, ~] = size(colors);
+
 for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     % 
     i_f = i_f_max;
@@ -182,52 +191,65 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     
     subplot(3, 1, 1)
     
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).electrical_load.p, 'r-');
-    hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).electrical_load.p, 'g-');
-    
-    if (power_analysis_flag)
+    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).electrical_load.p, ...
+            'Color', colors(dynamic_v_l_index, :));
+        
         hold on;
-        plot([0 t_f], P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], 'b--');
     end
     
+    if (power_analysis_flag)
+        plot([0 t_f], P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], '--', 'Color', colors(color_dim, :));
+    end
+    
+    hold off;
     ylim([0 Inf]);
     title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
     
     if (power_analysis_flag)
-        legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-            'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
+        legend('Leitura sobre a carga', 'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
     else
-        legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-            'Location', 'SouthEast');
+        legend('Leitura sobre a carga', 'Location', 'SouthEast');
     end
     
     grid on;
     
     subplot(3, 1, 2)
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).electrical_load.v, 'r-');
-    hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).electrical_load.v, 'g-');
+    
+    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).electrical_load.v, ...
+            'Color', colors(dynamic_v_l_index, :));
+        
+        hold on;
+    end
+    
+    hold off;
     ylim([0 Inf]);
     title('Tens{\~{a}}o sobre a carga');
     xlabel('$t$ $[s]$');
     ylabel('$v_{l}$ $[V]$');
-    legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-        'Location', 'SouthEast');
+%     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
+%         'Location', 'SouthEast');
     grid on;
     
     subplot(3, 1, 3)
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*0 + test_case_index).rectifier.control.u, 'r-');
-    hold on;
-    plot(test_case_out(num_cases/length(dynamic_v_l_list)*1 + test_case_index).rectifier.control.u, 'g-');
+    
+    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).rectifier.control.u, ...
+            'Color', colors(dynamic_v_l_index, :));
+        
+        hold on;
+    end
+    
+    hold off;
     ylim([0 Inf]);
     title('Ciclo de trabalho aplicado ao retificador');
     xlabel('$t$ $[s]$');
     ylabel('$d_{smr}$');
-    legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-        'Location', 'SouthEast');
+%     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
+%         'Location', 'SouthEast');
     grid on;
     
     suptitle(['Caso de teste: $n_{r} = ' num2str(n_r) '$ $[rpm]$; $r_{l} = ' num2str(r_l) '$ $[\Omega]$']);
