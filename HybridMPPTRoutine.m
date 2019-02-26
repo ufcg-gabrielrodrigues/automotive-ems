@@ -7,7 +7,7 @@ open_system('models/HybridMPPT.slx', 'loadonly');
 T_s = 1.0e-6;   % Passo de cálculo utilizado pelo 'solver' [s]
 T_r = 1.0e-5;   % Passo de amostragem global de leitura de variáveis [s]
 T_k = 1.0e-4;   % Passo de amostragem global de rotinas de controle [s]
-t_f = 5.0e-1;   % Tempo total de simulação [s]
+t_f = 3.0e-1;   % Tempo total de simulação [s]
 
 %% Esquema de controle
 
@@ -192,7 +192,7 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     subplot(3, 1, 1)
     
     for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).electrical_load.p, ...
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p, ...
             'Color', colors(dynamic_v_l_index, :));
         
         hold on;
@@ -203,7 +203,7 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     end
     
     hold off;
-    ylim([0 Inf]);
+    ylim(P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[0.9 1.1]);
     title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
     xlabel('$t$ $[s]$');
     ylabel('$P_{l}$ $[W]$');
@@ -219,7 +219,7 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     subplot(3, 1, 2)
     
     for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).electrical_load.v, ...
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v, ...
             'Color', colors(dynamic_v_l_index, :));
         
         hold on;
@@ -237,7 +237,7 @@ for test_case_index = 1:num_cases/length(dynamic_v_l_list)
     subplot(3, 1, 3)
     
     for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*dynamic_v_l_index + test_case_index).rectifier.control.u, ...
+        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u, ...
             'Color', colors(dynamic_v_l_index, :));
         
         hold on;
