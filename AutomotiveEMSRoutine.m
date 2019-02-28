@@ -47,7 +47,7 @@ hybrid_control_cases = [1.0 0.0; 0.0 10.0; 1.0 0.1];
 
 [num_cases, ~] = size(hybrid_control_cases);
 
-% Índice de figuras
+% �?ndice de figuras
 figure_index = 0;
 
 % Cores
@@ -74,6 +74,12 @@ battery.r = 50e-3;      % [Ohm]
 %% Carga elétrica
 
 electrical_load.r = 1.0e-0;	% [Ohm]
+
+%% Conversor Buck
+
+% Eficiência
+buck.efficiency = 0.85;
+buck.v_o_max = 13.5;
 
 %% Parâmetros de simulação
 
@@ -178,7 +184,7 @@ for test_case_index = 1:num_cases
 end
 
 if (exist('P_v_o_mpp_sim_fit', 'var'))
-    P_v_o_mpp = P_v_o_mpp_sim_fit(iceToAltRotRatio*ice.n(test_case_index).Data, alternator.rotor.l.i(test_case_index).Data);
+    P_v_o_mpp = buck.efficiency*P_v_o_mpp_sim_fit(iceToAltRotRatio*ice.n(test_case_index).Data, alternator.rotor.l.i(test_case_index).Data);
     P_v_o_mpp = timeseries(P_v_o_mpp, ice.n(test_case_index).Time);
     
     plot(P_v_o_mpp, 'Color', colors(num_cases + 1, :), 'DisplayName', 'Pot{\^{e}}ncia m{\''{a}}xima');
@@ -298,7 +304,7 @@ leg = legend;
 leg.Location = 'NorthEast';
 grid on;
 
-subplot(3, 1, 1)
+subplot(3, 1, 3)
 for test_case_index = 1:num_cases
     plot(rectifier.control.u_smr(test_case_index), 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
@@ -335,3 +341,4 @@ save('results/AutomotiveEMS/electrical_load.mat', 'electrical_load', '-v7.3');
 save('results/AutomotiveEMS/bus.mat', 'bus', '-v7.3');
 save('results/AutomotiveEMS/uc_bank.mat', 'uc_bank', '-v7.3');
 save('results/AutomotiveEMS/hybrid_control.mat', 'hybrid_control', '-v7.3');
+save('results/AutomotiveEMS/buck.mat', 'buck', '-v7.3');
