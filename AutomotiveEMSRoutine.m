@@ -318,6 +318,13 @@ grid on;
 
 suptitle('Sinais de controle de retificador');
 
+%% Armazenamento de figuras
+
+for i = 1:figure_index
+    fileName = sprintf('results/AutomotiveEMS/Figura_%d', i);
+    saveFigure(figure(i), fileName, 'fig');
+end
+
 %% Armazenamento dos resultados de simulação
 
 save('results/AutomotiveEMS/ice.mat', 'ice', '-v7.3');
