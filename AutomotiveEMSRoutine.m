@@ -99,8 +99,8 @@ for test_case_index = 1:num_cases
     hybrid_control.k_i(test_case_index) = test_case(2);
     
     simIn(test_case_index) = Simulink.SimulationInput('AutomotiveEMS');
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/k_p', 'Value', num2str(hybrid_control.k_p(test_case_index)));
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/k_i', 'Value', num2str(hybrid_control.k_i(test_case_index)));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/k_p', 'Gain', num2str(hybrid_control.k_p(test_case_index)));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/k_i', 'Gain', num2str(hybrid_control.k_i(test_case_index)));
 end
 
 %% Execução da simulação em ambiente Simulink
