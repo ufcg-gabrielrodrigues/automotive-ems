@@ -178,7 +178,7 @@ figure_index = figure_index + 1;
 figure(figure_index)
 
 for test_case_index = 1:num_cases
-    plot(uc_bank.p(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(uc_bank.p(test_case_index).Time, uc_bank.p(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
@@ -187,7 +187,8 @@ if (exist('P_v_o_mpp_sim_fit', 'var'))
     P_v_o_mpp = buck.efficiency*P_v_o_mpp_sim_fit(iceToAltRotRatio*ice.n(test_case_index).Data, alternator.rotor.l.i(test_case_index).Data);
     P_v_o_mpp = timeseries(P_v_o_mpp, ice.n(test_case_index).Time);
     
-    plot(P_v_o_mpp, 'Color', colors(num_cases + 1, :), 'DisplayName', 'Pot{\^{e}}ncia m{\''{a}}xima');
+    plot(P_v_o_mpp.Time, P_v_o_mpp.Data, 'Color', colors(num_cases + 1, :), ...
+        'DisplayName', 'Pot{\^{e}}ncia m{\''{a}}xima');
 end
 
 hold off;
@@ -227,7 +228,7 @@ figure_index = figure_index + 1;
 figure(figure_index)
 
 for test_case_index = 1:num_cases
-    plot(alternator.rotor.l.i(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(alternator.rotor.l.i(test_case_index).Time, alternator.rotor.l.i(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
@@ -248,7 +249,7 @@ figure_index = figure_index + 1;
 figure(figure_index)
 
 for test_case_index = 1:num_cases
-    plot(bus.v(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(bus.v(test_case_index).Time, bus.v(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
@@ -270,7 +271,7 @@ figure(figure_index)
 
 subplot(3, 1, 1)
 for test_case_index = 1:num_cases
-    plot(rectifier.control.u_lm(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(rectifier.control.u_lm(test_case_index).Time, rectifier.control.u_lm(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
@@ -288,7 +289,7 @@ grid on;
 
 subplot(3, 1, 2)
 for test_case_index = 1:num_cases
-    plot(rectifier.control.u_esc(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(rectifier.control.u_esc(test_case_index).Time, rectifier.control.u_esc(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
@@ -306,7 +307,7 @@ grid on;
 
 subplot(3, 1, 3)
 for test_case_index = 1:num_cases
-    plot(rectifier.control.u_smr(test_case_index), 'Color', colors(test_case_index, :), ...
+    plot(rectifier.control.u_smr(test_case_index).Time, rectifier.control.u_smr(test_case_index).Data, 'Color', colors(test_case_index, :), ...
         'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
     hold on;
 end
