@@ -40,14 +40,14 @@ k_e_local = ['k_e = ' k_e_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
-% Par�metros de esquema de controle h�brido
-hybrid_control_cases = [1.0 0.0; 0.0 1.0; 1.0 0.1];
+% Parâmetros de esquema de controle híbrido
+hybrid_control_cases = [1.0 0.0; 0.0 10.0; 1.0 0.1];
 
 %% Parâmetros auxiliares para figuras
 
 [num_cases, ~] = size(hybrid_control_cases);
 
-% �?ndice de figuras
+% Índice de figuras
 figure_index = 0;
 
 % Cores
@@ -158,7 +158,7 @@ end
 
 %% 
 
-% Carregamento de superf�cie ajustada de máxima potência
+% Carregamento de superfície ajustada de máxima potência
 try
     load('results/PowerAnalysis/P_v_o.mat', 'P_v_o_mpp_sim_fit');
 catch
