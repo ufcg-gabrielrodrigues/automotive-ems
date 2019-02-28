@@ -66,7 +66,7 @@ P_z_o = @(n_r, i_f, z_o) ((3.*pi.*v_s(n_r, i_f)).^2.*z_o)./((pi.^2.*omega_e(n_r)
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [0.01 0.5:0.5:5.0]';      % Corrente de excitação máxima [A]
+i_f_list = [0.01 0.5:0.5:5.0]';     % Corrente de excitação máxima [A]
 n_r_list = (2000:500:7500)';       	% Velocidade do alternador [rpm]
 v_o_list = (0.0:1.0:80.0)';       	% Tensão de saída [V]
 z_o_list = [0.01 0.05:0.05:2.0]';   % Impedância de saída [Ohm]
@@ -152,9 +152,15 @@ end
 [P_v_o_mpp_ana, v_o_mpp_index_ana] = max(P_v_o_ana, [], 3);
 v_o_mpp_ana = v_o_list(v_o_mpp_index_ana);
 
+[xData, yData, zData] = prepareSurfaceData(n_r_list, i_f_list, P_v_o_mpp_ana);
+[P_v_o_mpp_ana_fit, ~] = fit([xData, yData], zData, 'thinplateinterp', 'Normalize', 'on');
+
 % 
 [P_v_o_mpp_sim, v_o_mpp_index_sim] = max(P_v_o_sim, [], 3);
 v_o_mpp_sim = v_o_list(v_o_mpp_index_sim);
+
+[xData, yData, zData] = prepareSurfaceData(n_r_list, i_f_list, P_v_o_mpp_sim);
+[P_v_o_mpp_sim_fit, ~] = fit([xData, yData], zData, 'thinplateinterp', 'Normalize', 'on');
 
 %% Ajuste de superf�cie de tens�o de m�xima pot�ncia
 
@@ -268,7 +274,8 @@ grid on;
 %% Armazenamento dos resultados de simulação
 
 save('results/PowerAnalysis/P_v_o.mat', 'simIn', 'simOut', 'P_v_o_ana', 'P_v_o_sim', ...
-    'P_v_o_mpp_ana', 'P_v_o_mpp_sim', 'v_o_mpp_ana', 'v_o_mpp_sim', 'v_o_mpp_fit', '-v7.3');
+    'P_v_o_mpp_ana', 'P_v_o_mpp_sim', 'P_v_o_mpp_ana_fit', 'P_v_o_mpp_sim_fit', ...
+    'v_o_mpp_ana', 'v_o_mpp_sim', 'v_o_mpp_fit', '-v7.3');
 
 %% Configuração dos casos de teste para carga de impedância constante
 
@@ -327,9 +334,15 @@ end
 [P_z_o_mpp_ana, z_o_mpp_index_ana] = max(P_z_o_ana, [], 3);
 z_o_mpp_ana = z_o_list(z_o_mpp_index_ana);
 
+[xData, yData, zData] = prepareSurfaceData(n_r_list, i_f_list, P_z_o_mpp_ana);
+[P_z_o_mpp_ana_fit, ~] = fit([xData, yData], zData, 'thinplateinterp', 'Normalize', 'on');
+
 % 
 [P_z_o_mpp_sim, z_o_mpp_index_sim] = max(P_z_o_sim, [], 3);
 z_o_mpp_sim = z_o_list(z_o_mpp_index_sim);
+
+[xData, yData, zData] = prepareSurfaceData(n_r_list, i_f_list, P_z_o_mpp_sim);
+[P_z_o_mpp_sim_fit, ~] = fit([xData, yData], zData, 'thinplateinterp', 'Normalize', 'on');
 
 %% Ajuste de superf�cie de imped�ncia de m�xima pot�ncia
 
@@ -443,7 +456,8 @@ grid on;
 %% Armazenamento dos resultados de simulação
 
 save('results/PowerAnalysis/P_z_o.mat', 'simIn', 'simOut', 'P_z_o_ana', 'P_z_o_sim', ...
-    'P_z_o_mpp_ana', 'P_z_o_mpp_sim', 'z_o_mpp_ana', 'z_o_mpp_sim', 'z_o_mpp_fit', '-v7.3');
+    'P_z_o_mpp_ana', 'P_z_o_mpp_sim', 'P_z_o_mpp_ana_fit', 'P_z_o_mpp_sim_fit', ...
+    'z_o_mpp_ana', 'z_o_mpp_sim', 'z_o_mpp_fit', '-v7.3');
 
 %% Armazenamento de figuras
 
