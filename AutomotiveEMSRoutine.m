@@ -41,7 +41,7 @@ blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/H
 blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
 
 % Parâmetros de esquema de controle híbrido
-hybrid_control_cases = [1.0 0.0; 0.0 10.0; 1.0 0.1];
+hybrid_control_cases = [1.0 0.0; 0.0 0.5; 1.0 0.1];
 
 %% Parâmetros auxiliares para figuras
 
