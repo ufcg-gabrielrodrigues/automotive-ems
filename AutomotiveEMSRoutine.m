@@ -147,6 +147,13 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
 
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Excitation current controller/Excitation Current Protection Reference/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
+
+% Atualização de parâmetro: indutância própria de estator
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Excitation current controller/Excitation Current Protection Reference/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, l_s_local, l_s_default_local);
+
 %% Salva e finaliza modelo no Simulink
 
 save_system('models/AutomotiveEMS.slx');
