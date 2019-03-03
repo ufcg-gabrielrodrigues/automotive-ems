@@ -37,8 +37,30 @@ if (alternator.stator.connection == delta)
 end
 
 k_e_local = ['k_e = ' k_e_str ';'];
+
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Hybrid Load Matching Controller/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
 blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
+
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Excitation current controller/Excitation Current Protection Reference/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
+
+% Atualização de parâmetro: indutância própria de estator
+l_s_default_local = 'l_s = 1e-6;';
+
+if (isfield(alternator.stator.l, 'function'))
+    l_s_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
+else
+    l_s_str = num2str(alternator.stator.l.value);
+end
+
+if (alternator.stator.connection == delta)
+    l_s_str = ['(' l_s_str ')./3'];
+end
+
+l_s_local = ['l_s = ' l_s_str ';'];
+
+blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'AutomotiveEMS/Hybrid Load Matching Controller Scheme/Excitation current controller/Excitation Current Protection Reference/MATLAB Function');
+blockHandle.Script = strrep(blockHandle.Script, l_s_default_local, l_s_local);
 
 % Parâmetros de esquema de controle híbrido
 hybrid_control_cases = [1.0 0.0; 0.0 0.5; 1.0 0.1];
@@ -79,7 +101,11 @@ electrical_load.r = 1.0e-0;	% [Ohm]
 
 % Eficiência
 buck.efficiency = 0.85;
-buck.v_o_max = 13.5;
+
+%% Banco de supercapacitores
+
+uc_bank.protection.v_max = 0.9*(2.3*6);
+uc_bank.protection.i_max = 200;
 
 %% Parâmetros de simulação
 
