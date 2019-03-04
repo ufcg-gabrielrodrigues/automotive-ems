@@ -105,7 +105,7 @@ buck.efficiency = 0.85;
 %% Banco de supercapacitores
 
 uc_bank.protection.v_max = 0.9*(2.3*6);
-uc_bank.protection.i_max = 200;
+uc_bank.protection.i_max = realmax;
 
 %% Parâmetros de simulação
 
