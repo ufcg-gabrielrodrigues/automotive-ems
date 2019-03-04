@@ -47,7 +47,7 @@ hybrid_control_cases = [1.0 0.0; 0.0 0.5; 1.0 0.1];
 
 [num_cases, ~] = size(hybrid_control_cases);
 
-% �?ndice de figuras
+% �?ndice de figuras
 figure_index = 0;
 
 % Cores
@@ -73,13 +73,33 @@ battery.r = 50e-3;      % [Ohm]
 
 %% Carga elétrica
 
-electrical_load.r = 1.0e-0;	% [Ohm]
+electrical_load.r = 0.15;	% [Ohm]
 
 %% Conversor Buck
 
 % Eficiência
 buck.efficiency = 0.85;
-buck.v_o_max = 13.5;
+
+%% Banco de supercapacitores
+
+% Modelo de supercapacitor de 1500F validado por Zubieta (2000)
+uc_bank.Ri = 1.5e-3;    % [Ohm]
+uc_bank.Rd = 0.4;       % [Ohm]
+uc_bank.Rl = 3.2;       % [Ohm]
+uc_bank.Rleak = 4e+3;   % [Ohm]
+uc_bank.Ci0 = 900;      % [F]
+uc_bank.Ci1 = 600;      % [F/V]
+uc_bank.Cd = 200;       % [F]
+uc_bank.Cl = 330;       % [F]
+
+% Associação das células
+uc_bank.configuration.series = 6;
+uc_bank.configuration.parallel = 4;
+
+% Limites de proteção
+uc_bank.protection.v_max = 0.95 * (2.3 * uc_bank.configuration.series);
+uc_bank.protection.i_max = 0.95 * (100 * uc_bank.configuration.parallel);
+% uc_bank.protection.i_max = realmax;
 
 %% Parâmetros de simulação
 
@@ -189,6 +209,8 @@ if (exist('P_v_o_mpp_sim_fit', 'var'))
     
     plot(P_v_o_mpp.Time, P_v_o_mpp.Data, 'Color', colors(num_cases + 1, :), ...
         'DisplayName', 'Pot{\^{e}}ncia m{\''{a}}xima');
+    
+    ylim([0 1.05*max(P_v_o_mpp.Data)]);
 end
 
 hold off;
