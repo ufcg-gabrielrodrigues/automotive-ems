@@ -139,7 +139,7 @@ for test_case_index = 1:num_cases
     
     figure(figure_index)
     subplot(3, 1, 1)
-    plot(test_case_out(test_case_index).alternator.rotor.l.i, 'b-');
+    plot(test_case_out(test_case_index).alternator.rotor.l.i.time, test_case_out(test_case_index).alternator.rotor.l.i.data, 'b-');
     hold on;
     plot([0 t_f], [experimental_results(test_case_index, 1) experimental_results(test_case_index, 1)], 'r--');
     hold on;
@@ -150,10 +150,10 @@ for test_case_index = 1:num_cases
     hold on;
     error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
     plot(time, error_sim, 'g:');
-    xlabel('$t [s]$');
+%     xlabel('$t [s]$');
     ylabel('$i_{f} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.rotor.l.i.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 1)])]);
-    title('Compara{\c{c}}{\~{a}}o de corrente de excita{\c{c}}{\~{a}}o');
+%     title('Compara{\c{c}}{\~{a}}o de corrente de excita{\c{c}}{\~{a}}o');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
@@ -161,7 +161,7 @@ for test_case_index = 1:num_cases
     grid on;
     
     subplot(3, 1, 2)
-    plot(test_case_out(test_case_index).alternator.stator.output.v_ll, 'b-');
+    plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, test_case_out(test_case_index).alternator.stator.output.v_ll.data, 'b-');
     hold on;
     plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
     hold on;
@@ -172,10 +172,10 @@ for test_case_index = 1:num_cases
     hold on;
     error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
     plot(time, error_sim, 'g:');
-    xlabel('$t [s]$');
+%     xlabel('$t [s]$');
     ylabel('$v_{ll}^{RMS} [V]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
-    title('Compara{\c{c}}{\~{a}}o da tens{\~{a}}o terminal de linha');
+%     title('Compara{\c{c}}{\~{a}}o da tens{\~{a}}o terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
@@ -183,7 +183,7 @@ for test_case_index = 1:num_cases
     grid on;
     
     subplot(3, 1, 3)
-    plot(test_case_out(test_case_index).alternator.stator.output.i_l, 'b-');
+    plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, test_case_out(test_case_index).alternator.stator.output.i_l.data, 'b-');
     hold on;
     plot([0 t_f], [experimental_results(test_case_index, 3) experimental_results(test_case_index, 3)], 'r--');
     hold on;
@@ -197,21 +197,21 @@ for test_case_index = 1:num_cases
     xlabel('$t [s]$');
     ylabel('$i_{l}^{RMS} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
-    title('Compara{\c{c}}{\~{a}}o da corrente terminal de linha');
+%     title('Compara{\c{c}}{\~{a}}o da corrente terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
         'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
     
-    suptitle(['Caso de teste: $n_{r} =$ ' num2str(test_case_out(test_case_index).alternator.rotor.n) ...
-        ' $[rpm]$; $r_{DC} =$ ' num2str(test_case_out(test_case_index).electrical_load.r) ' $[\Omega]$']);
+%     suptitle(['Caso de teste: $n_{r} =$ ' num2str(test_case_out(test_case_index).alternator.rotor.n) ...
+%         ' $[rpm]$; $r_{DC} =$ ' num2str(test_case_out(test_case_index).electrical_load.r) ' $[\Omega]$']);
 end
 
 %% Armazenamento de figuras
 
 for i = 1:figure_index
-    fileName = sprintf('results/LundellAlternator/Figura_%d', i);
+    fileName = sprintf('results/LundellAlternator/alternador-validacao-%d', i);
     saveFigure(figure(i), fileName, 'fig');
 end
 

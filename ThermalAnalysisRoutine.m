@@ -12,7 +12,7 @@ t_f = 1.0e-2;   % Tempo total de simulação [s]
 % Lista de parâmetros a serem varridos individualmente
 i_f_list = [1.0 3.0 4.5]';                  % Corrente de excitação máxima [A]
 n_r_list = [2000 3500 5000 7500]';          % Velocidade do alternador [rpm]
-T_list = [20.0 50.0 100.0 150.0 200.0]';    % Temperaturas da resist�ncia de enrolamento de estator [Ohm]
+T_list = [20.0 50.0 100.0 150.0 200.0]';    % Temperaturas da resist�ncia de enrolamento de estator [oC]
 v_o_list = (0.0:1.0:80.0)';                 % Tensão de saída [V]
 
 %% Parâmetros auxiliares para figuras
@@ -93,7 +93,7 @@ for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         for T_index = 1:length(T_list)
             for v_o_index = 1:length(v_o_list)
-                P_o(i_f_index, n_r_index, T_index, v_o_index) = mean(simOut(i_f_index, n_r_index, T_index, v_o_index).p_l.data(round(end/2):end));
+                p_o(i_f_index, n_r_index, T_index, v_o_index) = mean(simOut(i_f_index, n_r_index, T_index, v_o_index).p_l.data(round(end/2):end));
             end
         end
     end
@@ -102,7 +102,7 @@ end
 %% Identificação dos pontos de máxima potência indexados pela tensão da carga
 
 % 
-[P_o_mpp, v_o_mpp_index] = max(P_o, [], 4);
+[p_o_mpp, v_o_mpp_index] = max(p_o, [], 4);
 v_o_mpp = v_o_list(v_o_mpp_index);
 
 %% Traço dos resultados relativos à variação da tensão da carga
@@ -117,10 +117,10 @@ for i_f_index = 1:length(i_f_list)
         
         for T_index = 1:length(T_list)
             
-            plot(v_o_list, squeeze(P_o(i_f_index, n_r_index, T_index, :)), '-', 'Color', colors(T_index, :), ...
+            plot(v_o_list, squeeze(p_o(i_f_index, n_r_index, T_index, :)), '-', 'Color', colors(T_index, :), ...
                 'DisplayName', ['$T = ' num2str(T_list(T_index)) '^{o}C$']);
             hold on;
-            plot(v_o_mpp(i_f_index, n_r_index, T_index, :), P_o_mpp(i_f_index, n_r_index, T_index, :), 'o', ...
+            plot(v_o_mpp(i_f_index, n_r_index, T_index, :), p_o_mpp(i_f_index, n_r_index, T_index, :), 'o', ...
                 'Color', colors(T_index, :), 'HandleVisibility', 'off');
             
             legend('off');
@@ -130,7 +130,7 @@ for i_f_index = 1:length(i_f_list)
         
         title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$; $n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
         xlabel('$v_o$ $[V]$');
-        ylabel('$P_o$ $[W]$');
+        ylabel('$p_o$ $[W]$');
         leg = legend;
         leg.Location = 'NorthWest';
         grid on;
@@ -146,6 +146,6 @@ end
 
 %% Armazenamento dos resultados de simulação
 
-save('results/ThermalAnalysis/P_o.mat', 'simIn', 'simOut', 'P_o', 'P_o_mpp', 'v_o_mpp', '-v7.3');
+save('results/ThermalAnalysis/p_o.mat', 'simIn', 'simOut', 'p_o', 'p_o_mpp', 'v_o_mpp', '-v7.3');
 save('results/ThermalAnalysis/simEnv.mat', 'alternator', 'rectifier', ...
     'i_f_list', 'n_r_list', 'T_list', 'v_o_list', '-v7.3');

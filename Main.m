@@ -11,10 +11,10 @@ clc;
 % Formatação
 set(groot, 'DefaultTextInterpreter', 'LaTeX');
 set(groot, 'DefaultLegendInterpreter', 'LaTeX');
-set(groot, 'DefaultTextFontSize', 14);
-set(groot, 'DefaultAxesFontSize', 14);
-set(groot, 'DefaultLegendFontSize', 14);
-set(groot, 'DefaultLineLineWidth', 1);
+set(groot, 'DefaultTextFontSize', 20);
+set(groot, 'DefaultAxesFontSize', 20);
+set(groot, 'DefaultLegendFontSize', 20);
+set(groot, 'DefaultLineLineWidth', 1.5);
 
 %% Identificação e adição do diretório principal e seus subdiretórios aos
 %  caminhos de busca do MATLAB

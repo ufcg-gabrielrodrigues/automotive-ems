@@ -160,6 +160,7 @@ for test_case_index = 1:num_cases
     uc_bank.v(test_case_index) = simOut(test_case_index).v_uc;
     uc_bank.i(test_case_index) = simOut(test_case_index).i_uc;
     uc_bank.p(test_case_index) = simOut(test_case_index).p_uc;
+    uc_bank.E(test_case_index) = simOut(test_case_index).E_uc;
 end
 
 %% 
@@ -184,10 +185,10 @@ for test_case_index = 1:num_cases
 end
 
 if (exist('P_v_o_mpp_sim_fit', 'var'))
-    P_v_o_mpp = buck.efficiency*P_v_o_mpp_sim_fit(iceToAltRotRatio*ice.n(test_case_index).Data, alternator.rotor.l.i(test_case_index).Data);
-    P_v_o_mpp = timeseries(P_v_o_mpp, ice.n(test_case_index).Time);
+    p_v_o_mpp = buck.efficiency*p_v_o_mpp_sim_fit(iceToAltRotRatio*ice.n(test_case_index).Data, alternator.rotor.l.i(test_case_index).Data);
+    p_v_o_mpp = timeseries(p_v_o_mpp, ice.n(test_case_index).Time);
     
-    plot(P_v_o_mpp.Time, P_v_o_mpp.Data, 'Color', colors(num_cases + 1, :), ...
+    plot(p_v_o_mpp.Time, p_v_o_mpp.Data, 'Color', colors(num_cases + 1, :), ...
         'DisplayName', 'Pot{\^{e}}ncia m{\''{a}}xima');
 end
 
@@ -197,7 +198,7 @@ legend('show');
 
 title('Pot{\^{e}}ncia transferida ao banco de supercapacitores');
 xlabel('$t$ $[s]$');
-ylabel('$P_{uc}$ $[W]$');
+ylabel('$p_{uc}$ $[W]$');
 leg = legend;
 leg.Location = 'NorthEast';
 grid on;
@@ -280,9 +281,10 @@ hold off;
 legend('off');
 legend('show');
 
-title('Sinal de controle baseado em modelo');
-xlabel('$t$ $[s]$');
-ylabel('$u$');
+% title('Sinal de controle baseado em modelo');
+% xlabel('$t$ $[s]$');
+xlim([0 3.1]);
+ylabel('$d_{ana}$');
 leg = legend;
 leg.Location = 'NorthEast';
 grid on;
@@ -298,9 +300,10 @@ hold off;
 legend('off');
 legend('show');
 
-title('Sinal de controle baseado em otimiza{\c{c}}{\~{a}}o');
-xlabel('$t$ $[s]$');
-ylabel('$u$');
+% title('Sinal de controle baseado em otimiza{\c{c}}{\~{a}}o');
+% xlabel('$t$ $[s]$');
+xlim([0 3.1]);
+ylabel('$d_{esc}$');
 leg = legend;
 leg.Location = 'NorthEast';
 grid on;
@@ -316,14 +319,37 @@ hold off;
 legend('off');
 legend('show');
 
-title('Sinal de controle resultante');
+% title('Sinal de controle resultante');
 xlabel('$t$ $[s]$');
-ylabel('$u$');
+xlim([0 3.1]);
+ylabel('$d_{smr}$');
 leg = legend;
 leg.Location = 'NorthEast';
 grid on;
 
-suptitle('Sinais de controle de retificador');
+% suptitle('Sinais de controle de retificador');
+
+%%
+figure_index = figure_index + 1;
+figure(figure_index)
+
+for test_case_index = 1:num_cases
+    plot(uc_bank.E(test_case_index).Time, uc_bank.E(test_case_index).Data, 'Color', colors(test_case_index, :), ...
+        'DisplayName', ['$k_{p} = ' num2str(hybrid_control.k_p(test_case_index)) '$; $k_{i} = ' num2str(hybrid_control.k_i(test_case_index)) '$']);
+    hold on;
+end
+
+hold off;
+legend('off');
+legend('show');
+
+% title('Tens{\~{a}}o de barramento do circuito secund{\''{a}}rio');
+xlabel('$t$ $[s]$');
+xlim([0 3.1]);
+ylabel('$E_{uc}$ $[J]$');
+leg = legend;
+leg.Location = 'NorthWest';
+grid on;
 
 %% Armazenamento de figuras
 

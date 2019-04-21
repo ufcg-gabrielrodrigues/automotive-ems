@@ -154,7 +154,7 @@ end
 
 try
     simEnv = load('results/PowerAnalysis/simEnv.mat', 'i_f_list', 'n_r_list');
-    P_v_o = load('results/PowerAnalysis/P_v_o.mat', 'P_v_o_mpp_sim');
+    p_v_o = load('results/PowerAnalysis/p_v_o.mat', 'p_v_o_mpp_sim');
     power_analysis_flag = true;
 catch
     power_analysis_flag = false;
@@ -175,84 +175,93 @@ end
 
 [color_dim, ~] = size(colors);
 
+% Casos a serem plotados
+n_r_plot = [3500; 5000; 6500];
+r_l_plot = 1;
+
 for test_case_index = 1:num_cases/length(dynamic_v_l_list)
-    % 
+    %
     i_f = i_f_max;
     n_r = test_cases(test_case_index, 1);
     r_l = test_cases(test_case_index, 2);
     
-    % 
-    i_f_index = find(simEnv.i_f_list == i_f);
-    n_r_index = find(simEnv.n_r_list == n_r);
-    
-    % 
-    figure_index = figure_index + 1;
-	figure(figure_index)
-    
-    subplot(3, 1, 1)
-    
-    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p, ...
-            'Color', colors(dynamic_v_l_index, :));
+    if (sum(n_r == n_r_plot) && sum(r_l == r_l_plot))
+        %
+        i_f_index = find(simEnv.i_f_list == i_f);
+        n_r_index = find(simEnv.n_r_list == n_r);
         
-        hold on;
-    end
-    
-    if (power_analysis_flag)
-        plot([0 t_f], P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], '--', 'Color', colors(color_dim, :));
-    end
-    
-    hold off;
-    ylim(P_v_o.P_v_o_mpp_sim(n_r_index, i_f_index)*[0.9 1.1]);
-    title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
-    xlabel('$t$ $[s]$');
-    ylabel('$P_{l}$ $[W]$');
-    
-    if (power_analysis_flag)
-        legend('Leitura sobre a carga', 'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
-    else
-        legend('Leitura sobre a carga', 'Location', 'SouthEast');
-    end
-    
-    grid on;
-    
-    subplot(3, 1, 2)
-    
-    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v, ...
-            'Color', colors(dynamic_v_l_index, :));
+        %
+        figure_index = figure_index + 1;
+        figure(figure_index)
         
-        hold on;
-    end
-    
-    hold off;
-    ylim([0 Inf]);
-    title('Tens{\~{a}}o sobre a carga');
-    xlabel('$t$ $[s]$');
-    ylabel('$v_{l}$ $[V]$');
-%     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-%         'Location', 'SouthEast');
-    grid on;
-    
-    subplot(3, 1, 3)
-    
-    for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-        plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u, ...
-            'Color', colors(dynamic_v_l_index, :));
+        subplot(3, 1, 1)
         
-        hold on;
+        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p.time, ...
+                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p.data, ...
+                'Color', colors(dynamic_v_l_index, :));
+            
+            hold on;
+        end
+        
+        if (power_analysis_flag)
+            plot([0 t_f], p_v_o.p_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], '--', 'Color', colors(color_dim, :));
+        end
+        
+        hold off;
+        ylim(p_v_o.p_v_o_mpp_sim(n_r_index, i_f_index)*[0.9 1.1]);
+%         title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
+%         xlabel('$t$ $[s]$');
+        ylabel('$p_{dc}$ $[W]$');
+        
+        if (power_analysis_flag)
+            legend('Leitura sobre a carga', 'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
+        else
+            legend('Leitura sobre a carga', 'Location', 'SouthEast');
+        end
+        
+        grid on;
+        
+        subplot(3, 1, 2)
+        
+        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v.time, ...
+                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v.data, ...
+                'Color', colors(dynamic_v_l_index, :));
+            
+            hold on;
+        end
+        
+        hold off;
+        ylim([0 Inf]);
+%         title('Tens{\~{a}}o sobre a carga');
+%         xlabel('$t$ $[s]$');
+        ylabel('$v_{dc}$ $[V]$');
+        %     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
+        %         'Location', 'SouthEast');
+        grid on;
+        
+        subplot(3, 1, 3)
+        
+        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
+            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u.time, ...
+                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u.data, ...
+                'Color', colors(dynamic_v_l_index, :));
+            
+            hold on;
+        end
+        
+        hold off;
+        ylim([0 Inf]);
+%         title('Ciclo de trabalho aplicado ao retificador');
+        xlabel('$t$ $[s]$');
+        ylabel('$d_{smr}$');
+        %     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
+        %         'Location', 'SouthEast');
+        grid on;
+        
+        %     suptitle(['Caso de teste: $n_{r} = ' num2str(n_r) '$ $[rpm]$; $r_{l} = ' num2str(r_l) '$ $[\Omega]$']);
     end
-    
-    hold off;
-    ylim([0 Inf]);
-    title('Ciclo de trabalho aplicado ao retificador');
-    xlabel('$t$ $[s]$');
-    ylabel('$d_{smr}$');
-%     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-%         'Location', 'SouthEast');
-    grid on;
-    
-    suptitle(['Caso de teste: $n_{r} = ' num2str(n_r) '$ $[rpm]$; $r_{l} = ' num2str(r_l) '$ $[\Omega]$']);
 end
 
 %% Armazenamento de figuras
