@@ -7,6 +7,10 @@ else
     previousVars{1} = who;
 end
 
+%% 
+
+close all;
+
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
@@ -146,9 +150,6 @@ end
 % Inicialização do índice de figuras
 figure_index = 0;
 
-% Cópia do vetor de tempo da simulação
-time = test_case_out(test_case_index).alternator.rotor.l.i.time;
-
 % Laço de iterações por casos de teste
 for test_case_index = 1:num_cases
     
@@ -161,8 +162,7 @@ for test_case_index = 1:num_cases
     plot([0 t_f], [simulated_results(test_case_index, 1) simulated_results(test_case_index, 1)], 'g--');
     hold on;
     error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.stator.output.e_ll.data);
-    plot(time, error_sim, 'g:');
-%     xlabel('$t [s]$');
+    plot(test_case_out(test_case_index).alternator.stator.output.e_ll.time, error_sim, 'g:');
     ylabel('$e_{ll}^{RMS} [V]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.e_ll.data(end) simulated_results(test_case_index, 1)])]);
     legend('Resultado simulado', 'Resultado simulado referenciado', ...
@@ -172,19 +172,17 @@ for test_case_index = 1:num_cases
     subplot(3, 1, 2)
     plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, test_case_out(test_case_index).alternator.stator.output.v_ll.data, 'b-');
     hold on;
-    plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
+    plot([0 t_f], [experimental_results(test_case_index, 1) experimental_results(test_case_index, 1)], 'r--');
     hold on;
     plot([0 t_f], [simulated_results(test_case_index, 2) simulated_results(test_case_index, 2)], 'g--');
     hold on;
-    error_exp = abs(experimental_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
-    plot(time, error_exp, 'r:');
+    error_exp = abs(experimental_results(test_case_index, 1) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
+    plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, error_exp, 'r:');
     hold on;
     error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
-    plot(time, error_sim, 'g:');
-%     xlabel('$t [s]$');
+    plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, error_sim, 'g:');
     ylabel('$v_{ll}^{RMS} [V]$');
-    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
-%     title('Compara{\c{c}}{\~{a}}o da tens{\~{a}}o terminal de linha');
+    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 2)])]);
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
@@ -194,27 +192,23 @@ for test_case_index = 1:num_cases
     subplot(3, 1, 3)
     plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, test_case_out(test_case_index).alternator.stator.output.i_l.data, 'b-');
     hold on;
-    plot([0 t_f], [experimental_results(test_case_index, 3) experimental_results(test_case_index, 3)], 'r--');
+    plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
     hold on;
     plot([0 t_f], [simulated_results(test_case_index, 3) simulated_results(test_case_index, 3)], 'g--');
     hold on;
-    error_exp = abs(experimental_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
-    plot(time, error_exp, 'r:');
+    error_exp = abs(experimental_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
+    plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, error_exp, 'r:');
     hold on;
     error_sim = abs(simulated_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
-    plot(time, error_sim, 'g:');
+    plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, error_sim, 'g:');
     xlabel('$t [s]$');
     ylabel('$i_{l}^{RMS} [A]$');
-    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
-%     title('Compara{\c{c}}{\~{a}}o da corrente terminal de linha');
+    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 3)])]);
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
         'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
-    
-%     suptitle(['Caso de teste: $n_{r} =$ ' num2str(test_case_out(test_case_index).alternator.rotor.n) ...
-%         ' $[rpm]$; $r_{DC} =$ ' num2str(test_case_out(test_case_index).electrical_load.r) ' $[\Omega]$']);
 end
 
 %% Armazenamento de figuras
@@ -222,7 +216,41 @@ end
 for i = 1:figure_index
     fileName = sprintf('results/LundellAlternator/alternador-validacao-ca-%d', i);
     saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'png');
 end
+
+%% 
+
+% 
+e_ll_validation = zeros(num_cases, 5);
+v_ll_validation = zeros(num_cases, 5);
+i_l_validation = zeros(num_cases, 5);
+
+% 
+for test_case_index = 1:num_cases
+    e_ll_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.stator.output.e_ll.data(ceil(end/2), end));
+    e_ll_validation(test_case_index, 2) = NaN;
+    e_ll_validation(test_case_index, 3) = NaN;
+    e_ll_validation(test_case_index, 4) = simulated_results(test_case_index, 1);
+    e_ll_validation(test_case_index, 5) = 100*abs(e_ll_validation(test_case_index, 1) - e_ll_validation(test_case_index, 4))/e_ll_validation(test_case_index, 4);
+    
+    v_ll_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.stator.output.v_ll.data(ceil(end/2), end));
+    v_ll_validation(test_case_index, 2) = experimental_results(test_case_index, 1);
+    v_ll_validation(test_case_index, 3) = 100*abs(v_ll_validation(test_case_index, 1) - v_ll_validation(test_case_index, 2))/v_ll_validation(test_case_index, 2);
+    v_ll_validation(test_case_index, 4) = simulated_results(test_case_index, 2);
+    v_ll_validation(test_case_index, 5) = 100*abs(v_ll_validation(test_case_index, 1) - v_ll_validation(test_case_index, 4))/v_ll_validation(test_case_index, 4);
+    
+    i_l_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.stator.output.i_l.data(ceil(end/2), end));
+    i_l_validation(test_case_index, 2) = experimental_results(test_case_index, 2);
+    i_l_validation(test_case_index, 3) = 100*abs(i_l_validation(test_case_index, 1) - i_l_validation(test_case_index, 2))/i_l_validation(test_case_index, 2);
+    i_l_validation(test_case_index, 4) = simulated_results(test_case_index, 3);
+    i_l_validation(test_case_index, 5) = 100*abs(i_l_validation(test_case_index, 1) - i_l_validation(test_case_index, 4))/i_l_validation(test_case_index, 4);
+end
+
+% 
+xlswrite('results/LundellAlternator/validacao_ca.xls', e_ll_validation, 'e_ll');
+xlswrite('results/LundellAlternator/validacao_ca.xlsx', v_ll_validation, 'v_ll');
+xlswrite('results/LundellAlternator/validacao_ca.xlsx', i_l_validation, 'i_l');
 
 %% Armazenamento dos resultados de simulação
 

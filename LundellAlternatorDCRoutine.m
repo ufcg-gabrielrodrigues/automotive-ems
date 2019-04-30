@@ -7,6 +7,10 @@ else
     previousVars{1} = who;
 end
 
+%% 
+
+close all;
+
 %% Parâmetros temporais
 
 T_s = 1e-6; % Passo de cálculo utilizado pelo 'solver' [s]
@@ -42,6 +46,9 @@ simulated_results = [1.960 12.70 27.20;
                      1.950 13.00 56.00];
 
 %% Alternador
+
+% Referência de tensão CC
+v_dc_ref = 13.5;            % [V]
 
 % Corrente de excitação máxima
 i_f_max = 5.0e-0;           % [A]
@@ -159,10 +166,8 @@ for test_case_index = 1:num_cases
     hold on;
     error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
     plot(time, error_sim, 'g:');
-%     xlabel('$t [s]$');
     ylabel('$i_{f} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.rotor.l.i.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 1)])]);
-%     title('Compara{\c{c}}{\~{a}}o de corrente de excita{\c{c}}{\~{a}}o');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
@@ -181,10 +186,8 @@ for test_case_index = 1:num_cases
     hold on;
     error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
     plot(time, error_sim, 'g:');
-%     xlabel('$t [s]$');
     ylabel('$v_{ll}^{RMS} [V]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
-%     title('Compara{\c{c}}{\~{a}}o da tens{\~{a}}o terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
@@ -206,15 +209,11 @@ for test_case_index = 1:num_cases
     xlabel('$t [s]$');
     ylabel('$i_{l}^{RMS} [A]$');
     ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
-%     title('Compara{\c{c}}{\~{a}}o da corrente terminal de linha');
     legend('Resultado simulado', 'Resultado experimental referenciado', ...
         'Resultado simulado referenciado', ...
         'Erro absoluto relativo ao resultado experimental referenciado', ...
         'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
     grid on;
-    
-%     suptitle(['Caso de teste: $n_{r} =$ ' num2str(test_case_out(test_case_index).alternator.rotor.n) ...
-%         ' $[rpm]$; $r_{DC} =$ ' num2str(test_case_out(test_case_index).electrical_load.r) ' $[\Omega]$']);
 end
 
 %% Armazenamento de figuras
@@ -222,7 +221,41 @@ end
 for i = 1:figure_index
     fileName = sprintf('results/LundellAlternator/alternador-validacao-cc-%d', i);
     saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'png');
 end
+
+%% 
+
+% 
+i_f_validation = zeros(num_cases, 5);
+v_ll_validation = zeros(num_cases, 5);
+i_l_validation = zeros(num_cases, 5);
+
+% 
+for test_case_index = 1:num_cases
+    i_f_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.rotor.l.i.data(ceil(end/2), end));
+    i_f_validation(test_case_index, 2) = experimental_results(test_case_index, 1);
+    i_f_validation(test_case_index, 3) = 100*abs(i_f_validation(test_case_index, 1) - i_f_validation(test_case_index, 2))/i_f_validation(test_case_index, 2);
+    i_f_validation(test_case_index, 4) = simulated_results(test_case_index, 1);
+    i_f_validation(test_case_index, 5) = 100*abs(i_f_validation(test_case_index, 1) - i_f_validation(test_case_index, 4))/i_f_validation(test_case_index, 4);
+    
+    v_ll_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.stator.output.v_ll.data(ceil(end/2), end));
+    v_ll_validation(test_case_index, 2) = experimental_results(test_case_index, 2);
+    v_ll_validation(test_case_index, 3) = 100*abs(v_ll_validation(test_case_index, 1) - v_ll_validation(test_case_index, 2))/v_ll_validation(test_case_index, 2);
+    v_ll_validation(test_case_index, 4) = simulated_results(test_case_index, 2);
+    v_ll_validation(test_case_index, 5) = 100*abs(v_ll_validation(test_case_index, 1) - v_ll_validation(test_case_index, 4))/v_ll_validation(test_case_index, 4);
+    
+    i_l_validation(test_case_index, 1) = mean(test_case_out(test_case_index).alternator.stator.output.i_l.data(ceil(end/2), end));
+    i_l_validation(test_case_index, 2) = experimental_results(test_case_index, 3);
+    i_l_validation(test_case_index, 3) = 100*abs(i_l_validation(test_case_index, 1) - i_l_validation(test_case_index, 2))/i_l_validation(test_case_index, 2);
+    i_l_validation(test_case_index, 4) = simulated_results(test_case_index, 3);
+    i_l_validation(test_case_index, 5) = 100*abs(i_l_validation(test_case_index, 1) - i_l_validation(test_case_index, 4))/i_l_validation(test_case_index, 4);
+end
+
+% 
+xlswrite('results/LundellAlternator/validacao_cc.xls', i_f_validation, 'i_f');
+xlswrite('results/LundellAlternator/validacao_cc.xlsx', v_ll_validation, 'v_ll');
+xlswrite('results/LundellAlternator/validacao_cc.xlsx', i_l_validation, 'i_l');
 
 %% Armazenamento dos resultados de simulação
 
