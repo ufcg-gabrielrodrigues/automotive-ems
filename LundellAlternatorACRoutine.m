@@ -248,7 +248,7 @@ for test_case_index = 1:num_cases
 end
 
 % 
-xlswrite('results/LundellAlternator/validacao_ca.xls', e_ll_validation, 'e_ll');
+xlswrite('results/LundellAlternator/validacao_ca.xlsx', e_ll_validation, 'e_ll');
 xlswrite('results/LundellAlternator/validacao_ca.xlsx', v_ll_validation, 'v_ll');
 xlswrite('results/LundellAlternator/validacao_ca.xlsx', i_l_validation, 'i_l');
 
