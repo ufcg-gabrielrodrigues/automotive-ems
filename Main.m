@@ -42,6 +42,14 @@ delta = 2;
 % parâmetros
 alternatorCalcParamFlag = true;
 
+% Determina realização ou não do traçado dos resultados da determinação de
+% parâmetros
+alternatorParamPlotFlag = false;
+
+% Determina realização ou não do traçado dos parâmetros definidos por
+% função
+alternatorFuncParamPlotFlag = true;
+
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
 
@@ -54,6 +62,19 @@ k_e_default = 'k_e == { 0, ''V/((rad/s)*(A))'' };';
 if (isfield(alternator.k_e, 'function'))
     k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
     k_e_str = strrep(k_e_str, 'i_f', '(i_f*{1,''1/A''})');
+    
+    if (alternatorFuncParamPlotFlag)
+        figure(1)
+        fplot(alternator.k_e.function, [0 alternator.rotor.i_max]);
+        xlabel('$i_{f}\,[A]$');
+        ylabel('$k_{e}\,[V/(A\cdot(rad/s))]$');
+        grid on;
+        
+        fileName = sprintf('results/LundellAlternator/alternador-acoplamento-eletrico');
+        saveFigure(figure(1), fileName, 'fig');
+        saveFigure(figure(1), fileName, 'png');
+        close all;
+    end
 else
     k_e_str = num2str(alternator.k_e.value);
 end
@@ -68,6 +89,19 @@ l_s_default = 'l == { 1e-6, ''H'' };';
 if (isfield(alternator.stator.l, 'function'))
     l_s_str = regexprep(func2str(alternator.stator.l.function), '@\(.+?\)', '');
     l_s_str = strrep(l_s_str, 'i_f', '(i_f*{1,''1/A''})');
+    
+    if (alternatorFuncParamPlotFlag)
+        figure(1)
+        fplot(alternator.stator.l.function, [0 alternator.rotor.i_max]);
+        xlabel('$i_{f}\,[A]$');
+        ylabel('$l_{s}\,[H]$');
+        grid on;
+        
+        fileName = sprintf('results/LundellAlternator/alternador-indutancia-estator');
+        saveFigure(figure(1), fileName, 'fig');
+        saveFigure(figure(1), fileName, 'png');
+        close all;
+    end
 else
     l_s_str = num2str(alternator.stator.l.value);
 end

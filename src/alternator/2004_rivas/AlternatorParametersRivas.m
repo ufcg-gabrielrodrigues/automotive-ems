@@ -19,6 +19,7 @@ if (alternatorCalcParamFlag)
     
     alternator.n = 3;                                           % Número de fases
     alternator.p = 6;                                           % Número de pares de polos por fase
+    alternator.rotor.i_max = 3.6;                               % Corrente máxima de circuito de excitação [A]
     alternator.stator.connection = y;                           % Tipo de conexão do circuito de estator
     alternator.stator.l.value = 120e-6;                         % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = 37e-3;                          % Resistência por fase do circuito de armadura [Ohm]

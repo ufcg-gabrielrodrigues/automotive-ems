@@ -131,6 +131,40 @@ inductanceMeas = csvToTimeSeries(inductanceMeas);
 
 inductanceFit = csvToTimeSeries(inductanceFit);
 
+%% 
+
+if (alternatorParamPlotFlag)
+    figure(1)
+    plot(frictionWindageLossesMeas.time, frictionWindageLossesMeas.data, 'bo'); hold on;
+    xlabel('$n_{r}\,[rpm]$');
+    ylabel('$p_{f\&w}\,[W]$');
+    grid on;
+    
+    figure(2)
+    plot(openCircuitVoltage2000rpmMeas.time, openCircuitVoltage2000rpmMeas.data, 'ro'); hold on;
+    plot(openCircuitVoltage4000rpmMeas.time, openCircuitVoltage4000rpmMeas.data, 'go'); hold on;
+    plot(openCircuitVoltage6000rpmMeas.time, openCircuitVoltage6000rpmMeas.data, 'bo'); hold on;
+    plot(openCircuitVoltage8000rpmMeas.time, openCircuitVoltage8000rpmMeas.data, 'ko'); hold on;
+    xlabel('$i_{f}\,[A]$');
+    ylabel('$e_{ll}\,[V]$');
+    grid on;
+    
+    figure(3)
+    plot(ironLoss2000rpmMeas.time, ironLoss2000rpmMeas.data, 'ro'); hold on;
+    plot(ironLoss4000rpmMeas.time, ironLoss4000rpmMeas.data, 'go'); hold on;
+    plot(ironLoss6000rpmMeas.time, ironLoss6000rpmMeas.data, 'bo'); hold on;
+    plot(ironLoss8000rpmMeas.time, ironLoss8000rpmMeas.data, 'ko'); hold on;
+    xlabel('$i_{f}\,[A]$');
+    ylabel('$p_{i}\,[W]$');
+    grid on;
+    
+    figure(4)
+    plot(inductanceMeas.time, inductanceMeas.data, 'bo'); hold on;
+    xlabel('$i_{f}\,[A]$');
+    ylabel('$l_{s}\,[H]$');
+    grid on;
+end
+
 %% Registro dos dados extraídos dos gráficos em arquivos .MAT
 
 % Registro dos dados de perdas por atrito e enrolamento de acordo com a
@@ -224,6 +258,40 @@ implicitAlternatorCharacteristics = strcat(currentFolder, ...
 % Registro das características no destino previamente especificado
 save(implicitAlternatorCharacteristics, 'frictionWindageLosses', ...
     'openCircuitVoltage', 'ironLoss', 'inductance');
+
+%% 
+
+if (alternatorParamPlotFlag)
+    figure(1)
+    fplot(frictionWindageLosses, [2000 8000], 'b-'); hold off;
+    
+    figure(2)
+    fplot(@(i_f) 2000*openCircuitVoltage(i_f), [0 5], 'r-'); hold on;
+    fplot(@(i_f) 4000*openCircuitVoltage(i_f), [0 5], 'g-'); hold on;
+    fplot(@(i_f) 6000*openCircuitVoltage(i_f), [0 5], 'b-'); hold on;
+    fplot(@(i_f) 8000*openCircuitVoltage(i_f), [0 5], 'k-'); hold off;
+    
+    figure(3)
+    fplot(@(i_f) 2000*ironLoss(i_f), [0 5], 'r-'); hold on;
+    fplot(@(i_f) 4000*ironLoss(i_f), [0 5], 'g-'); hold on;
+    fplot(@(i_f) 6000*ironLoss(i_f), [0 5], 'b-'); hold on;
+    fplot(@(i_f) 8000*ironLoss(i_f), [0 5], 'k-'); hold off;
+    
+    figure(4)
+    fplot(inductance, [0 5], 'b-'); hold off;
+    
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'fig');
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'png');
+    
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage', 'fig');
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage', 'png');
+    
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss', 'fig');
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss', 'png');
+    
+    saveFigure(figure(4), 'results/LundellAlternator/inductance', 'fig');
+    saveFigure(figure(4), 'results/LundellAlternator/inductance', 'png');
+end
 
 %% Exclusão das variáveis excedentes
 

@@ -32,6 +32,7 @@ if (alternatorCalcParamFlag)
     alternator.ironLoss = extFunctionHandle(@(n_r, i_f) n_r.*ironLoss(i_f));    % Perdas no ferro [W]
     alternator.n = n;                                                           % Número de fases
     alternator.p = p;                                                           % Número de pares de polos por fase
+    alternator.rotor.i_max = 5.00;                                              % Corrente máxima de circuito de excitação [A]
     alternator.rotor.l.value = 0.2;                                             % Indutância própria do circuito de excitação [H]
     alternator.rotor.r.value = r_f;                                             % Resistência do circuito de excitação a 20oC [Ohm]
     alternator.rotor.s.v_gs_on = 10;                                            % Tensão gate-source para acionamento do MOSFET do circuito de excitação [V]
