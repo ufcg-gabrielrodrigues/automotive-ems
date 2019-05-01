@@ -56,6 +56,11 @@ i_f_max = 5.0e-0;           % [A]
 % Efeito térmico na resistência do circuito de estator
 alternator.stator.r.T = 32; % [oC]
 
+%% Retificador
+
+% Filtro passivo
+rectifier.filter.c = 1e-3;  % Capacitância de filtro [F]
+
 %% Inicializa modelo no Simulink
 
 open_system('models/LundellAlternatorDC.slx', 'loadonly');
