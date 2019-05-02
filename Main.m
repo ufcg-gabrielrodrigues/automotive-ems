@@ -72,7 +72,7 @@ if (isfield(alternator.k_e, 'function'))
         
         fileName = sprintf('results/LundellAlternator/alternador-acoplamento-eletrico');
         saveFigure(figure(1), fileName, 'fig');
-        saveFigure(figure(1), fileName, 'png');
+        saveFigure(figure(1), fileName, 'eps');
         close all;
     end
 else
@@ -99,7 +99,7 @@ if (isfield(alternator.stator.l, 'function'))
         
         fileName = sprintf('results/LundellAlternator/alternador-indutancia-estator');
         saveFigure(figure(1), fileName, 'fig');
-        saveFigure(figure(1), fileName, 'png');
+        saveFigure(figure(1), fileName, 'eps');
         close all;
     end
 else
