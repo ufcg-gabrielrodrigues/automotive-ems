@@ -29,7 +29,7 @@ if (alternatorCalcParamFlag)
     %% Registro de parâmetros definidos em estrutura que representa o alternador
     
     alternator.frictionWindageLosses = frictionWindageLosses;                   % Perdas por atrito e enrolamento [W]
-    alternator.ironLoss = extFunctionHandle(@(n_r, i_f) n_r.*ironLoss(i_f));    % Perdas no ferro [W]
+    alternator.ironLoss = ironLoss;                                             % Perdas no ferro [W]
     alternator.n = n;                                                           % Número de fases
     alternator.p = p;                                                           % Número de pares de polos por fase
     alternator.rotor.i_max = 5.00;                                              % Corrente máxima de circuito de excitação [A]
@@ -39,8 +39,9 @@ if (alternatorCalcParamFlag)
     alternator.rotor.control.pwm.f_s = 10e+3;                                   % Frequência de chaveamento do PWM de controle do circuito de excitação [Hz]
     alternator.stator.connection = connection;                                  % Tipo de conexão do circuito de estator
     alternator.stator.slots = slots;                                            % Número de ranhuras no estator
-    alternator.k_e.function = extFunctionHandle(@(i_f) ...
-        sqrt(2).*(openCircuitVoltage(i_f)./i_f).*(1./(p.*pi./30)));          	% Constante de acoplamento elétrico [V/((rad/s)*A)]
+    alternator.k_e.function = extFunctionHandle(@(i_f, n_r) ...
+        sqrt(2).*(openCircuitVoltage(i_f, n_r)./(i_f.*n_r)).* ...
+        (1./(p.*pi./30)));                                                      % Constante de acoplamento elétrico [V/((rad/s)*A)]
     alternator.stator.l.function = inductance;                                  % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = r_a;                                            % Resistência por fase do circuito de armadura na temperatura de referência [Ohm]
     alternator.stator.r.T_ref = 20;                                           	% Temperatura de referência da resistência por fase do circuito de armadura [oC]

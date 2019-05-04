@@ -12,6 +12,7 @@ function [fitresult, gof] = customSurfaceFit(x, y, z, f, fx, fy, fz, p0, varargi
     % 
     ft = fittype(f, 'independent', {fx, fy}, 'dependent', fz);
     opts = fitoptions('Method', 'NonlinearLeastSquares');
+    opts.Algorithm = 'Levenberg-Marquardt';
     opts.Display = 'Off';
     opts.StartPoint = p0;
 

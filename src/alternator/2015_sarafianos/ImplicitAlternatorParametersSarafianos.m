@@ -208,46 +208,63 @@ save(registerPath, 'inductanceMeas');
 registerPath = strcat(inductanceFolder, '/inductanceFit.mat');
 save(registerPath, 'inductanceFit');
 
-%% Preparação de dados medidos para etapa de ajustes de curvas
-
-frictionWindageLossesMeas = scaleMixTimeSeries(frictionWindageLossesMeas, 1.0);
-
-openCircuitVoltageMeas = scaleMixTimeSeries(openCircuitVoltage2000rpmMeas, 1/2000, ...
-    openCircuitVoltage4000rpmMeas, 1/4000, openCircuitVoltage6000rpmMeas, 1/6000, ...
-    openCircuitVoltage8000rpmMeas, 1/8000);
-
-ironLossMeas = scaleMixTimeSeries(ironLoss2000rpmMeas, 1/2000, ...
-    ironLoss4000rpmMeas, 1/4000, ironLoss6000rpmMeas, 1/6000, ...
-    ironLoss8000rpmMeas, 1/8000);
-
-inductanceMeas = scaleMixTimeSeries(inductanceMeas, 1.0);
-
 %% Ajuste de curvas segundo método apropriado
 
-% Tipos de ajuste de curva
-quadraticFit = 'poly2';     % Ajuste por equação de segunda ordem
-cubicFit = 'poly3';         % Ajuste por equação de terceira ordem
-fourthOrderFit = 'poly4';   % Ajuste por equação de quarta ordem
+% 
+frictionWindageLossesFit = fitTimeSeries(frictionWindageLossesMeas, 'poly2');
+frictionWindageLosses = vectorToPolyFunctionHandle(frictionWindageLossesFit, 'omega_r');
 
-% Realização do ajuste de curvas segundo tipo escolhido para cada caso
-frictionWindageLossesFit = fitTimeSeries(frictionWindageLossesMeas, quadraticFit);
+% 
+openCircuitVoltageFit(1, :) = fitTimeSeries(openCircuitVoltage2000rpmMeas, 'sigmoid');
+openCircuitVoltageFit(2, :) = fitTimeSeries(openCircuitVoltage4000rpmMeas, 'sigmoid');
+openCircuitVoltageFit(3, :) = fitTimeSeries(openCircuitVoltage6000rpmMeas, 'sigmoid');
+openCircuitVoltageFit(4, :) = fitTimeSeries(openCircuitVoltage8000rpmMeas, 'sigmoid');
 
-openCircuitVoltageFit = fitTimeSeries(openCircuitVoltageMeas, fourthOrderFit);
+openCircuitVoltage{1} = @(i_f) openCircuitVoltageFit(1, 1)+(openCircuitVoltageFit(1, 2)-openCircuitVoltageFit(1, 1))./(1+10.^((openCircuitVoltageFit(1, 3)-i_f)*openCircuitVoltageFit(1, 4)));
+openCircuitVoltage{2} = @(i_f) openCircuitVoltageFit(2, 1)+(openCircuitVoltageFit(2, 2)-openCircuitVoltageFit(2, 1))./(1+10.^((openCircuitVoltageFit(2, 3)-i_f)*openCircuitVoltageFit(2, 4)));
+openCircuitVoltage{3} = @(i_f) openCircuitVoltageFit(3, 1)+(openCircuitVoltageFit(3, 2)-openCircuitVoltageFit(3, 1))./(1+10.^((openCircuitVoltageFit(3, 3)-i_f)*openCircuitVoltageFit(3, 4)));
+openCircuitVoltage{4} = @(i_f) openCircuitVoltageFit(4, 1)+(openCircuitVoltageFit(4, 2)-openCircuitVoltageFit(4, 1))./(1+10.^((openCircuitVoltageFit(4, 3)-i_f)*openCircuitVoltageFit(4, 4)));
 
-ironLossFit = fitTimeSeries(ironLossMeas, fourthOrderFit);
+i_f = 0.00:0.25:5.00;
+n_r = 2000:2000:8000;
+e_ll = zeros(length(n_r), length(i_f));
 
-inductanceFit = fitTimeSeries(inductanceMeas, cubicFit);
+e_ll(1, :) = openCircuitVoltage{1}(i_f);
+e_ll(2, :) = openCircuitVoltage{2}(i_f);
+e_ll(3, :) = openCircuitVoltage{3}(i_f);
+e_ll(4, :) = openCircuitVoltage{4}(i_f);
 
-%% Utilização dos parâmetros encontrados via ajuste de curvas para criar
-%  manipuladores de função
+openCircuitVoltageFun = 'n_r.*(a+(b-a)./(1+10.^((c-i_f)*d)))';
 
-frictionWindageLosses = vectorToPolyFunctionHandle(coeffvalues(frictionWindageLossesFit), 'omega_r');
+openCircuitVoltage = fitToFunction(customSurfaceFit(i_f, n_r, e_ll, openCircuitVoltageFun, 'i_f', 'n_r', 'e_ll', [0.292136752238811 0.165676040245502 0.164950588884314 0.906364323265215]));
 
-openCircuitVoltage = vectorToPolyFunctionHandle(coeffvalues(openCircuitVoltageFit), 'i_f');
+% 
+ironLossFit(1, :) = fitTimeSeries(ironLoss2000rpmMeas, 'poly7');
+ironLossFit(2, :) = fitTimeSeries(ironLoss4000rpmMeas, 'poly7');
+ironLossFit(3, :) = fitTimeSeries(ironLoss6000rpmMeas, 'poly7');
+ironLossFit(4, :) = fitTimeSeries(ironLoss8000rpmMeas, 'poly7');
 
-ironLoss = vectorToPolyFunctionHandle(coeffvalues(ironLossFit), 'i_f');
+ironLoss{1} = vectorToPolyFunctionHandle(ironLossFit(1, :), 'i_f');
+ironLoss{2} = vectorToPolyFunctionHandle(ironLossFit(2, :), 'i_f');
+ironLoss{3} = vectorToPolyFunctionHandle(ironLossFit(3, :), 'i_f');
+ironLoss{4} = vectorToPolyFunctionHandle(ironLossFit(4, :), 'i_f');
 
-inductance = vectorToPolyFunctionHandle(coeffvalues(inductanceFit), 'i_f');
+i_f = 0.00:0.25:5.00;
+n_r = 2000:2000:8000;
+p_i = zeros(length(n_r), length(i_f));
+
+p_i(1, :) = ironLoss{1}(i_f);
+p_i(2, :) = ironLoss{2}(i_f);
+p_i(3, :) = ironLoss{3}(i_f);
+p_i(4, :) = ironLoss{4}(i_f);
+
+ironLossFun = '(k_n0 + k_n1.*n_r).*(k_i0 + k_i1.*(i_f) + k_i2.*(i_f.^2) + k_i3.*(i_f.^3) + k_i4.*(i_f.^4) + k_i5.*(i_f.^5) + k_i6.*(i_f.^6) + k_i7.*(i_f.^7))';
+
+ironLoss = fitToFunction(customSurfaceFit(i_f, n_r, p_i, ironLossFun, 'i_f', 'n_r', 'p_i', [0.720855670816931 0.361022049194661 0.620278427071085 0.811150885100285 0.0192574774141414 0.0838735082828999 0.97480166718489 0.651349532415353 0.0186127747263861 0.231237816164352]));
+
+% 
+inductanceFit = fitTimeSeries(inductanceMeas, 'poly3');
+inductance = vectorToPolyFunctionHandle(inductanceFit, 'i_f');
 
 %% Registro das características implícitas em arquivo .MAT
 
@@ -266,16 +283,16 @@ if (alternatorParamPlotFlag)
     fplot(frictionWindageLosses, [2000 8000], 'b-'); hold off;
     
     figure(2)
-    fplot(@(i_f) 2000*openCircuitVoltage(i_f), [0 5], 'r-'); hold on;
-    fplot(@(i_f) 4000*openCircuitVoltage(i_f), [0 5], 'g-'); hold on;
-    fplot(@(i_f) 6000*openCircuitVoltage(i_f), [0 5], 'b-'); hold on;
-    fplot(@(i_f) 8000*openCircuitVoltage(i_f), [0 5], 'k-'); hold off;
+    fplot(@(i_f) openCircuitVoltage(i_f, 2000), [0 5], 'r-'); hold on;
+    fplot(@(i_f) openCircuitVoltage(i_f, 4000), [0 5], 'g-'); hold on;
+    fplot(@(i_f) openCircuitVoltage(i_f, 6000), [0 5], 'b-'); hold on;
+    fplot(@(i_f) openCircuitVoltage(i_f, 8000), [0 5], 'k-'); hold off;
     
     figure(3)
-    fplot(@(i_f) 2000*ironLoss(i_f), [0 5], 'r-'); hold on;
-    fplot(@(i_f) 4000*ironLoss(i_f), [0 5], 'g-'); hold on;
-    fplot(@(i_f) 6000*ironLoss(i_f), [0 5], 'b-'); hold on;
-    fplot(@(i_f) 8000*ironLoss(i_f), [0 5], 'k-'); hold off;
+    fplot(@(i_f) ironLoss(i_f, 2000), [0 5], 'r-'); hold on;
+    fplot(@(i_f) ironLoss(i_f, 4000), [0 5], 'g-'); hold on;
+    fplot(@(i_f) ironLoss(i_f, 6000), [0 5], 'b-'); hold on;
+    fplot(@(i_f) ironLoss(i_f, 8000), [0 5], 'k-'); hold off;
     
     figure(4)
     fplot(inductance, [0 5], 'b-'); hold off;
