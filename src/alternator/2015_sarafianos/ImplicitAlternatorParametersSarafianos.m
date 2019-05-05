@@ -220,10 +220,10 @@ openCircuitVoltageFit(2, :) = fitTimeSeries(openCircuitVoltage4000rpmMeas, 'sigm
 openCircuitVoltageFit(3, :) = fitTimeSeries(openCircuitVoltage6000rpmMeas, 'sigmoid');
 openCircuitVoltageFit(4, :) = fitTimeSeries(openCircuitVoltage8000rpmMeas, 'sigmoid');
 
-openCircuitVoltage{1} = @(i_f) openCircuitVoltageFit(1, 1)+(openCircuitVoltageFit(1, 2)-openCircuitVoltageFit(1, 1))./(1+10.^((openCircuitVoltageFit(1, 3)-i_f)*openCircuitVoltageFit(1, 4)));
-openCircuitVoltage{2} = @(i_f) openCircuitVoltageFit(2, 1)+(openCircuitVoltageFit(2, 2)-openCircuitVoltageFit(2, 1))./(1+10.^((openCircuitVoltageFit(2, 3)-i_f)*openCircuitVoltageFit(2, 4)));
-openCircuitVoltage{3} = @(i_f) openCircuitVoltageFit(3, 1)+(openCircuitVoltageFit(3, 2)-openCircuitVoltageFit(3, 1))./(1+10.^((openCircuitVoltageFit(3, 3)-i_f)*openCircuitVoltageFit(3, 4)));
-openCircuitVoltage{4} = @(i_f) openCircuitVoltageFit(4, 1)+(openCircuitVoltageFit(4, 2)-openCircuitVoltageFit(4, 1))./(1+10.^((openCircuitVoltageFit(4, 3)-i_f)*openCircuitVoltageFit(4, 4)));
+openCircuitVoltage{1} = vectorToSigmFunctionHandle(openCircuitVoltageFit(1, :), 'i_f');
+openCircuitVoltage{2} = vectorToSigmFunctionHandle(openCircuitVoltageFit(2, :), 'i_f');
+openCircuitVoltage{3} = vectorToSigmFunctionHandle(openCircuitVoltageFit(3, :), 'i_f');
+openCircuitVoltage{4} = vectorToSigmFunctionHandle(openCircuitVoltageFit(4, :), 'i_f');
 
 i_f = 0.00:0.25:5.00;
 n_r = 2000:2000:8000;
@@ -263,8 +263,8 @@ ironLossFun = '(k_n0 + k_n1.*n_r).*(k_i0 + k_i1.*(i_f) + k_i2.*(i_f.^2) + k_i3.*
 ironLoss = fitToFunction(customSurfaceFit(i_f, n_r, p_i, ironLossFun, 'i_f', 'n_r', 'p_i', [0.720855670816931 0.361022049194661 0.620278427071085 0.811150885100285 0.0192574774141414 0.0838735082828999 0.97480166718489 0.651349532415353 0.0186127747263861 0.231237816164352]));
 
 % 
-inductanceFit = fitTimeSeries(inductanceMeas, 'poly3');
-inductance = vectorToPolyFunctionHandle(inductanceFit, 'i_f');
+inductanceFit = fitTimeSeries(inductanceMeas, 'sigmoid');
+inductance = vectorToSigmFunctionHandle(inductanceFit, 'i_f');
 
 %% Registro das características implícitas em arquivo .MAT
 
