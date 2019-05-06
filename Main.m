@@ -48,7 +48,7 @@ alternatorParamPlotFlag = false;
 
 % Determina realização ou não do traçado dos parâmetros definidos por
 % função
-alternatorFuncParamPlotFlag = true;
+alternatorFuncParamPlotFlag = false;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';

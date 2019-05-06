@@ -263,8 +263,8 @@ ironLossFun = '(k_n0 + k_n1.*n_r).*(k_i0 + k_i1.*(i_f) + k_i2.*(i_f.^2) + k_i3.*
 ironLoss = fitToFunction(customSurfaceFit(i_f, n_r, p_i, ironLossFun, 'i_f', 'n_r', 'p_i', [0.720855670816931 0.361022049194661 0.620278427071085 0.811150885100285 0.0192574774141414 0.0838735082828999 0.97480166718489 0.651349532415353 0.0186127747263861 0.231237816164352]));
 
 % 
-inductanceFit = fitTimeSeries(inductanceMeas, 'sigmoid');
-inductance = vectorToSigmFunctionHandle(inductanceFit, 'i_f');
+inductanceFit = fitTimeSeries(inductanceMeas, 'poly3');
+inductance = vectorToPolyFunctionHandle(inductanceFit, 'i_f');
 
 %% Registro das características implícitas em arquivo .MAT
 
