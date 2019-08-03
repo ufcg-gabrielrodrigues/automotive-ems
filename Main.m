@@ -67,7 +67,7 @@ if (isfield(alternator.m_f, 'function'))
         figure(1)
         x = 0:1e-3:alternator.rotor.i_max;
         y = alternator.m_f.function(x);
-        plot(x, y);
+        plot(x, y, 'b-');
         xlabel('$i_{f}\,[A]$');
         ylabel('$m_{f}\,[\frac{V\,s}{A\,rad}]$');
         grid on;
@@ -96,7 +96,7 @@ if (isfield(alternator.stator.l, 'function'))
         figure(1)
         x = 0:1e-3:alternator.rotor.i_max;
         y = alternator.stator.l.function(x);
-        plot(x, y);
+        plot(x, y, 'b-');
         xlabel('$i_{f}\,[A]$');
         ylabel('$l_{s}\,[H]$');
         grid on;

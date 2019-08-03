@@ -146,7 +146,10 @@ if (alternatorParamPlotFlag)
     plot(openCircuitVoltage6000rpmMeas.time, openCircuitVoltage6000rpmMeas.data, 'bo'); hold on;
     plot(openCircuitVoltage8000rpmMeas.time, openCircuitVoltage8000rpmMeas.data, 'ko'); hold on;
     xlabel('$i_{f}\,[A]$');
-    ylabel('$e_{ll}\,[V]$');
+    ylabel('$e_{s,rms}^{ll}\,[V]$');
+    legend('$n_{r} = 2000\,rpm$', '$n_{r} = 4000\,rpm$', ...
+           '$n_{r} = 6000\,rpm$', '$n_{r} = 8000\,rpm$', ...
+           'Location', 'NorthWest');
     grid on;
     
     figure(3)
@@ -156,6 +159,9 @@ if (alternatorParamPlotFlag)
     plot(ironLoss8000rpmMeas.time, ironLoss8000rpmMeas.data, 'ko'); hold on;
     xlabel('$i_{f}\,[A]$');
     ylabel('$p_{i}\,[W]$');
+    legend('$n_{r} = 2000\,rpm$', '$n_{r} = 4000\,rpm$', ...
+           '$n_{r} = 6000\,rpm$', '$n_{r} = 8000\,rpm$', ...
+           'Location', 'NorthWest');
     grid on;
     
     figure(4)
@@ -163,6 +169,18 @@ if (alternatorParamPlotFlag)
     xlabel('$i_{f}\,[A]$');
     ylabel('$l_{s}\,[H]$');
     grid on;
+    
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss-exp', 'fig');
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss-exp', 'eps');
+    
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage-exp', 'fig');
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage-exp', 'eps');
+    
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss-exp', 'fig');
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss-exp', 'eps');
+    
+    saveFigure(figure(4), 'results/LundellAlternator/inductance-exp', 'fig');
+    saveFigure(figure(4), 'results/LundellAlternator/inductance-exp', 'eps');
 end
 
 %% Registro dos dados extraídos dos gráficos em arquivos .MAT
@@ -289,49 +307,50 @@ if (alternatorParamPlotFlag)
     x = 0:1e-3:5;
     
     y = openCircuitVoltage(x, 2000);
-    plot(x, y, 'r-'); hold on;
+    plot(x, y, 'r-', 'HandleVisibility', 'off'); hold on;
     
     y = openCircuitVoltage(x, 4000);
-    plot(x, y, 'g-'); hold on;
+    plot(x, y, 'g-', 'HandleVisibility', 'off'); hold on;
     
     y = openCircuitVoltage(x, 6000);
-    plot(x, y, 'b-'); hold on;
+    plot(x, y, 'b-', 'HandleVisibility', 'off'); hold on;
     
     y = openCircuitVoltage(x, 8000);
-    plot(x, y, 'k-'); hold off;
+    plot(x, y, 'k-', 'HandleVisibility', 'off'); hold off;
     
     figure(3)
     x = 0:1e-3:5;
     
     y = ironLoss(x, 2000);
-    plot(x, y, 'r-'); hold on;
+    plot(x, y, 'r-', 'HandleVisibility', 'off'); hold on;
     
     y = ironLoss(x, 4000);
-    plot(x, y, 'g-'); hold on;
+    plot(x, y, 'g-', 'HandleVisibility', 'off'); hold on;
     
     y = ironLoss(x, 6000);
-    plot(x, y, 'b-'); hold on;
+    plot(x, y, 'b-', 'HandleVisibility', 'off'); hold on;
     
     y = ironLoss(x, 8000);
-    plot(x, y, 'k-'); hold off;
+    plot(x, y, 'k-', 'HandleVisibility', 'off'); hold off;
     
     figure(4)
+    legend('off');
     x = 0:1e-3:5;
     
     y = inductance(x);
-    plot(x, y, 'b-'); hold off;
+    plot(x, y, 'b-', 'HandleVisibility', 'off'); hold off;
     
-    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'fig');
-    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'png');
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss-fit', 'fig');
+    saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss-fit', 'eps');
     
-    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage', 'fig');
-    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage', 'png');
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage-fit', 'fig');
+    saveFigure(figure(2), 'results/LundellAlternator/open-circuit-voltage-fit', 'eps');
     
-    saveFigure(figure(3), 'results/LundellAlternator/iron-loss', 'fig');
-    saveFigure(figure(3), 'results/LundellAlternator/iron-loss', 'png');
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss-fit', 'fig');
+    saveFigure(figure(3), 'results/LundellAlternator/iron-loss-fit', 'eps');
     
-    saveFigure(figure(4), 'results/LundellAlternator/inductance', 'fig');
-    saveFigure(figure(4), 'results/LundellAlternator/inductance', 'png');
+    saveFigure(figure(4), 'results/LundellAlternator/inductance-fit', 'fig');
+    saveFigure(figure(4), 'results/LundellAlternator/inductance-fit', 'eps');
 end
 
 %% Exclusão das variáveis excedentes

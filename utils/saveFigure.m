@@ -7,7 +7,7 @@ function [ output_args ] = saveFigure(handle, fileName, fileFormat)
     origSize = get(handle, 'Position'); % grab original on screen size
     set(handle, 'Position', [0 0 screen_size(3) screen_size(4)]); % set to scren size
     set(handle, 'PaperPositionMode','auto') % set paper pos for printing
-    saveas(handle, fileName, fileFormat) % save figure
+    export_fig(handle, [fileName '.' fileFormat], '-transparent'); % save figure
     set(handle, 'Position', origSize) % set back to original dimensions
 
 end
