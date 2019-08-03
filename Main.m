@@ -72,7 +72,7 @@ if (isfield(alternator.m_f, 'function'))
         ylabel('$m_{f}\,[\frac{V\,s}{A\,rad}]$');
         grid on;
         
-        fileName = sprintf('results/LundellAlternator/alternador-acoplamento-eletrico');
+        fileName = sprintf('results/LundellAlternator/alternador-indutancia-mutua');
         saveFigure(figure(1), fileName, 'fig');
         saveFigure(figure(1), fileName, 'eps');
         close all;

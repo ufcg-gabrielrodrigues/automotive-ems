@@ -19,7 +19,6 @@ component back_emf
         omega = { 0, 'rad/s' };         % Alternator electrical frequency
         theta = { 0, 'rad' };           % Alternator electrical argument 
         m_f = { 0, 'V/((rad/s)*(A))' }  % Armature-field mutual inductance
-        e = { 0, 'V' };                 % Back EMF peak
     end
     function setup
         if (floor(p) ~= p)
@@ -35,9 +34,8 @@ component back_emf
         omega == p*omega_r;
         theta == integ(omega);
         m_f == { 0, 'V/((rad/s)*(A))' };
-        e == m_f*omega*i_f;
-        e_a == e*cos(theta);
-        e_b == e*cos(theta + 2*pi/3);
-        e_c == e*cos(theta - 2*pi/3);
+        e_a == (m_f*omega*i_f)*sin(theta) - m_f.der*i_f*cos(theta) - m_f*i_f.der*cos(theta);
+        e_b == (m_f*omega*i_f)*sin(theta + 2*pi/3) - m_f.der*i_f*cos(theta + 2*pi/3) - m_f*i_f.der*cos(theta + 2*pi/3);
+        e_c == (m_f*omega*i_f)*sos(theta - 2*pi/3) - m_f.der*i_f*cos(theta - 2*pi/3) - m_f*i_f.der*cos(theta - 2*pi/3);
     end
 end
