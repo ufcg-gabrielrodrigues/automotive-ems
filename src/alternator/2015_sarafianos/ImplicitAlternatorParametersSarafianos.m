@@ -234,7 +234,7 @@ e_ll(2, :) = openCircuitVoltage{2}(i_f);
 e_ll(3, :) = openCircuitVoltage{3}(i_f);
 e_ll(4, :) = openCircuitVoltage{4}(i_f);
 
-openCircuitVoltageFun = 'n_r.*(a+(b-a)./(1+10.^((c-i_f)*d)))';
+openCircuitVoltageFun = 'n_r.*i_f.*(a+(b-a)./(1+10.^((c-i_f)*d)))';
 
 openCircuitVoltage = fitToFunction(customSurfaceFit(i_f, n_r, e_ll, openCircuitVoltageFun, 'i_f', 'n_r', 'e_ll', [0.292136752238811 0.165676040245502 0.164950588884314 0.906364323265215]));
 
@@ -280,22 +280,46 @@ save(implicitAlternatorCharacteristics, 'frictionWindageLosses', ...
 
 if (alternatorParamPlotFlag)
     figure(1)
-    fplot(frictionWindageLosses, [2000 8000], 'b-'); hold off;
+    x = 2000:1:8000;
+    
+    y = frictionWindageLosses(x);
+    plot(x, y, 'b-'); hold off;
     
     figure(2)
-    fplot(@(i_f) openCircuitVoltage(i_f, 2000), [0 5], 'r-'); hold on;
-    fplot(@(i_f) openCircuitVoltage(i_f, 4000), [0 5], 'g-'); hold on;
-    fplot(@(i_f) openCircuitVoltage(i_f, 6000), [0 5], 'b-'); hold on;
-    fplot(@(i_f) openCircuitVoltage(i_f, 8000), [0 5], 'k-'); hold off;
+    x = 0:1e-3:5;
+    
+    y = openCircuitVoltage(x, 2000);
+    plot(x, y, 'r-'); hold on;
+    
+    y = openCircuitVoltage(x, 4000);
+    plot(x, y, 'g-'); hold on;
+    
+    y = openCircuitVoltage(x, 6000);
+    plot(x, y, 'b-'); hold on;
+    
+    y = openCircuitVoltage(x, 8000);
+    plot(x, y, 'k-'); hold off;
     
     figure(3)
-    fplot(@(i_f) ironLoss(i_f, 2000), [0 5], 'r-'); hold on;
-    fplot(@(i_f) ironLoss(i_f, 4000), [0 5], 'g-'); hold on;
-    fplot(@(i_f) ironLoss(i_f, 6000), [0 5], 'b-'); hold on;
-    fplot(@(i_f) ironLoss(i_f, 8000), [0 5], 'k-'); hold off;
+    x = 0:1e-3:5;
+    
+    y = ironLoss(x, 2000);
+    plot(x, y, 'r-'); hold on;
+    
+    y = ironLoss(x, 4000);
+    plot(x, y, 'g-'); hold on;
+    
+    y = ironLoss(x, 6000);
+    plot(x, y, 'b-'); hold on;
+    
+    y = ironLoss(x, 8000);
+    plot(x, y, 'k-'); hold off;
     
     figure(4)
-    fplot(inductance, [0 5], 'b-'); hold off;
+    x = 0:1e-3:5;
+    
+    y = inductance(x);
+    plot(x, y, 'b-'); hold off;
     
     saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'fig');
     saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss', 'png');

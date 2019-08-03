@@ -11,10 +11,10 @@ clc;
 % Formatação
 set(groot, 'DefaultTextInterpreter', 'LaTeX');
 set(groot, 'DefaultLegendInterpreter', 'LaTeX');
-set(groot, 'DefaultTextFontSize', 20);
-set(groot, 'DefaultAxesFontSize', 20);
-set(groot, 'DefaultLegendFontSize', 20);
-set(groot, 'DefaultLineLineWidth', 1.5);
+set(groot, 'DefaultTextFontSize', 25);
+set(groot, 'DefaultAxesFontSize', 25);
+set(groot, 'DefaultLegendFontSize', 25);
+set(groot, 'DefaultLineLineWidth', 2.5);
 
 %% Identificação e adição do diretório principal e seus subdiretórios aos
 %  caminhos de busca do MATLAB
@@ -44,11 +44,11 @@ alternatorCalcParamFlag = true;
 
 % Determina realização ou não do traçado dos resultados da determinação de
 % parâmetros
-alternatorParamPlotFlag = false;
+alternatorParamPlotFlag = true;
 
 % Determina realização ou não do traçado dos parâmetros definidos por
 % função
-alternatorFuncParamPlotFlag = false;
+alternatorFuncParamPlotFlag = true;
 
 % Escolha do alternador a ser utilizado
 alternatorCase = 'Sarafianos2015';
@@ -56,18 +56,20 @@ alternatorCase = 'Sarafianos2015';
 % Executa script que determina parâmetros do alternador
 AlternatorParametersEMS;
 
-% Atualização de parâmetro: constante de acoplamento elétrico
-k_e_default = 'k_e == { 0, ''V/((rad/s)*(A))'' };';
+% Atualização de parâmetro: indutância mútua entre armadura e campo
+m_f_default = 'm_f == { 0, ''V/((rad/s)*(A))'' };';
 
-if (isfield(alternator.k_e, 'function'))
-    k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
-    k_e_str = strrep(k_e_str, 'i_f', '(i_f*{1,''1/A''})');
+if (isfield(alternator.m_f, 'function'))
+    m_f_str = regexprep(func2str(alternator.m_f.function), '@\(.+?\)', '');
+    m_f_str = strrep(m_f_str, 'i_f', '(i_f*{1,''1/A''})');
     
     if (alternatorFuncParamPlotFlag)
         figure(1)
-        fplot(alternator.k_e.function, [0 alternator.rotor.i_max]);
+        x = 0:1e-3:alternator.rotor.i_max;
+        y = alternator.m_f.function(x);
+        plot(x, y);
         xlabel('$i_{f}\,[A]$');
-        ylabel('$k_{e}\,[V/(A\cdot(rad/s))]$');
+        ylabel('$m_{f}\,[\frac{V\,s}{A\,rad}]$');
         grid on;
         
         fileName = sprintf('results/LundellAlternator/alternador-acoplamento-eletrico');
@@ -76,12 +78,12 @@ if (isfield(alternator.k_e, 'function'))
         close all;
     end
 else
-    k_e_str = num2str(alternator.k_e.value);
+    m_f_str = num2str(alternator.m_f.value);
 end
 
-k_e = ['k_e == { ' k_e_str ', ''V/((rad/s)*(A))'' };'];
+m_f = ['m_f == { ' m_f_str ', ''V/((rad/s)*(A))'' };'];
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    k_e_default, k_e);
+    m_f_default, m_f);
 
 % Atualização de parâmetro: indutância própria de estator
 l_s_default = 'l == { 1e-6, ''H'' };';
@@ -92,7 +94,9 @@ if (isfield(alternator.stator.l, 'function'))
     
     if (alternatorFuncParamPlotFlag)
         figure(1)
-        fplot(alternator.stator.l.function, [0 alternator.rotor.i_max]);
+        x = 0:1e-3:alternator.rotor.i_max;
+        y = alternator.stator.l.function(x);
+        plot(x, y);
         xlabel('$i_{f}\,[A]$');
         ylabel('$l_{s}\,[H]$');
         grid on;
@@ -132,10 +136,10 @@ LundellAlternatorRoutine;
 
 %% Redefinição de parâmetros de alternador
 
-% Atualização de parâmetro para valor padrão: constante de acoplamento
-% elétrico
+% Atualização de parâmetro para valor padrão: indutância mútua entre
+% armadura e campo
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/back_emf.ssc', ...
-    k_e, k_e_default);
+    m_f, m_f_default);
 
 % Atualização de parâmetro para valor padrão: indutância própria de estator
 replaceFileExpression('models/+SimscapeCustomBlocks/+Alternator/stator_inductance.ssc', ...

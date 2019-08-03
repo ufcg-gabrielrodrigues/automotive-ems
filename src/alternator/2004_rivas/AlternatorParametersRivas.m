@@ -23,7 +23,7 @@ if (alternatorCalcParamFlag)
     alternator.stator.connection = y;                           % Tipo de conexão do circuito de estator
     alternator.stator.l.value = 120e-6;                         % Indutância própria por fase do circuito de armadura [H]
     alternator.stator.r.value = 37e-3;                          % Resistência por fase do circuito de armadura [Ohm]
-    alternator.k_e.value = 10.716*sqrt(2)/((2*pi*180)*(3.6));	% Constante de acoplamento elétrico [V/((rad/s)*A)]
+    alternator.m_f.value = 10.716*sqrt(2)/((2*pi*180)*(3.6));	% Indutância mútua entre fase do circuito de armadura e circuito de excitação [V/((rad/s)*A)]
     alternator.stator.r.value = 37e-3;                      	% Resistência por fase do circuito de armadura na temperatura de referência [Ohm]
     alternator.stator.r.T_ref = 20;                           	% Temperatura de referência da resistência por fase do circuito de armadura [oC]
     alternator.stator.r.T = 20;                             	% Temperatura da resistência por fase do circuito de armadura [oC]
