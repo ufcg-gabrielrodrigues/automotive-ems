@@ -68,8 +68,8 @@ if (isfield(alternator.m_f, 'function'))
         x = 0:1e-3:alternator.rotor.i_max;
         y = alternator.m_f.function(x);
         plot(x, y, 'b-');
-        xlabel('$i_{f}\,[A]$');
-        ylabel('$m_{f}\,[\frac{V\,s}{A\,rad}]$');
+        xlabel('$i_{f}\,[\textrm{A}]$');
+        ylabel('$m_{f}\,\left[\frac{\textrm{V}\,\textrm{s}}{\textrm{A}\,\textrm{rad}}\right]$');
         grid on;
         
         fileName = sprintf('results/LundellAlternator/alternador-indutancia-mutua');
@@ -97,8 +97,8 @@ if (isfield(alternator.stator.l, 'function'))
         x = 0:1e-3:alternator.rotor.i_max;
         y = alternator.stator.l.function(x);
         plot(x, y, 'b-');
-        xlabel('$i_{f}\,[A]$');
-        ylabel('$l_{s}\,[H]$');
+        xlabel('$i_{f}\,[\textrm{A}]$');
+        ylabel('$l_{s}\,[\textrm{H}]$');
         grid on;
         
         fileName = sprintf('results/LundellAlternator/alternador-indutancia-estator');

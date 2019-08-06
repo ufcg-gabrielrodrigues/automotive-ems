@@ -136,8 +136,8 @@ inductanceFit = csvToTimeSeries(inductanceFit);
 if (alternatorParamPlotFlag)
     figure(1)
     plot(frictionWindageLossesMeas.time, frictionWindageLossesMeas.data, 'bo'); hold on;
-    xlabel('$n_{r}\,[rpm]$');
-    ylabel('$p_{f\&w}\,[W]$');
+    xlabel('$n_{r}\,[\textrm{rpm}]$');
+    ylabel('$p_{f\&w}\,[\textrm{W}]$');
     grid on;
     
     figure(2)
@@ -145,10 +145,10 @@ if (alternatorParamPlotFlag)
     plot(openCircuitVoltage4000rpmMeas.time, openCircuitVoltage4000rpmMeas.data, 'go'); hold on;
     plot(openCircuitVoltage6000rpmMeas.time, openCircuitVoltage6000rpmMeas.data, 'bo'); hold on;
     plot(openCircuitVoltage8000rpmMeas.time, openCircuitVoltage8000rpmMeas.data, 'ko'); hold on;
-    xlabel('$i_{f}\,[A]$');
-    ylabel('$e_{s,rms}^{ll}\,[V]$');
-    legend('$n_{r} = 2000\,rpm$', '$n_{r} = 4000\,rpm$', ...
-           '$n_{r} = 6000\,rpm$', '$n_{r} = 8000\,rpm$', ...
+    xlabel('$i_{f}\,[\textrm{A}]$');
+    ylabel('$e_{s,\textrm{rms}}^{ll}\,[\textrm{V}]$');
+    legend('$n_{r} = 2000\,\textrm{rpm}$', '$n_{r} = 4000\,\textrm{rpm}$', ...
+           '$n_{r} = 6000\,\textrm{rpm}$', '$n_{r} = 8000\,\textrm{rpm}$', ...
            'Location', 'NorthWest');
     grid on;
     
@@ -157,17 +157,17 @@ if (alternatorParamPlotFlag)
     plot(ironLoss4000rpmMeas.time, ironLoss4000rpmMeas.data, 'go'); hold on;
     plot(ironLoss6000rpmMeas.time, ironLoss6000rpmMeas.data, 'bo'); hold on;
     plot(ironLoss8000rpmMeas.time, ironLoss8000rpmMeas.data, 'ko'); hold on;
-    xlabel('$i_{f}\,[A]$');
-    ylabel('$p_{i}\,[W]$');
-    legend('$n_{r} = 2000\,rpm$', '$n_{r} = 4000\,rpm$', ...
-           '$n_{r} = 6000\,rpm$', '$n_{r} = 8000\,rpm$', ...
+    xlabel('$i_{f}\,[\textrm{A}]$');
+    ylabel('$p_{i}\,[\textrm{W}]$');
+    legend('$n_{r} = 2000\,\textrm{rpm}$', '$n_{r} = 4000\,\textrm{rpm}$', ...
+           '$n_{r} = 6000\,\textrm{rpm}$', '$n_{r} = 8000\,\textrm{rpm}$', ...
            'Location', 'NorthWest');
     grid on;
     
     figure(4)
     plot(inductanceMeas.time, inductanceMeas.data, 'bo'); hold on;
-    xlabel('$i_{f}\,[A]$');
-    ylabel('$l_{s}\,[H]$');
+    xlabel('$i_{f}\,[\textrm{A}]$');
+    ylabel('$l_{s}\,[\textrm{H}]$');
     grid on;
     
     saveFigure(figure(1), 'results/LundellAlternator/friction-windage-loss-exp', 'fig');
