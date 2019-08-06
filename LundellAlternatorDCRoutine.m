@@ -147,86 +147,87 @@ end
 
 %% Traço de resultados
 
-% Inicialização do índice de figuras
-figure_index = 0;
-
-% Cópia do vetor de tempo da simulação
-time = test_case_out(test_case_index).alternator.rotor.l.i.time;
-
-% Laço de iterações por casos de teste
-for test_case_index = 1:num_cases
+if (plotDCValidationFlag)
+    % Inicialização do índice de figuras
+    figure_index = 0;
     
-    figure_index = figure_index + 1;
+    % Cópia do vetor de tempo da simulação
+    time = test_case_out(test_case_index).alternator.rotor.l.i.time;
     
-    figure(figure_index)
-    subplot(3, 1, 1)
-    plot(test_case_out(test_case_index).alternator.rotor.l.i.time, test_case_out(test_case_index).alternator.rotor.l.i.data, 'b-');
-    hold on;
-    plot([0 t_f], [experimental_results(test_case_index, 1) experimental_results(test_case_index, 1)], 'r--');
-    hold on;
-    plot([0 t_f], [simulated_results(test_case_index, 1) simulated_results(test_case_index, 1)], 'g--');
-    hold on;
-    error_exp = abs(experimental_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
-    plot(time, error_exp, 'r:');
-    hold on;
-    error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
-    plot(time, error_sim, 'g:');
-    ylabel('$i_{f} [A]$');
-    ylim([0 1.05*max([test_case_out(test_case_index).alternator.rotor.l.i.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 1)])]);
-    legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', ...
-        'Erro absoluto relativo ao resultado experimental referenciado', ...
-        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
-    grid on;
+    % Laço de iterações por casos de teste
+    for test_case_index = 1:num_cases
+        
+        figure_index = figure_index + 1;
+        
+        figure(figure_index)
+        subplot(3, 1, 1)
+        plot(test_case_out(test_case_index).alternator.rotor.l.i.time, test_case_out(test_case_index).alternator.rotor.l.i.data, 'b-');
+        hold on;
+        plot([0 t_f], [experimental_results(test_case_index, 1) experimental_results(test_case_index, 1)], 'r--');
+        hold on;
+        plot([0 t_f], [simulated_results(test_case_index, 1) simulated_results(test_case_index, 1)], 'g--');
+        hold on;
+        error_exp = abs(experimental_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
+        plot(time, error_exp, 'r:');
+        hold on;
+        error_sim = abs(simulated_results(test_case_index, 1) - test_case_out(test_case_index).alternator.rotor.l.i.data);
+        plot(time, error_sim, 'g:');
+        ylabel('$i_{f}\,[\textrm{A}]$');
+        ylim([0 1.05*max([test_case_out(test_case_index).alternator.rotor.l.i.data(end) experimental_results(test_case_index, 1) simulated_results(test_case_index, 1)])]);
+        legend('Resultado simulado', 'Resultado experimental referenciado', ...
+            'Resultado simulado referenciado', ...
+            'Erro absoluto relativo ao resultado experimental referenciado', ...
+            'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
+        grid on;
+        
+        subplot(3, 1, 2)
+        plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, test_case_out(test_case_index).alternator.stator.output.v_ll.data, 'b-');
+        hold on;
+        plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
+        hold on;
+        plot([0 t_f], [simulated_results(test_case_index, 2) simulated_results(test_case_index, 2)], 'g--');
+        hold on;
+        error_exp = abs(experimental_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
+        plot(time, error_exp, 'r:');
+        hold on;
+        error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
+        plot(time, error_sim, 'g:');
+        ylabel('$v_{s,\textrm{rms}}^{ll}\,[\textrm{V}]$');
+        ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
+        legend('Resultado simulado', 'Resultado experimental referenciado', ...
+            'Resultado simulado referenciado', ...
+            'Erro absoluto relativo ao resultado experimental referenciado', ...
+            'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
+        grid on;
+        
+        subplot(3, 1, 3)
+        plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, test_case_out(test_case_index).alternator.stator.output.i_l.data, 'b-');
+        hold on;
+        plot([0 t_f], [experimental_results(test_case_index, 3) experimental_results(test_case_index, 3)], 'r--');
+        hold on;
+        plot([0 t_f], [simulated_results(test_case_index, 3) simulated_results(test_case_index, 3)], 'g--');
+        hold on;
+        error_exp = abs(experimental_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
+        plot(time, error_exp, 'r:');
+        hold on;
+        error_sim = abs(simulated_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
+        plot(time, error_sim, 'g:');
+        xlabel('$t [s]$');
+        ylabel('$i_{s,\textrm{rms}}^{ll}\,[\textrm{A}]$');
+        ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
+        legend('Resultado simulado', 'Resultado experimental referenciado', ...
+            'Resultado simulado referenciado', ...
+            'Erro absoluto relativo ao resultado experimental referenciado', ...
+            'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
+        grid on;
+    end
     
-    subplot(3, 1, 2)
-    plot(test_case_out(test_case_index).alternator.stator.output.v_ll.time, test_case_out(test_case_index).alternator.stator.output.v_ll.data, 'b-');
-    hold on;
-    plot([0 t_f], [experimental_results(test_case_index, 2) experimental_results(test_case_index, 2)], 'r--');
-    hold on;
-    plot([0 t_f], [simulated_results(test_case_index, 2) simulated_results(test_case_index, 2)], 'g--');
-    hold on;
-    error_exp = abs(experimental_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
-    plot(time, error_exp, 'r:');
-    hold on;
-    error_sim = abs(simulated_results(test_case_index, 2) - test_case_out(test_case_index).alternator.stator.output.v_ll.data);
-    plot(time, error_sim, 'g:');
-    ylabel('$v_{ll}^{RMS} [V]$');
-    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.v_ll.data(end) experimental_results(test_case_index, 2) simulated_results(test_case_index, 2)])]);
-    legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', ...
-        'Erro absoluto relativo ao resultado experimental referenciado', ...
-        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
-    grid on;
-    
-    subplot(3, 1, 3)
-    plot(test_case_out(test_case_index).alternator.stator.output.i_l.time, test_case_out(test_case_index).alternator.stator.output.i_l.data, 'b-');
-    hold on;
-    plot([0 t_f], [experimental_results(test_case_index, 3) experimental_results(test_case_index, 3)], 'r--');
-    hold on;
-    plot([0 t_f], [simulated_results(test_case_index, 3) simulated_results(test_case_index, 3)], 'g--');
-    hold on;
-    error_exp = abs(experimental_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
-    plot(time, error_exp, 'r:');
-    hold on;
-    error_sim = abs(simulated_results(test_case_index, 3) - test_case_out(test_case_index).alternator.stator.output.i_l.data);
-    plot(time, error_sim, 'g:');
-    xlabel('$t [s]$');
-    ylabel('$i_{l}^{RMS} [A]$');
-    ylim([0 1.05*max([test_case_out(test_case_index).alternator.stator.output.i_l.data(end) experimental_results(test_case_index, 3) simulated_results(test_case_index, 3)])]);
-    legend('Resultado simulado', 'Resultado experimental referenciado', ...
-        'Resultado simulado referenciado', ...
-        'Erro absoluto relativo ao resultado experimental referenciado', ...
-        'Erro absoluto relativo ao resultado simulado referenciado', 'Location', 'SouthEast');
-    grid on;
-end
-
-%% Armazenamento de figuras
-
-for i = 1:figure_index
-    fileName = sprintf('results/LundellAlternator/alternador-validacao-cc-%d', i);
-    saveFigure(figure(i), fileName, 'fig');
-    saveFigure(figure(i), fileName, 'png');
+    % Armazenamento de figuras
+    for i = 1:figure_index
+        fileName = sprintf('results/LundellAlternator/alternador-validacao-cc-%d', i);
+        saveFigure(figure(i), fileName, 'fig');
+        saveFigure(figure(i), fileName, 'png');
+    end
 end
 
 %% 
@@ -258,9 +259,9 @@ for test_case_index = 1:num_cases
 end
 
 % 
-xlswrite('results/LundellAlternator/validacao_cc.xlsx', i_f_validation, 'i_f');
-xlswrite('results/LundellAlternator/validacao_cc.xlsx', v_ll_validation, 'v_ll');
-xlswrite('results/LundellAlternator/validacao_cc.xlsx', i_l_validation, 'i_l');
+xlswrite('results/LundellAlternator/validacao_cc.xlsx', [param_sweep i_f_validation], 'i_f');
+xlswrite('results/LundellAlternator/validacao_cc.xlsx', [param_sweep v_ll_validation], 'v_ll');
+xlswrite('results/LundellAlternator/validacao_cc.xlsx', [param_sweep i_l_validation], 'i_l');
 
 %% Armazenamento dos resultados de simulação
 
