@@ -26,15 +26,15 @@ load_model = 1;
 % Efeito térmico na resistência do circuito de estator
 alternator.stator.r.T = 150;    % [oC]
 
-% Fator de acoplamento
-if (isfield(alternator.k_e, 'function'))
-    k_e_fun = @(i_f) alternator.k_e.function(i_f);
+% Indutância m�tua
+if (isfield(alternator.m_f, 'function'))
+    m_f_fun = @(i_f) alternator.m_f.function(i_f);
 else
-    k_e_fun = @(i_f) alternator.k_e.value;
+    m_f_fun = @(i_f) alternator.m_f.value;
 end
 
 if (alternator.stator.connection == delta)
-    k_e_fun = @(i_f) k_e_fun(i_f)./sqrt(3);
+    m_f_fun = @(i_f) m_f_fun(i_f)./sqrt(3);
 end
 
 % Indutância de estator
@@ -52,7 +52,7 @@ end
 omega_e = @(n_r) n_r.*(2.*pi./60).*alternator.p;
 
 % Função de cálculo da tensão induzida no estator
-v_s = @(n_r, i_f) k_e_fun(i_f).*omega_e(n_r).*i_f;
+v_s = @(n_r, i_f) m_f_fun(i_f).*omega_e(n_r).*i_f;
 
 %% Modelos analíticos para cálculo de potência
 
@@ -65,15 +65,12 @@ p_z_o = @(n_r, i_f, z_o) ((3.*pi.*v_s(n_r, i_f)).^2.*z_o)./((pi.^2.*omega_e(n_r)
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [0.01 0.5:0.5:5.0]';     % Corrente de excitação máxima [A]
-n_r_list = (2000:500:7500)';       	% Velocidade do alternador [rpm]
+i_f_list = [0.01 1.0:1.0:5.0]';     % Corrente de excitação máxima [A]
+n_r_list = (2000:500:7500)';     	% Velocidade do alternador [rpm]
 v_o_list = (0.0:1.0:80.0)';       	% Tensão de saída [V]
 z_o_list = [0.01 0.05:0.05:2.0]';   % Impedância de saída [Ohm]
 
 %% Parâmetros auxiliares para figuras
-
-% �?ndice de figuras
-figure_index = 0;
 
 % Cores
 colors_n_r = distinguishable_colors(length(n_r_list));
@@ -140,7 +137,11 @@ simOut = reshape(simOut, [length(n_r_list) length(i_f_list) length(v_o_list)]);
 for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         for v_o_index = 1:length(v_o_list)
-            p_v_o_sim(n_r_index, i_f_index, v_o_index) = mean(simOut(n_r_index, i_f_index, v_o_index).p_l.data(round(end/2):end));
+            if (isempty(simOut(n_r_index, i_f_index, v_o_index).ErrorMessage))
+                p_v_o_sim(n_r_index, i_f_index, v_o_index) = mean(simOut(n_r_index, i_f_index, v_o_index).p_l.data(round(end/2):end));
+            else
+                p_v_o_sim(n_r_index, i_f_index, v_o_index) = nan;
+            end
         end
     end
 end
@@ -169,6 +170,12 @@ v_o_mpp_fit = customSurfaceFit((alternator.p*2*pi/60)*squeeze(n_r_grid(:, :, 1))
 
 %% Traço dos resultados relativos à variação da tensão da carga
 
+% �?ndice de figuras
+figure_index = 0;
+
+% Lista de t�tulos
+tit = cell(length(i_f_list) + length(n_r_list) + 2);
+
 % 
 for i_f_index = 1:length(i_f_list)
     
@@ -178,7 +185,7 @@ for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         
         plot(v_o_list, squeeze(p_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_n_r(n_r_index, :), ...
-            'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
+            'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) '\,\textrm{rpm}$']);
         hold on;
         plot(v_o_mpp_ana(n_r_index, i_f_index, :), p_v_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
             'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
@@ -193,9 +200,9 @@ for i_f_index = 1:length(i_f_list)
         legend('show');
     end
     
-    title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$)']);
-    xlabel('$v_o$ $[V]$');
-    ylabel('$p_o$ $[W]$');
+    tit{figure_index} = ['mpp-vo-if-' num2str(i_f_list(i_f_index))];
+    xlabel('$v_{o}\,[\textrm{V}]$');
+    ylabel('$p_{o}\,[\textrm{W}]$');
     leg = legend;
     leg.Location = 'NorthWest';
     grid on;
@@ -210,7 +217,7 @@ for n_r_index = 1:length(n_r_list)
     for i_f_index = 1:length(i_f_list)
         
         plot(v_o_list, squeeze(p_v_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_i_f(i_f_index, :), ...
-            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index)) ' A$']);
+            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index), '%1.2f') '\,\textrm{A}$']);
         hold on;
         plot(v_o_mpp_ana(n_r_index, i_f_index, :), p_v_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
             'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
@@ -225,9 +232,9 @@ for n_r_index = 1:length(n_r_list)
         legend('show');
     end
     
-    title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
-    xlabel('$v_o$ $[V]$');
-    ylabel('$p_o$ $[W]$');
+    tit{figure_index} = ['mpp-vo-nr-' num2str(n_r_list(n_r_index))];
+    xlabel('$v_{o}\,[\textrm{V}]$');
+    ylabel('$p_{o}\,[\textrm{W}]$');
     leg = legend;
     leg.Location = 'NorthWest';
     grid on;
@@ -244,10 +251,10 @@ hold on;
 h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), v_o_mpp_sim);
 colormap(winter);
 
-title('Superf{\''i}cies de tens{\~{a}}o de m{\''{a}}xima pot{\^{e}}ncia');
-xlabel('$n_r$ $[rpm]$');
-ylabel('$i_f$ $[A]$');
-zlabel('$v_o$ $[V]$');
+tit{figure_index} = 'mpp-vo-sup';
+xlabel('$n_{r}\,[\textrm{rpm}]$');
+ylabel('$i_{f}\,[\textrm{A}]$');
+zlabel('$v_{o}\,[\textrm{V}]$');
 legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
     'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
 grid on;
@@ -262,13 +269,21 @@ hold on;
 h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), p_v_o_mpp_sim);
 colormap(winter);
 
-title('Superf{\''i}cies de m{\''{a}}xima pot{\^{e}}ncia');
-xlabel('$n_r$ $[rpm]$');
-ylabel('$i_f$ $[A]$');
-zlabel('$p_o$ $[W]$');
+tit{figure_index} = 'mpp-po-v-sup';
+xlabel('$n_{r}\,[\textrm{rpm}]$');
+ylabel('$i_{f}\,[\textrm{A}]$');
+zlabel('$p_{o}\,[\textrm{W}]$');
 legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
     'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
 grid on;
+
+%% Armazenamento de figuras
+
+for i = 1:figure_index
+    fileName = ['results/PowerAnalysis/' tit{i}];
+    saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'eps');
+end
 
 %% Armazenamento dos resultados de simulação
 
@@ -322,7 +337,11 @@ simOut = reshape(simOut, [length(n_r_list) length(i_f_list) length(z_o_list)]);
 for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         for z_o_index = 1:length(z_o_list)
-            p_z_o_sim(n_r_index, i_f_index, z_o_index) = mean(simOut(n_r_index, i_f_index, z_o_index).p_l.data(round(end/2):end));
+            if (isempty(simOut(n_r_index, i_f_index, z_o_index).ErrorMessage))
+                p_z_o_sim(n_r_index, i_f_index, z_o_index) = mean(simOut(n_r_index, i_f_index, z_o_index).p_l.data(round(end/2):end));
+            else
+                p_z_o_sim(n_r_index, i_f_index, z_o_index) = nan;
+            end
         end
     end
 end
@@ -351,6 +370,12 @@ z_o_mpp_fit = customSurfaceFit((alternator.p*2*pi/60)*squeeze(n_r_grid(:, :, 1))
 
 %% Traço dos resultados relativos à variação da impedância da carga
 
+% �?ndice de figuras
+figure_index = 0;
+
+% Lista de t�tulos
+tit = cell(length(i_f_list) + length(n_r_list) + 2);
+
 % 
 for i_f_index = 1:length(i_f_list)
     
@@ -360,7 +385,7 @@ for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         
         plot(z_o_list, squeeze(p_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_n_r(n_r_index, :), ...
-            'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) ' rpm$']);
+            'DisplayName', ['$n_{r} = ' num2str(n_r_list(n_r_index)) '\,\textrm{rpm}$']);
         hold on;
         plot(z_o_mpp_ana(n_r_index, i_f_index, :), p_z_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
             'Color', colors_n_r(n_r_index, :), 'HandleVisibility', 'off');
@@ -375,9 +400,9 @@ for i_f_index = 1:length(i_f_list)
         legend('show');
     end
     
-    title(['Curvas de pot{\^{e}}ncia indexadas pela imped{\^{a}}ncia da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$)']);
-    xlabel('$z_o$ $[\Omega]$');
-    ylabel('$p_o$ $[W]$');
+    tit{figure_index} = ['mpp-zo-if-' num2str(i_f_list(i_f_index))];
+    xlabel('$z_{o}\,[\mathrm{\Omega}]$');
+    ylabel('$p_{o}\,[\textrm{W}]$');
     leg = legend;
     leg.Location = 'NorthEast';
     grid on;
@@ -392,7 +417,7 @@ for n_r_index = 1:length(n_r_list)
     for i_f_index = 1:length(i_f_list)
         
         plot(z_o_list, squeeze(p_z_o_ana(n_r_index, i_f_index, :)), '-', 'Color', colors_i_f(i_f_index, :), ...
-            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index)) ' A$']);
+            'DisplayName', ['$i_{f} = ' num2str(i_f_list(i_f_index), '%1.2f') '\,\textrm{A}$']);
         hold on;
         plot(z_o_mpp_ana(n_r_index, i_f_index, :), p_z_o_mpp_ana(n_r_index, i_f_index, :), 'o', ...
             'Color', colors_i_f(i_f_index, :), 'HandleVisibility', 'off');
@@ -407,9 +432,9 @@ for n_r_index = 1:length(n_r_list)
         legend('show');
     end
     
-    title(['Curvas de pot{\^{e}}ncia indexadas pela imped{\^{a}}ncia da carga ($n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
-    xlabel('$z_o$ $[\Omega]$');
-    ylabel('$p_o$ $[W]$');
+    tit{figure_index} = ['mpp-zo-nr-' num2str(n_r_list(n_r_index))];
+    xlabel('$z_{o}\,[\mathrm{\Omega}]$');
+    ylabel('$p_{o}\,[\textrm{W}]$');
     leg = legend;
     leg.Location = 'NorthEast';
     grid on;
@@ -426,10 +451,10 @@ hold on;
 h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), z_o_mpp_sim);
 colormap(winter);
 
-title('Superf{\''i}cies de imped{\^{a}}ncia de m{\''{a}}xima pot{\^{e}}ncia');
-xlabel('$n_r$ $[rpm]$');
-ylabel('$i_f$ $[A]$');
-zlabel('$z_o$ $[\Omega]$');
+tit{figure_index} = 'mpp-zo-sup';
+xlabel('$n_{r}\,[\textrm{rpm}]$');
+ylabel('$i_{f}\,[\textrm{A}]$');
+zlabel('$z_{o}\,[\mathrm{\Omega}]$');
 legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
     'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
 grid on;
@@ -444,26 +469,27 @@ hold on;
 h_mpp_sim = surf(squeeze(n_r_grid(:, :, 1)), squeeze(i_f_grid(:, :, 1)), p_z_o_mpp_sim);
 colormap(winter);
 
-title('Superf{\''i}cies de m{\''{a}}xima pot{\^{e}}ncia');
-xlabel('$n_r$ $[rpm]$');
-ylabel('$i_f$ $[A]$');
-zlabel('$p_o$ $[W]$');
+tit{figure_index} = 'mpp-po-z-sup';
+xlabel('$n_{r}\,[\textrm{rpm}]$');
+ylabel('$i_{f}\,[\textrm{A}]$');
+zlabel('$p_{o}\,[\textrm{W}]$');
 legend([h_mpp_ana, h_mpp_sim], {'Superf{\''i}cie obtida analiticamente', ...
     'Superf{\''i}cie obtida via simula{\c{c}}{\~{a}}o'}, 'Location', 'NorthEast');
 grid on;
+
+%% Armazenamento de figuras
+
+for i = 1:figure_index
+    fileName = ['results/PowerAnalysis/' tit{i}];
+    saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'eps');
+end
 
 %% Armazenamento dos resultados de simulação
 
 save('results/PowerAnalysis/p_z_o.mat', 'simIn', 'simOut', 'p_z_o_ana', 'p_z_o_sim', ...
     'p_z_o_mpp_ana', 'p_z_o_mpp_sim', 'p_z_o_mpp_ana_fit', 'p_z_o_mpp_sim_fit', ...
     'z_o_mpp_ana', 'z_o_mpp_sim', 'z_o_mpp_fit', '-v7.3');
-
-%% Armazenamento de figuras
-
-for i = 1:figure_index
-    fileName = sprintf('results/PowerAnalysis/Figura_%d', i);
-    saveFigure(figure(i), fileName, 'fig');
-end
 
 %% Armazenamento dos resultados de simulação
 
