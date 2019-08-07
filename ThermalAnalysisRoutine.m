@@ -10,14 +10,14 @@ t_f = 1.0e-2;   % Tempo total de simulação [s]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-i_f_list = [1.0 3.0 4.5]';                  % Corrente de excitação máxima [A]
+i_f_list = [1.0 3.0 5.0]';                  % Corrente de excitação máxima [A]
 n_r_list = [2000 3500 5000 7500]';          % Velocidade do alternador [rpm]
-T_list = [20.0 50.0 100.0 150.0 200.0]';    % Temperaturas da resist�ncia de enrolamento de estator [oC]
+T_list = [20.0 50.0 100.0 150.0 200.0]';    % Temperaturas da resistência de enrolamento de estator [oC]
 v_o_list = (0.0:1.0:80.0)';                 % Tensão de saída [V]
 
 %% Parâmetros auxiliares para figuras
 
-% �?ndice de figuras
+% Índice de figuras
 figure_index = 0;
 
 % Cores
@@ -93,7 +93,11 @@ for i_f_index = 1:length(i_f_list)
     for n_r_index = 1:length(n_r_list)
         for T_index = 1:length(T_list)
             for v_o_index = 1:length(v_o_list)
-                p_o(i_f_index, n_r_index, T_index, v_o_index) = mean(simOut(i_f_index, n_r_index, T_index, v_o_index).p_l.data(round(end/2):end));
+                if (isempty(simOut(i_f_index, n_r_index, T_index, v_o_index).ErrorMessage))
+                    p_o(i_f_index, n_r_index, T_index, v_o_index) = mean(simOut(i_f_index, n_r_index, T_index, v_o_index).p_l.data(round(end/2):end));
+                else
+                    p_o(i_f_index, n_r_index, T_index, v_o_index) = nan;
+                end
             end
         end
     end
@@ -108,6 +112,9 @@ v_o_mpp = v_o_list(v_o_mpp_index);
 %% Traço dos resultados relativos à variação da tensão da carga
 
 % 
+tit = cell(length(i_f_list) * length(n_r_list));
+
+% 
 for i_f_index = 1:length(i_f_list)
     
     for n_r_index = 1:length(n_r_list)
@@ -118,7 +125,7 @@ for i_f_index = 1:length(i_f_list)
         for T_index = 1:length(T_list)
             
             plot(v_o_list, squeeze(p_o(i_f_index, n_r_index, T_index, :)), '-', 'Color', colors(T_index, :), ...
-                'DisplayName', ['$T = ' num2str(T_list(T_index)) '^{o}C$']);
+                'DisplayName', ['$T = ' num2str(T_list(T_index)) '^{o}\textrm{C}$']);
             hold on;
             plot(v_o_mpp(i_f_index, n_r_index, T_index, :), p_o_mpp(i_f_index, n_r_index, T_index, :), 'o', ...
                 'Color', colors(T_index, :), 'HandleVisibility', 'off');
@@ -128,9 +135,9 @@ for i_f_index = 1:length(i_f_list)
             
         end
         
-        title(['Curvas de pot{\^{e}}ncia indexadas pela tens{\~{a}}o da carga ($i_{f}$ $=$ $' num2str(i_f_list(i_f_index)) '$ $[A]$; $n_{r}$ $=$ $' num2str(n_r_list(n_r_index)) '$ $[rpm]$)']);
-        xlabel('$v_o$ $[V]$');
-        ylabel('$p_o$ $[W]$');
+        tit{figure_index} = ['po-vo-if-' num2str(i_f_list(i_f_index)) '-nr-' num2str(n_r_list(n_r_index))];
+        xlabel('$v_{o}\,[\textrm{V}]$');
+        ylabel('$p_{o}\,[\textrm{W}]$');
         leg = legend;
         leg.Location = 'NorthWest';
         grid on;
@@ -140,8 +147,9 @@ end
 %% Armazenamento de figuras
 
 for i = 1:figure_index
-    fileName = sprintf('results/ThermalAnalysis/Figura_%d', i);
+    fileName = ['results/ThermalAnalysis/' tit{i}];
     saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'eps');
 end
 
 %% Armazenamento dos resultados de simulação
