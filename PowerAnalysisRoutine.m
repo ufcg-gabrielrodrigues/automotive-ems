@@ -26,7 +26,7 @@ load_model = 1;
 % Efeito térmico na resistência do circuito de estator
 alternator.stator.r.T = 150;    % [oC]
 
-% Indutância mútua
+% Indut�ncia m�tua
 if (isfield(alternator.m_f, 'function'))
     m_f_fun = @(i_f) alternator.m_f.function(i_f);
 else
@@ -37,7 +37,7 @@ if (alternator.stator.connection == delta)
     m_f_fun = @(i_f) m_f_fun(i_f)./sqrt(3);
 end
 
-% Indutância por fase da armadura
+% Indut�ncia por fase da armadura
 if (isfield(alternator.stator.l, 'function'))
     l_s_fun = @(i_f) alternator.stator.l.function(i_f);
 else
@@ -48,19 +48,32 @@ if (alternator.stator.connection == delta)
     l_s_fun = @(i_f) l_s_fun(i_f)./3;
 end
 
-% Função de cálculo da frequência elétrica
-omega = @(n_r) n_r.*(2.*pi./60).*alternator.p;
-
-% Função de cálculo da tensão induzida no estator
-v_s = @(n_r, i_f) m_f_fun(i_f).*omega(n_r).*i_f;
-
 %% Modelos analíticos para cálculo de potência
 
+% Em caso de m_f e l_s serem funções, em que valor de i_f elas devem ser avaliadas
+i_f_set = 5.0;
+
+m_f = m_f_fun(i_f_set);
+l_s = l_s_fun(i_f_set);
+
+% Leitura de corrente de campo
+i_f_reading_flag = false;
+
+% Frequência elétrica
+omega = @(n_r) n_r.*(2.*pi./60).*alternator.p;
+
+% Tensão induzida no estator
+if (i_f_reading_flag)
+    v_s = @(n_r, i_f) m_f.*omega(n_r).*i_f;
+else
+    v_s = @(n_r, i_f) m_f.*omega(n_r).*i_f_set;
+end
+
 % Carga de tensão constante
-p_v_dc = @(n_r, i_f, v_dc) (3.*v_dc./pi).*(sqrt(v_s(n_r, i_f).^2 - (2.*v_dc./pi).^2))./(omega(n_r).*l_s_fun(i_f));
+p_v_dc = @(n_r, i_f, v_dc) (3.*v_dc./pi).*(sqrt(v_s(n_r, i_f).^2 - (2.*v_dc./pi).^2))./(omega(n_r).*l_s);
 
 % Carga de impedância constante
-p_z_dc = @(n_r, i_f, z_dc) ((3.*pi.*v_s(n_r, i_f)).^2.*z_dc)./((pi.^2.*omega(n_r).*l_s_fun(i_f)).^2 + (6.*z_dc).^2);
+p_z_dc = @(n_r, i_f, z_dc) ((3.*pi.*v_s(n_r, i_f)).^2.*z_dc)./((pi.^2.*omega(n_r).*l_s).^2 + (6.*z_dc).^2);
 
 %% Varredura de parâmetros
 
