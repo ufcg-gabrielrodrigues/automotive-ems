@@ -11,27 +11,27 @@ t_f = 3.0e-1;   % Tempo total de simulação [s]
 
 %% Esquema de controle
 
-% Atualização de parâmetro: fator de acoplamento
-k_e_default_local = 'k_e = 0;';
+% Atualização de parâmetro: indutância mútua
+m_f_default_local = 'm_f = 0;';
 
-if (isfield(alternator.k_e, 'function'))
-    k_e_str = regexprep(func2str(alternator.k_e.function), '@\(.+?\)', '');
+if (isfield(alternator.m_f, 'function'))
+    m_f_str = regexprep(func2str(alternator.m_f.function), '@\(.+?\)', '');
 else
-    k_e_str = num2str(alternator.k_e.value);
+    m_f_str = num2str(alternator.m_f.value);
 end
 
 if (alternator.stator.connection == delta)
-    k_e_str = ['(' k_e_str ')./sqrt(3)'];
+    m_f_str = ['(' m_f_str ')./sqrt(3)'];
 end
 
-k_e_local = ['k_e = ' k_e_str ';'];
+m_f_local = ['m_f = ' m_f_str ';'];
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, k_e_default_local, k_e_local);
+blockHandle.Script = strrep(blockHandle.Script, m_f_default_local, m_f_local);
 
 %% Alternador
 
 % Corrente de excitação máxima
-i_f_max = 4.5;                  % [A]
+i_f_max = 5;                    % [A]
 
 % Temperatura da resistência do circuito de estator
 alternator.stator.r.T = 150;    % [oC]
@@ -48,30 +48,13 @@ battery.v_nom = 80.0;   % [V]
 %% Varredura de parâmetros
 
 % Lista de parâmetros a serem varridos individualmente
-dynamic_v_l_list = [false]';        % Atualização dinâmica da tensão de saída para lei de controle
-n_r_list = (2000:500:7500)';        % Velocidade do alternador [rpm]
-r_l_list = [0.15 (0.5:0.5:2.0)]';	% Resistência de carga [Ohm]
+p_l_max = [4110; 5280; 6350; 7445];
+n_r_list = (4500:1000:7500)';   % Velocidade do alternador [rpm]
+k_p_list = [1]';                % 
+k_i_list = [0 1]';              % 
 
 % Formação das casos de varredura
-param_sweep = [];
-
-for index_dynamic_v_l = 1:length(dynamic_v_l_list)
-    
-    n_r_sweep = [];
-    [r_l_dim, ~] = size(r_l_list);
-    
-    for index_n_r = 1:length(n_r_list)
-        n_r_tmp = n_r_list(index_n_r) * ones(r_l_dim, 1);
-        n_r_tmp = [n_r_tmp, r_l_list];
-        n_r_sweep = [n_r_sweep; n_r_tmp];
-    end
-    
-    [n_r_sweep_dim, ~] = size(n_r_sweep);
-    
-    dynamic_v_l_tmp = index_dynamic_v_l * ones(n_r_sweep_dim, 1);
-    dynamic_v_l_tmp = [dynamic_v_l_tmp, n_r_sweep];
-    param_sweep = [param_sweep; dynamic_v_l_tmp];
-end
+param_sweep = combvec(n_r_list', k_p_list', k_i_list')';
 
 %% Parâmetros de simulação
 
@@ -94,14 +77,14 @@ save_system('models/HybridMPPT.slx');
 
 for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
-    dynamic_v_l = test_case(1);
-    n_r = test_case(2);
-    r_l = test_case(3);
+    n_r = test_case(1);
+    k_p = test_case(2);
+    k_i = test_case(3);
     
     simIn(test_case_index) = Simulink.SimulationInput('HybridMPPT');
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/dynamic_v_l','Value', num2str(dynamic_v_l));
     simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/n_r', 'Value', num2str(n_r));
-    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/Load/r_l', 'R', num2str(r_l));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/k_p', 'Gain', num2str(k_p));
+    simIn(test_case_index) = simIn(test_case_index).setBlockParameter('HybridMPPT/k_i', 'Gain', num2str(k_i));
 end
 
 %% Execução da simulação em ambiente Simulink
@@ -112,9 +95,9 @@ simOut = parsim(simIn, 'ShowProgress', 'on', 'ShowSimulationManager', 'on', ...
 
 %% Redefinição de parâmetros de alternador
 
-% Atualização de parâmetro para valor padrão: fator de acoplamento
+% Atualização de parâmetro para valor padrão: indutância mútua
 blockHandle = find(slroot, '-isa', 'Stateflow.EMChart', 'Path', 'HybridMPPT/Load Matching Switched-Mode Rectifier Controller/MATLAB Function');
-blockHandle.Script = strrep(blockHandle.Script, k_e_local, k_e_default_local);
+blockHandle.Script = strrep(blockHandle.Script, m_f_local, m_f_default_local);
 
 %% Finaliza modelo no Simulink
 
@@ -129,146 +112,132 @@ for test_case_index = 1:num_cases
     test_case = param_sweep(test_case_index, :);
     
     % Valor de variáveis correspondentes ao caso de teste
-    dynamic_v_l = test_case(1);
-    n_r = test_case(2);
-    r_l = test_case(3);
+    n_r = test_case(1);
+    k_p = test_case(2);
+    k_i = test_case(3);
     
     % Esquema de controle
-    test_case_out(test_case_index).dynamic_v_l = dynamic_v_l;
+    test_case_out(test_case_index).k_p = k_p;
+    test_case_out(test_case_index).k_i = k_i;
     
     % Alternador
     test_case_out(test_case_index).alternator.rotor.n = n_r;
-    test_case_out(test_case_index).alternator.rotor.l.i = simOut(test_case_index).i_f;
+    test_case_out(test_case_index).alternator.rotor.l.i = i_f_max;
     
     % Retificador
     test_case_out(test_case_index).rectifier.control.u = simOut(test_case_index).u_smr;
     
     % Carga
-    test_case_out(test_case_index).electrical_load.r = r_l;
     test_case_out(test_case_index).electrical_load.v = simOut(test_case_index).v_l;
     test_case_out(test_case_index).electrical_load.i = simOut(test_case_index).i_l;
     test_case_out(test_case_index).electrical_load.p = simOut(test_case_index).p_l;
 end
 
-%% Carregamento de resultados de an�lise de pot�ncia
+%% Verifica��o de an�lise de pot�ncia
 
-try
-    simEnv = load('results/PowerAnalysis/simEnv.mat', 'i_f_list', 'n_r_list');
-    p_v_o = load('results/PowerAnalysis/p_v_o.mat', 'p_v_o_mpp_sim');
+if (length(p_l_max) == length(n_r_list))
     power_analysis_flag = true;
-catch
+else
     power_analysis_flag = false;
 end
 
 %% Resultados comparativos
 
+%
 figure_index = 0;
 
-test_cases = param_sweep(param_sweep(:, 1) == 1, 2:3);
+%
+cmp_dim = length(k_p_list)*length(k_i_list);
 
 % Cores
 if (power_analysis_flag)
-    colors = distinguishable_colors(length(dynamic_v_l_list) + 1);
+    colors = distinguishable_colors(cmp_dim + 1);
 else
-    colors = distinguishable_colors(length(dynamic_v_l_list));
+    colors = distinguishable_colors(cmp_dim);
 end
 
 [color_dim, ~] = size(colors);
 
-% Casos a serem plotados
-n_r_plot = [3500; 5000; 6500];
-r_l_plot = 1;
+%
+param_sweep = [param_sweep (1:length(param_sweep))'];
+param_sweep = sortrows(param_sweep, 1);
 
-for test_case_index = 1:num_cases/length(dynamic_v_l_list)
+for test_case_index = 1:num_cases/cmp_dim
     %
-    i_f = i_f_max;
-    n_r = test_cases(test_case_index, 1);
-    r_l = test_cases(test_case_index, 2);
+    test_case = param_sweep(1:cmp_dim, :);
+    param_sweep(1:cmp_dim, :) = [];
     
-    if (sum(n_r == n_r_plot) && sum(r_l == r_l_plot))
-        %
-        i_f_index = find(simEnv.i_f_list == i_f);
-        n_r_index = find(simEnv.n_r_list == n_r);
+    %
+    n_r = test_case(1, 1);
+    
+    figure_index = figure_index + 1;
+    figure(figure_index)
+    
+    subplot(2, 1, 1)
+    
+    for cmp_case = 1:cmp_dim
+        k_p = test_case(cmp_case, 2);
+        k_i = test_case(cmp_case, 3);
         
-        %
-        figure_index = figure_index + 1;
-        figure(figure_index)
-        
-        subplot(3, 1, 1)
-        
-        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p.time, ...
-                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.p.data, ...
-                'Color', colors(dynamic_v_l_index, :));
+        if (k_p == 0 && k_i == 0)
+            leg = '\textit{Load matching} desligado';
+        elseif (k_p == 0 && k_i == 1)
+            leg = 'ESC';
+        elseif (k_p == 1 && k_i == 0)
+            leg = 'Anal{\''{i}}tico';
+        elseif (k_p == 1 && k_i == 1)
+            leg = 'H{\''{i}}brido';
+        end
             
-            hold on;
-        end
+        plot(test_case_out(test_case(cmp_case, end)).electrical_load.p.time, ...
+            test_case_out(test_case(cmp_case, end)).electrical_load.p.data, ...
+            'Color', colors(cmp_case, :), 'DisplayName', leg);
         
-        if (power_analysis_flag)
-            plot([0 t_f], p_v_o.p_v_o_mpp_sim(n_r_index, i_f_index)*[1 1], '--', 'Color', colors(color_dim, :));
-        end
+        legend('off');
+        legend('show');
         
-        hold off;
-        ylim(p_v_o.p_v_o_mpp_sim(n_r_index, i_f_index)*[0.9 1.1]);
-%         title('Pot{\^{e}}ncia el{\''{e}}trica fornecida para a carga');
-%         xlabel('$t$ $[s]$');
-        ylabel('$p_{dc}$ $[W]$');
-        
-        if (power_analysis_flag)
-            legend('Leitura sobre a carga', 'M{\''{a}}xima pot{\^{e}ncia}', 'Location', 'SouthEast');
-        else
-            legend('Leitura sobre a carga', 'Location', 'SouthEast');
-        end
-        
-        grid on;
-        
-        subplot(3, 1, 2)
-        
-        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v.time, ...
-                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).electrical_load.v.data, ...
-                'Color', colors(dynamic_v_l_index, :));
-            
-            hold on;
-        end
-        
-        hold off;
-        ylim([0 Inf]);
-%         title('Tens{\~{a}}o sobre a carga');
-%         xlabel('$t$ $[s]$');
-        ylabel('$v_{dc}$ $[V]$');
-        %     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-        %         'Location', 'SouthEast');
-        grid on;
-        
-        subplot(3, 1, 3)
-        
-        for dynamic_v_l_index = 1:length(dynamic_v_l_list)
-            plot(test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u.time, ...
-                test_case_out(num_cases/length(dynamic_v_l_list)*(dynamic_v_l_index - 1) + test_case_index).rectifier.control.u.data, ...
-                'Color', colors(dynamic_v_l_index, :));
-            
-            hold on;
-        end
-        
-        hold off;
-        ylim([0 Inf]);
-%         title('Ciclo de trabalho aplicado ao retificador');
-        xlabel('$t$ $[s]$');
-        ylabel('$d_{smr}$');
-        %     legend('Tens{\~{a}}o est{\''{a}}tica na carga', 'Atualiza{\c{c}}{\~{a}}o din{\^{a}}mica de tens{\~{a}}o na carga', ...
-        %         'Location', 'SouthEast');
-        grid on;
-        
-        %     suptitle(['Caso de teste: $n_{r} = ' num2str(n_r) '$ $[rpm]$; $r_{l} = ' num2str(r_l) '$ $[\Omega]$']);
+        hold on;
     end
+    
+    if (power_analysis_flag)
+        plot([test_case_out(test_case(cmp_case, end)).electrical_load.p.time(1) ...
+            test_case_out(test_case(cmp_case, end)).electrical_load.p.time(end)], ...
+            p_l_max(test_case_index)*[1 1], '--', 'Color', colors(color_dim, :), ...
+            'DisplayName', 'M{\''{a}}xima pot{\^{e}ncia}');
+    end
+    
+    hold off;
+    ylim(p_l_max(test_case_index)*[0.9 1.1]); 
+    ylabel('$p_{l}\,[\textrm{W}]$');
+    leg = legend;
+    leg.Location = 'NorthEast';
+    grid on;
+    
+    subplot(2, 1, 2)
+    
+    for cmp_case = 1:cmp_dim
+        plot(test_case_out(test_case(cmp_case, end)).rectifier.control.u.time, ...
+            test_case_out(test_case(cmp_case, end)).rectifier.control.u.data, ...
+            'Color', colors(cmp_case, :));
+        
+        hold on;
+    end
+    
+    hold off;
+    ylim([0 Inf]);
+    xlabel('$t\,[\textrm{s}]$');
+    ylabel('$d_{\textrm{smr}}$');
+    grid on;
+    
+    tit{test_case_index} = ['results/HybridMPPT/mppt-nr-' num2str(n_r)];
 end
 
 %% Armazenamento de figuras
 
 for i = 1:figure_index
-    fileName = sprintf('results/HybridMPPT/Figura_%d', i);
+    fileName = tit{i};
     saveFigure(figure(i), fileName, 'fig');
+    saveFigure(figure(i), fileName, 'eps');
 end
 
 %% Armazenamento dos resultados de simulação
