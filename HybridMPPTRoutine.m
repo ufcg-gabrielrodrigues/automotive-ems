@@ -43,7 +43,7 @@ rectifier.control.pwm.f_s = 1/T_k;  % Frequência de chaveamento dos PWMs de con
 
 %% Bateria
 
-battery.v_nom = 80.0;   % [V]
+battery.v_nom = 70.0;   % [V]
 
 %% Varredura de parâmetros
 
