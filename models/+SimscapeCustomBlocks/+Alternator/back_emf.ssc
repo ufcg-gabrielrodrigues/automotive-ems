@@ -1,0 +1,47 @@
+component back_emf
+    % Alternator Back EMF
+    % Description.
+    
+    inputs
+        i_f = { 0, 'A' };   % Excitation current:left
+        n_r = { 0, 'rpm' };	% Rotor speed:left
+    end
+    outputs
+        e_a = { 0, 'V' };	% Back EMF (phase A):right
+        e_b = { 0, 'V' };	% Back EMF (phase B):right
+        e_c = { 0, 'V' };	% Back EMF (phase C):right
+    end
+    parameters
+        p = 1;	% Number of pole pairs
+    end
+    variables
+        omega_r = { 0, 'rad/s' };       % Rotor speed
+        omega = { 0, 'rad/s' };         % Alternator electrical frequency
+        theta = { 0, 'rad' };           % Alternator electrical argument 
+        m_f = { 0, 'V/((rad/s)*(A))' }  % Armature-field mutual inductance
+        e_s = { 0, 'V' }                % 
+        dm_f = { 0, 'V/(rad*A)' }       % 
+        di_f = { 0, 'A/s' }             % 
+    end
+    function setup
+        if (floor(p) ~= p)
+            error( 'Number of pole pairs must be integer' )
+        end
+
+        if (p <= 0)
+            error( 'Number of pole pairs must be greater than zero' )
+        end
+    end
+    equations
+        omega_r == n_r;
+        omega == p*omega_r;
+        theta == integ(omega);
+        m_f == { 0, 'V/((rad/s)*(A))' };
+        e_s == m_f*omega*i_f;
+        dm_f == m_f.der;
+        di_f == i_f.der;
+        e_a == e_s*sin(theta) - dm_f*i_f*cos(theta) - m_f*di_f*cos(theta);
+        e_b == e_s*sin(theta + 2*pi/3) - dm_f*i_f*cos(theta + 2*pi/3) - m_f*di_f*cos(theta + 2*pi/3);
+        e_c == e_s*sin(theta - 2*pi/3) - dm_f*i_f*cos(theta - 2*pi/3) - m_f*di_f*cos(theta - 2*pi/3);
+    end
+end
